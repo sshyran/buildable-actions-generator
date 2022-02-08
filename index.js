@@ -74,22 +74,21 @@ const run = async (input) => {
 `
 
 const run = async () => {
-  const results = await axios({
-    url: "https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/ghes-3.3/ghes-3.3.json"
-  })
+  // const results = await axios({
+  //   url: "https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/ghes-3.3/ghes-3.3.json"
+  // })
 
   // console.log(results)
 
-  const openAPISchema = results.data
+  // const openAPISchema = results.data
+
+  const openAPISchema = JSON.parse(fs.readFileSync("../play/openapi-github.json"))
 
   // console.log(openAPISchema)
 
   
 
   Object.keys(openAPISchema.paths).forEach(path => {
-    if(path !== "/repos/{owner}/{repo}/issues"){
-      return
-    }
     console.log(path)
     Object.keys(openAPISchema.paths[path]).forEach(method => {
       console.log(">", method)
@@ -97,6 +96,8 @@ const run = async () => {
       let inputParams = []
       let params = []
       let data = []
+      let accept = []
+      let contentType = ""
 
       
       
@@ -131,19 +132,39 @@ const run = async () => {
 
       const requestBody = openAPISchema.paths[path][method].requestBody
 
-      console.log("requestBody", requestBody)
+      // console.log("requestBody", requestBody)
 
-      if(requestBody) {
-        if(requestBody.content["application/json"].schema.type === "object") {
-          data = Object.keys(requestBody.content["application/json"].schema.properties)
-        }
+      if(get(requestBody, "content.application/json.schema.type") === "object") {
+        data = Object.keys(requestBody.content["application/json"].schema.properties || [])
+      } else if (Object.keys(get(requestBody, "content", [])).reduce((acc, curr) => acc || curr.includes("text/"), false)) {
+        data = ""
+        contentType = Object.keys(get(requestBody, "content", []))[0]
       }
 
       let axiosCallData = ""
 
       if(method !== "get") {
-        axiosCallData = `data: { ${data.join(", ")} }`
+        if(Array.isArray(data)) {
+          axiosCallData = `data: {${data.join(", ")}}`
+        } else if (typeof data === "string") {
+          axiosCallData = `data`
+          inputParams.push("data")
+          data = []
+        }
       }
+
+      Object.keys(openAPISchema.paths[path][method].responses).forEach(response => {
+        const content = openAPISchema.paths[path][method].responses[response].content
+        if(response.charAt(0) === "2" && content) {
+          Object.keys(content).forEach(type => {
+            if(type === "application/json") {
+              accept.push("application/vnd.github.v3+json")
+            } else {
+              accept.push(type)
+            }
+          })
+        }
+      })
 
 
       let title = openAPISchema.paths[path][method].summary.split(" ").map(i => i.charAt(0).toUpperCase() + i.slice(1)).join(" ")
@@ -154,6 +175,10 @@ const run = async () => {
 
       let input = `GITHUB_API_USERNAME, GITHUB_API_TOKEN, ${inputParams.concat(data).join(", ")}`
 
+      contentType = contentType ? `"content-type": "${contentType}",` : ""
+
+      accept = accept.length > 0 ? `"accept": "${accept.join(", ")}",` : ""
+
       let axiosCall = `
         method: "${method}",
         url: \`https://api.github.com${path.replace(/{/g, "${")}\`,
@@ -161,17 +186,15 @@ const run = async () => {
           username: GITHUB_API_USERNAME,
           password: GITHUB_API_TOKEN,
         },
-        headers: {
-          accept: "application/vnd.github.v3+json"
-        },
-        params: { ${params.join(", ")} },
+        headers: {${accept} ${contentType}},
+        params: {${params.join(", ")}},
         ${axiosCallData}
       `
 
       
-      console.log(axiosCall)
+      // console.log(axiosCall)
 
-      console.log(input)
+      // console.log(input)
 
       let _runFile = runFile({ title, description, docs, input, axiosCall })
 
