@@ -220,7 +220,7 @@
             console.log(err);
           }
 
-          bodyParameters.push({ ...param, ...(sample ? { sample } : {}) })
+          bodyParameters.push({ ...param, sample })
         }
       }
     }
@@ -259,7 +259,9 @@
                   { skipReadOnly: true },
                   openApi
                 );
-                sample = sample || property.example || property.default
+                if(sample === undefined) {
+                  sample = property.example || property.default
+                }
               } catch (e) {
                 console.error(e)
               }
@@ -407,8 +409,19 @@
         }
       }
     }
+
+    let sample
+    try {
+      sample = OpenAPISampler.sample(
+        param.schema,
+        { skipReadOnly: true },
+        openApi
+      );
+    } catch (err) {
+      console.log(err);
+    }
     
-    params[param.name] = param;
+    params[param.name] = { sample, ...param };
   }
 
   return params;
