@@ -2,10 +2,10 @@ const fs = require("fs")
 const axios = require("axios")
 const get = require("lodash/get")
 
-let configFile = () => ({
-  "name": "pullRequests",
-  "title": "List Pull Requests",
-  "description": "List pull requests using the GitHub API",
+let configFile = ({ name, title, description }) => ({
+  "name": name,
+  "title": title,
+  "description": description,
   "type": "js-request-function",
   "envVars": {
     "GITHUB_API_TOKEN": {
@@ -32,12 +32,38 @@ let configFile = () => ({
   "__version": "1.0.0"
 })
 
+let inputFile = ({ title, docs, input }) => `
+/**
+ * ----------------------------------------------------------------------------------------------------
+ * ${title} [Input]
+ *
+ * @author    Buildable Technologies Inc.
+ * @access    open
+ * @license   MIT
+ * @docs      ${docs}
+ * ----------------------------------------------------------------------------------------------------
+ */
+
+/**
+ * Lets you select the input for your Node's run function
+ *
+ * @param {Params} params
+ * @param {Object} $trigger - This Flow's request object
+ * @param {Object} $nodes - Data from above Nodes
+ */
+const nodeInput = ({ $trigger, $nodes }) => {
+  return {
+    ${input}
+  };
+};
+`
+
 let runFile = ({ title, description, docs, input, axiosCall }) => `
 /**
  * ----------------------------------------------------------------------------------------------------
  * ${title} [Run]
  *
- * @description - ${description} using the GitHub API
+ * @description - ${description}
  *
  * @author    Buildable Technologies Inc.
  * @access    open
@@ -56,6 +82,8 @@ const axios = require("axios");
  */
 const run = async (input) => {
   const { ${input} } = input;
+
+  verifyInput(input);
 
   try {
     const result = await axios({
@@ -94,7 +122,8 @@ const run = async () => {
       console.log(">", method)
 
       let inputParams = []
-      let params = []
+      let inputRunParams = []
+      let axiosParams = []
       let data = []
       let accept = []
       let contentType = ""
@@ -109,22 +138,24 @@ const run = async () => {
           parameter = get(openAPISchema, parameter["$ref"].replace("#/", "").replace(/\//g, "."))
         }
 
+        inputParams.push(parameter)
+
         switch(parameter.in) {
           // case "header":
           //   console.log("is header", parameter)
           //   headers[parameter.name] = ""
           //   break;
           case "query":
-            inputParams.push(parameter.name)
+            inputRunParams.push(parameter.name)
             if(parameter.required) {
-              params.push(parameter.name)
+              axiosParams.push(parameter.name)
             } else {
-              params.push(`...(${parameter.name} ? { ${parameter.name} } : {})`)
+              axiosParams.push(`...(${parameter.name} ? { ${parameter.name} } : {})`)
             }
             
             break;
           case "path":
-            inputParams.push(parameter.name)
+            inputRunParams.push(parameter.name)
             break;
         }
         
@@ -135,10 +166,19 @@ const run = async () => {
       // console.log("requestBody", requestBody)
 
       if(get(requestBody, "content.application/json.schema.type") === "object") {
+
         data = Object.keys(requestBody.content["application/json"].schema.properties || [])
+
+      } else if (get(requestBody, "content.application/x-www-form-urlencoded.schema.type") === "object") {
+
+        data = Object.keys(requestBody.content["application/x-www-form-urlencoded"].schema.properties || [])
+        contentType = Object.keys(get(requestBody, "content", []))[0]
+
       } else if (Object.keys(get(requestBody, "content", [])).reduce((acc, curr) => acc || curr.includes("text/"), false)) {
+
         data = ""
         contentType = Object.keys(get(requestBody, "content", []))[0]
+
       }
 
       let axiosCallData = ""
@@ -148,7 +188,7 @@ const run = async () => {
           axiosCallData = `data: {${data.join(", ")}}`
         } else if (typeof data === "string") {
           axiosCallData = `data`
-          inputParams.push("data")
+          inputRunParams.push("data")
           data = []
         }
       }
@@ -169,11 +209,11 @@ const run = async () => {
 
       let title = openAPISchema.paths[path][method].summary.split(" ").map(i => i.charAt(0).toUpperCase() + i.slice(1)).join(" ")
 
-      let description = openAPISchema.paths[path][method].summary
+      let description = openAPISchema.paths[path][method].summary + " using the GitHub API"
 
       let docs = openAPISchema.paths[path][method].externalDocs.url
 
-      let input = `GITHUB_API_USERNAME, GITHUB_API_TOKEN, ${inputParams.concat(data).join(", ")}`
+      let input = `GITHUB_API_USERNAME, GITHUB_API_TOKEN, ${inputRunParams.concat(data).join(", ")}`
 
       contentType = contentType ? `"content-type": "${contentType}",` : ""
 
@@ -187,7 +227,7 @@ const run = async () => {
           password: GITHUB_API_TOKEN,
         },
         headers: {${accept} ${contentType}},
-        params: {${params.join(", ")}},
+        params: {${axiosParams.join(", ")}},
         ${axiosCallData}
       `
 
@@ -198,11 +238,35 @@ const run = async () => {
 
       let _runFile = runFile({ title, description, docs, input, axiosCall })
 
+      function camelize(str) {
+        return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+          return index === 0 ? word.toLowerCase() : word.toUpperCase();
+        }).replace(/\s+/g, '');
+      }
+
+      let _configFile = configFile({ title, description, name: camelize(openAPISchema.paths[path][method].summary.replace("-", " ")) + "Result" })
+
+      let inputFileInput = 
+      `
+      GITHUB_API_TOKEN: $trigger.env.GITHUB_API_TOKEN, // Required for private repos
+      GITHUB_API_USERNAME: $trigger.env.GITHUB_API_USERNAME, // Required for private repos
+      ${inputParams.filter(p => p.required).map(p => {
+        return `${p.name}: "", // Required`
+      }).join("\n")}
+      ${inputParams.filter(p => !p.required).map(p => {
+        return `// ${p.name}: "",`
+      }).join("\n")}
+      `
+
+      let _inputFile = inputFile({ title, docs, input: inputFileInput })
+
       let dir = `generated/${docs.split("#")[1]}`
 
       fs.mkdirSync(dir, { recursive: true })
 
       fs.writeFileSync(`${dir}/run.js`, _runFile)
+      fs.writeFileSync(`${dir}/config.json`, JSON.stringify(_configFile))
+      fs.writeFileSync(`${dir}/input.js`, _inputFile)
 
     })
   })
