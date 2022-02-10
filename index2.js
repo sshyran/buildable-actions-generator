@@ -200,7 +200,7 @@ const run = async () => {
 
 
       const handleJSONSampleQuotes = (json) => {
-        return json.replace(/"([^"]+)":/g, '$1:').replace(/\uFFFF/g, '\\\"');
+        return json.replace(/\uFFFF/g, '\\\"');
       }
       
 
@@ -210,14 +210,14 @@ const run = async () => {
         if(p.sample && p.schema.type === "string" && !p.ignoreSurroundingSampleQuotes) {
           return `${p.name}: "${p.sample.replace(/"/g, "")}", // Required`
         }
-        return `${p.name}: ${p.sample && typeof p.sample === "object" ? JSON.stringify(p.sample).replace(/\\/g, "") : p.sample}, // Required`
+        return `${p.name}: ${p.sample && typeof p.sample === "object" ? handleJSONSampleQuotes(JSON.stringify(p.sample)) : p.sample}, // Required`
       }).join("\n")}
       
       ${auth.concat(params).concat(body).filter(p => !p.required).map(p => {
         if(p.sample && p.schema.type === "string" && !p.ignoreSurroundingSampleQuotes) {
           return `// ${p.name}: "${p.sample.replace(/"/g, "")}",`
         }
-        return `// ${p.name}: ${p.sample && typeof p.sample === "object" ? JSON.stringify(p.sample).replace(/\\/g, "") : p.sample},`
+        return `// ${p.name}: ${p.sample && typeof p.sample === "object" ? handleJSONSampleQuotes(JSON.stringify(p.sample)) : p.sample},`
       }).join("\n")}
       `
 
