@@ -198,20 +198,26 @@ const run = async () => {
 
       let _configFile = configFile({ title, description, name: camelize(openApi.paths[path][method].summary.replace("-", " ")) + "Result" })
 
+
+      const handleJSONSampleQuotes = (json) => {
+        return json.replace(/"([^"]+)":/g, '$1:').replace(/\uFFFF/g, '\\\"');
+      }
+      
+
       let inputFileInput =
       `
       ${auth.concat(params).concat(body).filter(p => p.required).map(p => {
         if(p.sample && p.schema.type === "string" && !p.ignoreSurroundingSampleQuotes) {
-          return `${p.name}: "${p.sample.replace('"', "")}", // Required`
+          return `${p.name}: "${p.sample.replace(/"/g, "")}", // Required`
         }
-        return `${p.name}: ${p.sample}, // Required`
+        return `${p.name}: ${p.sample && typeof p.sample === "object" ? JSON.stringify(p.sample).replace(/\\/g, "") : p.sample}, // Required`
       }).join("\n")}
       
       ${auth.concat(params).concat(body).filter(p => !p.required).map(p => {
         if(p.sample && p.schema.type === "string" && !p.ignoreSurroundingSampleQuotes) {
           return `// ${p.name}: "${p.sample.replace(/"/g, "")}",`
         }
-        return `// ${p.name}: ${p.sample},`
+        return `// ${p.name}: ${p.sample && typeof p.sample === "object" ? JSON.stringify(p.sample).replace(/\\/g, "") : p.sample},`
       }).join("\n")}
       `
 
