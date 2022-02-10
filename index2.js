@@ -1,4 +1,5 @@
 const fs = require("fs")
+const { snakeCase } = require("snake-case")
 const { getBaseUrl, getFullPath, getHeadersArray, _getParameters, _getBodyParameters } = require("./parse-openapi")
 const openApi = JSON.parse(fs.readFileSync("../play/openapi-github.json"))
 
@@ -58,7 +59,7 @@ const nodeInput = ({ $trigger, $nodes }) => {
 };
 `
 
-let runFile = ({ title, description, docs, input, axiosCall }) => `
+let runFile = ({ title, description, docs, input, axiosCall, verifyInput, verifyErrors, verifyChecks }) => `
 /**
  * ----------------------------------------------------------------------------------------------------
  * ${title} [Run]
@@ -98,6 +99,17 @@ const run = async (input) => {
       data: error.response.data,
     };
   }
+};
+
+/**
+ * Verifies the input parameters
+ */
+const verifyInput = ({ ${verifyInput} }) => {
+  const ERRORS = {
+    ${verifyErrors}
+  };
+
+  ${verifyChecks}
 };
 `
 
@@ -168,11 +180,15 @@ const run = async () => {
         url: \`${url.replace(/{/g, "${")}\`,
         auth: {${auth.map(i => `${i.field}: ${i.name}`).join(", ")}},
         headers: {${headers.map(i => `${i.name}: "${i.schema.default}"`).join(", ")}},
-        params: {${params.map(i => i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`)}},
+        params: {${params.filter(i => i.in === "query").map(i => i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`)}},
         ${axiosData}
       `
 
-      let _runFile = runFile({ title, description, docs, input, axiosCall })
+      let verifyInput = params.concat(body).filter(i => i.required).map(i => i.name)
+      let verifyErrors = params.concat(body).filter(i => i.required).map(i => `INVALID_${snakeCase(i.name).toUpperCase()}: "A valid ${i.name} field (${i.schema.type}) was not provided in the input.",`).join("\n")
+      let verifyChecks = params.concat(body).filter(i => i.required).map(i => `if (typeof ${i.name} !== "${typeof i.sample}") throw new Error(ERRORS.INVALID_${snakeCase(i.name).toUpperCase()});`).join("\n")
+
+      let _runFile = runFile({ title, description, docs, input, axiosCall, verifyInput, verifyErrors, verifyChecks })
 
       function camelize(str) {
         return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
@@ -190,6 +206,7 @@ const run = async () => {
         }
         return `${p.name}: ${p.sample}, // Required`
       }).join("\n")}
+      
       ${auth.concat(params).concat(body).filter(p => !p.required).map(p => {
         if(p.sample && p.schema.type === "string" && !p.ignoreSurroundingSampleQuotes) {
           return `// ${p.name}: "${p.sample.replace(/"/g, "")}",`

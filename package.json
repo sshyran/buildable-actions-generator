@@ -10,6 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.25.0"
+    "axios": "^0.25.0",
+    "openapi-snippet": "^0.13.0",
+    "snake-case": "^3.0.4",
+    "swagger-parser": "^10.0.3"
   }
 }
