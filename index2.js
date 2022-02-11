@@ -143,7 +143,7 @@ const run = async () => {
             type: "string"
           },
           sample: "$trigger.env.GITHUB_API_USERNAME",
-          ignoreSurroundingSampleQuotes: true
+          isEnvironmentVariable: true
         },
         {
           name: "GITHUB_API_TOKEN",
@@ -154,7 +154,7 @@ const run = async () => {
             type: "string"
           },
           sample: "$trigger.env.GITHUB_API_TOKEN",
-          ignoreSurroundingSampleQuotes: true
+          isEnvironmentVariable: true
         }
 
       ]
@@ -207,16 +207,26 @@ const run = async () => {
       let inputFileInput =
       `
       ${auth.concat(params).concat(body).filter(p => p.required).map(p => {
-        if(p.sample && typeof p.sample === "string" && !p.ignoreSurroundingSampleQuotes) {
+        if(p.sample && typeof p.sample === "string") {
+          if(p.isEnvironmentVariable) {
+            return `${p.name}: ${p.sample && typeof p.sample === "object" ? handleJSONSampleQuotes(JSON.stringify(p.sample)) : p.sample}, // Required for private repos or if making structural changes (i.e modifying branch protection rules)`
+          }
+
           return `${p.name}: "${p.sample.replace(/"/g, "")}", // Required`
         }
+
         return `${p.name}: ${p.sample && typeof p.sample === "object" ? handleJSONSampleQuotes(JSON.stringify(p.sample)) : p.sample}, // Required`
       }).join("\n")}
       
       ${auth.concat(params).concat(body).filter(p => !p.required).map(p => {
-        if(p.sample && typeof p.sample === "string" && !p.ignoreSurroundingSampleQuotes) {
+        if(p.sample && typeof p.sample === "string") {
+          if(p.isEnvironmentVariable) {
+            return `${p.name}: ${p.sample && typeof p.sample === "object" ? handleJSONSampleQuotes(JSON.stringify(p.sample)) : p.sample}, // Required for private repos or if making structural changes (i.e modifying branch protection rules)`
+          }
+
           return `// ${p.name}: "${p.sample.replace(/"/g, "")}",`
         }
+
         return `// ${p.name}: ${p.sample && typeof p.sample === "object" ? handleJSONSampleQuotes(JSON.stringify(p.sample)) : p.sample},`
       }).join("\n")}
       `
