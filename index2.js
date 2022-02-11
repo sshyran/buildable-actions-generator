@@ -185,7 +185,7 @@ const run = async () => {
       `
 
       let verifyInput = params.concat(body).filter(i => i.required).map(i => i.name)
-      let verifyErrors = params.concat(body).filter(i => i.required).map(i => `INVALID_${snakeCase(i.name).toUpperCase()}: "A valid ${i.name} field (${i.schema.type}) was not provided in the input.",`).join("\n")
+      let verifyErrors = params.concat(body).filter(i => i.required).map(i => `INVALID_${snakeCase(i.name).toUpperCase()}: "A valid ${i.name} field (${typeof i.sample}) was not provided in the input.",`).join("\n")
       let verifyChecks = params.concat(body).filter(i => i.required).map(i => `if (typeof ${i.name} !== "${typeof i.sample}") throw new Error(ERRORS.INVALID_${snakeCase(i.name).toUpperCase()});`).join("\n")
 
       let _runFile = runFile({ title, description, docs, input, axiosCall, verifyInput, verifyErrors, verifyChecks })
@@ -207,14 +207,14 @@ const run = async () => {
       let inputFileInput =
       `
       ${auth.concat(params).concat(body).filter(p => p.required).map(p => {
-        if(p.sample && p.schema.type === "string" && !p.ignoreSurroundingSampleQuotes) {
+        if(p.sample && typeof p.sample === "string" && !p.ignoreSurroundingSampleQuotes) {
           return `${p.name}: "${p.sample.replace(/"/g, "")}", // Required`
         }
         return `${p.name}: ${p.sample && typeof p.sample === "object" ? handleJSONSampleQuotes(JSON.stringify(p.sample)) : p.sample}, // Required`
       }).join("\n")}
       
       ${auth.concat(params).concat(body).filter(p => !p.required).map(p => {
-        if(p.sample && p.schema.type === "string" && !p.ignoreSurroundingSampleQuotes) {
+        if(p.sample && typeof p.sample === "string" && !p.ignoreSurroundingSampleQuotes) {
           return `// ${p.name}: "${p.sample.replace(/"/g, "")}",`
         }
         return `// ${p.name}: ${p.sample && typeof p.sample === "object" ? handleJSONSampleQuotes(JSON.stringify(p.sample)) : p.sample},`
