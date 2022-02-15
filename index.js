@@ -26,23 +26,19 @@ let configFile = ({ name, title, description }) => ({
   description: description,
   type: "js-request-function",
   envVars: {
-    GITHUB_API_TOKEN: {
-      development: "",
-      production: "",
-    },
-    GITHUB_API_USERNAME: {
+    TWITTER_BEARER_TOKEN: {
       development: "",
       production: "",
     },
   },
   fee: 0,
-  image: "https://assets.buildable.dev/catalog/node-templates/github.svg",
-  category: "git",
+  image: "https://assets.buildable.dev/catalog/node-templates/twitter.svg",
+  category: "social",
   accessType: "open",
   language: "javascript",
   price: "free",
-  platform: "github",
-  tags: ["git", "github"],
+  platform: "twitter",
+  tags: ["twitter", "social"],
   stateType: "stateless",
   __version: "1.0.0",
 });
@@ -161,19 +157,19 @@ const run = async () => {
         {
           name: "authorization",
           schema: {
-            default: "\`Bearer ${TWITTER_API_TOKEN}\`"
+            default: "\`Bearer ${TWITTER_BEARER_TOKEN}\`"
           }
         }
       ]
 
       const params = [{
-        name: "TWITTER_API_TOKEN",
+        name: "TWITTER_BEARER_TOKEN",
         required: true,
         in: "headers",
         schema: {
           type: "string"
         },
-        sample: "$trigger.env.TWITTER_API_TOKEN",
+        sample: "$trigger.env.TWITTER_BEARER_TOKEN",
         isEnvironmentVariable: true,
       }].concat(_getParameters(openApi, path, method, {}).filter(p => !p.deprecated).map(i => {
         i.camelizedName = camelize(i.name).replace(".", "")
@@ -258,11 +254,11 @@ const run = async () => {
 
       let verifyInput = params
         .concat(body)
-        .filter((i) => i.required)
+        .filter((i) => i.required && !i.isEnvironmentVariable)
         .map((i) => i.name);
       let verifyErrors = params
         .concat(body)
-        .filter((i) => i.required)
+        .filter((i) => i.required && !i.isEnvironmentVariable)
         .map(
           (i) =>
             `INVALID_${snakeCase(i.name).toUpperCase()}: "A valid ${
@@ -272,7 +268,7 @@ const run = async () => {
         .join("\n");
       let verifyChecks = params
         .concat(body)
-        .filter((i) => i.required)
+        .filter((i) => i.required && !i.isEnvironmentVariable)
         .map(
           (i) =>
             `if (typeof ${
@@ -300,7 +296,7 @@ const run = async () => {
         title,
         description,
         name:
-          camelize(openApi.paths[path][method].summary.replace("-", " ")) +
+          camelize(openApi.paths[path][method].summary).replace(/\W/g, '') +
           "Result",
       });
 
