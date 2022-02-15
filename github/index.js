@@ -1,8 +1,6 @@
 const fs = require("fs");
 const { snakeCase } = require("snake-case");
-const kebabCase = require("lodash/kebabCase")
 const get = require("lodash/get")
-const axios = require("axios")
 const {
   getBaseUrl,
   getFullPath,
@@ -10,15 +8,7 @@ const {
   _getParameters,
   _getBodyParameters,
 } = require("./parse-openapi");
-// const openApi = JSON.parse(fs.readFileSync("../play/openapi-github.json"));
-
-function camelize(str) {
-  return str
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
-      return index === 0 ? word.toLowerCase() : word.toUpperCase();
-    })
-    .replace(/\s+/g, "");
-}
+const openApi = JSON.parse(fs.readFileSync("../play/openapi-github.json"));
 
 let configFile = ({ name, title, description }) => ({
   name: name,
@@ -137,57 +127,58 @@ const verifyInput = ({ ${verifyInput} }) => {
 `;
 
 const run = async () => {
-  const openApi = (await axios({
-    url: "https://api.twitter.com/2/openapi.json"
-  })).data
-
   for (let path in openApi.paths) {
-    console.log(path)
     for (let method in openApi.paths[path]) {
-      console.log(">", method)
       if(openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data")) {
         //skip deprecated methods
         continue
       }
 
       const url =
-        getBaseUrl(openApi, path, method) + getFullPath(openApi, path, method);
+        "https://api.github.com" + getFullPath(openApi, path, method);
 
-      // const headers = getHeadersArray(openApi, path, method);
-
-      // console.log(headers)
-
-      const headers = [
-        {
-          name: "authorization",
-          schema: {
-            default: "\`Bearer ${TWITTER_API_TOKEN}\`"
-          }
-        }
-      ]
-
-      const params = [{
-        name: "TWITTER_API_TOKEN",
-        required: true,
-        in: "headers",
+      const headers = getHeadersArray(openApi, path, method);
+      //GitHub specific
+      headers.push({
+        name: "accept",
+        description: "This API is under preview and subject to change.",
+        in: "header",
         schema: {
-          type: "string"
+          type: "string",
+          default: "application/vnd.github.v3+json",
         },
-        sample: "$trigger.env.TWITTER_API_TOKEN",
-        isEnvironmentVariable: true,
-      }].concat(_getParameters(openApi, path, method, {}).filter(p => !p.deprecated).map(i => {
-        i.camelizedName = camelize(i.name).replace(".", "")
-
-        return i
-      }));
-
-      const body = _getBodyParameters(openApi, path, method).filter(p => !p.deprecated).map(i => {
-        i.camelizedName = camelize(i.name).replace(".", "")
-
-        return i
+        required: true,
       });
 
-      const auth = []
+      //GitHub specific
+      const auth = [
+        {
+          name: "GITHUB_API_USERNAME",
+          in: "auth",
+          field: "username",
+          required: true, // not actually, but doesn't break if provide null values,
+          schema: {
+            type: "string",
+          },
+          sample: "$trigger.env.GITHUB_API_USERNAME",
+          isEnvironmentVariable: true,
+        },
+        {
+          name: "GITHUB_API_TOKEN",
+          field: "password",
+          in: "auth",
+          required: true, // not actually, but doesn't break if provide null values,
+          schema: {
+            type: "string",
+          },
+          sample: "$trigger.env.GITHUB_API_TOKEN",
+          isEnvironmentVariable: true,
+        },
+      ];
+
+      const params = _getParameters(openApi, path, method, {}).filter(p => !p.deprecated);
+
+      const body = _getBodyParameters(openApi, path, method).filter(p => !p.deprecated);;
 
       let title = openApi.paths[path][method].summary
         .split(" ")
@@ -195,14 +186,14 @@ const run = async () => {
         .join(" ");
 
       let description =
-        title + " using the Twitter v2 API";
+        openApi.paths[path][method].summary + " using the GitHub API";
 
-      let docs = "https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2"
+      let docs = openApi.paths[path][method].externalDocs.url;
 
       let input = auth
         .concat(params)
         .concat(body)
-        .map((i) => i.camelizedName || i.name);
+        .map((i) => i.name);
 
       let axiosData =
         body.length > 0
@@ -217,13 +208,9 @@ const run = async () => {
 
                 return 0;
               })
-              .map((i) => {
-                if(i.name.includes(".")) {
-                  return i.required ? `"${i.name}": ${i.camelizedName}` : `...(${i.camelizedName} ? { "${i.name}": ${i.camelizedName} } : {})`
-                }
-    
-                return i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`
-              })}}`
+              .map((i) =>
+                i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`
+              )}}`
           : "";
 
       let axiosCall = `
@@ -231,7 +218,7 @@ const run = async () => {
         url: \`${url.replace(/{/g, "${")}\`,
         auth: {${auth.map((i) => `${i.field}: ${i.name}`).join(", ")}},
         headers: {${headers
-          .map((i) => `${i.name}: ${i.schema.default}`)
+          .map((i) => `${i.name}: "${i.schema.default}"`)
           .join(", ")}},
         params: {${params
           .filter((i) => i.in === "query")
@@ -245,13 +232,8 @@ const run = async () => {
 
             return 0;
           })
-          .map((i) => {
-            if(i.name.includes(".")) {
-              return i.required ? `"${i.name}": ${i.camelizedName}` : `...(${i.camelizedName} ? { "${i.name}": ${i.camelizedName} } : {})`
-            }
-
-            return i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`
-          }
+          .map((i) =>
+            i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`
           )}},
         ${axiosData}
       `;
@@ -294,7 +276,13 @@ const run = async () => {
         verifyChecks,
       });
 
-      
+      function camelize(str) {
+        return str
+          .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+            return index === 0 ? word.toLowerCase() : word.toUpperCase();
+          })
+          .replace(/\s+/g, "");
+      }
 
       let _configFile = configFile({
         title,
@@ -320,13 +308,13 @@ const run = async () => {
                 p.sample && typeof p.sample === "object"
                   ? handleJSONSampleQuotes(JSON.stringify(p.sample))
                   : p.sample
-              }, // Required for private info`;
+              }, // Required for private repos or if making structural changes (i.e modifying branch protection rules)`;
             }
 
-            return `${p.camelizedName}: "${p.sample.replace(/"/g, "")}", // Required`;
+            return `${p.name}: "${p.sample.replace(/"/g, "")}", // Required`;
           }
 
-          return `${p.camelizedName}: ${
+          return `${p.name}: ${
             p.sample && typeof p.sample === "object"
               ? handleJSONSampleQuotes(JSON.stringify(p.sample))
               : p.sample
@@ -345,13 +333,13 @@ const run = async () => {
                 p.sample && typeof p.sample === "object"
                   ? handleJSONSampleQuotes(JSON.stringify(p.sample))
                   : p.sample
-              }, // Required for private info`;
+              }, // Required for private repos or if making structural changes (i.e modifying branch protection rules)`;
             }
 
-            return `// ${p.camelizedName}: "${p.sample.replace(/"/g, "")}",`;
+            return `// ${p.name}: "${p.sample.replace(/"/g, "")}",`;
           }
 
-          return `// ${p.camelizedName}: ${
+          return `// ${p.name}: ${
             p.sample && typeof p.sample === "object"
               ? handleJSONSampleQuotes(JSON.stringify(p.sample))
               : p.sample
@@ -362,9 +350,7 @@ const run = async () => {
 
       let _inputFile = inputFile({ title, docs, input: inputFileInput });
 
-      console.log(docs)
-
-      let dir = `generated/${kebabCase(openApi.paths[path][method].operationId)}`;
+      let dir = `generated/${docs.split("#")[1]}`;
 
       fs.mkdirSync(dir, { recursive: true });
 
