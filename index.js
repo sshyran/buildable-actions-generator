@@ -94,6 +94,7 @@ let runFile = ({
  */
 
 const axios = require("axios");
+const qs = require("qs");
 
 /**
  * The Node’s executable function
@@ -106,11 +107,11 @@ const run = async (input) => {
   verifyInput(input);
 
   try {
-    const result = await axios({
+    const { data } = await axios({
       ${axiosCall}
     });
 
-    return result.data;
+    return data;
   } catch (error) {
     return {
       failed: true,
@@ -141,7 +142,7 @@ const run = async () => {
     console.log(path)
     for (let method in openApi.paths[path]) {
       console.log(">", method)
-      if(openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data")) {
+      if(openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data") || !get(openApi.paths[path][method], "security", []).find((i) => Object.keys(i).find(j => j === "BearerToken"))) {
         //skip deprecated methods
         continue
       }
@@ -249,8 +250,12 @@ const run = async () => {
             return i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`
           }
           )}},
+        paramsSerializer: params => {
+          return qs.stringify(params, { arrayFormat: "comma" })
+        },
         ${axiosData}
       `;
+      
 
       let verifyInput = params
         .concat(body)
@@ -316,7 +321,7 @@ const run = async () => {
                 p.sample && typeof p.sample === "object"
                   ? handleJSONSampleQuotes(JSON.stringify(p.sample))
                   : p.sample
-              }, // Required for private info`;
+              }, // Required`;
             }
 
             return `${p.camelizedName}: "${p.sample.replace(/"/g, "")}", // Required`;
@@ -341,7 +346,7 @@ const run = async () => {
                 p.sample && typeof p.sample === "object"
                   ? handleJSONSampleQuotes(JSON.stringify(p.sample))
                   : p.sample
-              }, // Required for private info`;
+              }, // Required`;
             }
 
             return `// ${p.camelizedName}: "${p.sample.replace(/"/g, "")}",`;
