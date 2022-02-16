@@ -533,7 +533,7 @@
        ) {
          if (typeof param.example !== 'undefined') {
            // only if the schema has an example value
-           fullPath = fullPath.replace('{' + param.name + '}', param.example);
+          //  fullPath = fullPath.replace('{' + param.name + '}', param.example);
          }
        }
      }
