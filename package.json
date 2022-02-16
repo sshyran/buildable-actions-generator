@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate": "rm -rf generated && node index.js && npx prettier --write \"generated/**/*.{js,json}\"",
+    "count": "find generated/* -maxdepth 0 -type d | wc -l"
   },
   "keywords": [],
   "author": "",
