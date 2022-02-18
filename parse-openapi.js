@@ -247,35 +247,61 @@
         const content = openApi.paths[path][method].requestBody.content[type];
         if (content && content.schema) {
 
-          if (type === 'application/json') {
+          if (type === 'application/json') {            
             const parameters = []
-            for(let p in content.schema.properties) {
-              const property = content.schema.properties[p]
 
-              let sample
-              try {
-                sample = OpenAPISampler.sample(
-                  property,
-                  { skipReadOnly: true },
-                  openApi
-                );
-                if(sample === undefined) {
-                  sample = property.example || property.default
+            //todo: handle allOf and others
+            if(content.schema.oneOf) {
+              //todo: handle multiple types of payloads in node templates
+              content.schema = content.schema.oneOf[0]
+            }
+
+            if(content.schema["$ref"]) {
+              content.schema = resolveRef(
+                openApi,
+                content.schema["$ref"]
+              );
+            }
+
+            if(content.schema.properties) {
+              for(let p in content.schema.properties) {
+                const property = content.schema.properties[p]
+  
+                let sample
+                try {
+                  sample = OpenAPISampler.sample(
+                    property,
+                    { skipReadOnly: true },
+                    openApi
+                  );
+                  if(sample === undefined) {
+                    sample = property.example || property.default
+                  }
+                } catch (e) {
+                  console.error(e)
                 }
-              } catch (e) {
-                console.error(e)
+  
+                parameters.push({
+                  name: p,
+                  description: property.description,
+                  in: "body",
+                  required: !!(content.schema.required || []).find(r => r === p),
+                  schema: property,
+                  sample,
+                })
               }
-
-              
-
-              parameters.push({
-                name: p,
-                description: property.description,
-                in: "body",
-                required: !!(content.schema.required || []).find(r => r === p),
-                schema: property,
-                sample,
-              })
+            } else if (content.schema.example) {
+              for(let p in content.schema.example) {
+                parameters.push({
+                  name: p,
+                  in: "body",
+                  required: !!(openApi.paths[path][method].requestBody.required === true || (content.schema.required || []).find(r => r === p)),
+                  schema: {
+                    type: typeof content.schema.example[p]
+                  },
+                  sample: content.schema.example[p],
+                })
+              }
             }
 
             

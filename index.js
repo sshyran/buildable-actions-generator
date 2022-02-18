@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { snakeCase } = require("snake-case");
 const kebabCase = require("lodash/kebabCase")
+const {titleCase} = require("title-case")
 const get = require("lodash/get")
 const axios = require("axios")
 const {
@@ -10,7 +11,7 @@ const {
   _getParameters,
   _getBodyParameters,
 } = require("./parse-openapi");
-const openApi = JSON.parse(fs.readFileSync("../../Desktop/result.json"));
+const openApi = JSON.parse(fs.readFileSync("../../Desktop/tatum-openapi.json"));
 
 function camelize(str) {
   return str
@@ -31,19 +32,19 @@ let configFile = ({ name, title, description }) => ({
   description: description,
   type: "js-request-function",
   envVars: {
-    SEGMENT_BEARER_TOKEN: {
+    TATUM_API_KEY: {
       development: "",
       production: "",
     },
   },
   fee: 0,
-  image: "https://assets.buildable.dev/catalog/node-templates/segment.svg",
-  category: "social",
+  image: "https://assets.buildable.dev/catalog/node-templates/tatum.svg",
+  category: "blockchain",
   accessType: "open",
   language: "javascript",
   price: "free",
-  platform: "segment",
-  tags: ["segment", "ads", "marketing"],
+  platform: "tatum",
+  tags: ["blockchain", "cryptocurrency"],
   stateType: "stateless",
   __version: "1.0.0",
 });
@@ -111,11 +112,11 @@ const run = async (input) => {
   verifyInput(input);
 
   try {
-    const { data } = await axios({
+    const { ${input.includes("data") ? "data: _data" : "data"} } = await axios({
       ${axiosCall}
     });
 
-    return data;
+    return ${input.includes("data") ? "_data" : "data"};
   } catch (error) {
     return {
       failed: true,
@@ -152,59 +153,79 @@ const run = async () => {
       }
 
       const url =
-        "https://platform.segmentapis.com" + getFullPath(openApi, path, method);
+        "https://api-eu1.tatum.io" + getFullPath(openApi, path, method); // free tier api keys are in eu
 
-      const headers = getHeadersArray(openApi, path, method).map(header => {
-        if(header.value && header.value.includes("REPLACE_BEARER_TOKEN")) {
-          header.value = header.value.replace("REPLACE_BEARER_TOKEN", "${SEGMENT_BEARER_TOKEN}")
-          header.isEnvironmentVariable = true
-          header.required = true
-          header.envVarName = "SEGMENT_BEARER_TOKEN"
-          header.sample = "$trigger.env.SEGMENT_BEARER_TOKEN"
-        }
+      const headers = getHeadersArray(openApi, path, method)
+        .map(header => {
+          if(header.value && header.value.includes("REPLACE_KEY_VALUE")) {
+            header.isEnvironmentVariable = true
+            header.required = true
+            header.envVarName = "TATUM_API_KEY"
+            header.sample = "$trigger.env.TATUM_API_KEY"
+          } else {
+            header.sample = header.sample || header.example || (header.schema && (header.schema.default || header.schema.type))
+          }
 
-        return header
-      });
+          
+          if(header.name.split("-")[0] === "x" || header.name.split("-")[0] === "X") {
+            header.camelizedName = camelize(header.name.split("-").slice(1).join("-")).replace(/-/g, "")
+          } else {
+            header.camelizedName = camelize(header.name).replace(/-/g, "")
+          }
 
-      const params = _getParameters(openApi, path, method, {}).filter(p => !p.deprecated).map(i => {
+          
+
+          return header
+        });
+
+      const params = _getParameters(openApi, path, method, {}).filter(p => !p.deprecated && !headers.find(h => h.name === p.name)).map(i => {
         i.camelizedName = camelize(i.name).replace(".", "")
 
         return i
       });
-
-      get(openApi, `${path}.${method}.requestBody.content.application/json.schema.example`)
 
       const body = _getBodyParameters(openApi, path, method).filter(p => !p.deprecated).map(i => {
         i.camelizedName = camelize(i.name).replace(".", "")
 
         return i
       });
-      
-      if(method === "post") {
-        console.log(path)
-        console.log(_getBodyParameters(openApi, path, method))
-      }
+
+      console.log("body", body)
 
       const auth = []
 
-      let title = openApi.paths[path][method].summary
-        .split(" ")
-        .map((i) => i.charAt(0).toUpperCase() + i.slice(1))
-        .join(" ");
-
-      
+      let title = titleCase(openApi.paths[path][method].summary)     
 
       let description =
-        sentenceCase(openApi.paths[path][method].summary) + " using the Segment Config API";
+        sentenceCase(openApi.paths[path][method].summary) + " using the Tatum API";
 
-      let docs = "https://reference.segmentapis.com"
+      let docs = `https://tatum.io/apidoc.php#operation/${openApi.paths[path][method].operationId}`
+
 
       let input = auth
         .concat(headers)
         .concat(params)
-        .filter(p => p.in !== "header" || p.envVarName)
         .concat(body)
-        .map((i) => i.camelizedName || i.envVarName || i.name);
+        .sort((a, b) => { // sort required first
+          if (a.isEnvironmentVariable) {
+            return -1;
+          }
+
+          if (b.isEnvironmentVariable) {
+            return 1;
+          }
+
+          if (a.required) {
+            return -1;
+          }
+
+          if (b.required) {
+            return 1;
+          }
+
+          return 0;
+        })
+        .map((i) => i.envVarName || i.camelizedName || i.name)
 
       let axiosData =
         body.length > 0
@@ -232,7 +253,23 @@ const run = async () => {
         method: "${method}",
         url: \`${url.replace(/{/g, "${")}\`,
         headers: {${headers
-          .map((i) => `"${i.name}": \`${i.value || i.example}\``)
+          .sort((a, b) => { // sort required first
+            if (a.required) {
+              return -1;
+            }
+            if (b.required) {
+              return 1;
+            }
+
+            return 0;
+          })
+          .map((i) => {
+            if(i.required) {
+              return `"${i.name}": \`\${${i.envVarName || i.camelizedName || i.name}}\``
+            } else {
+              return `...(${i.envVarName || i.camelizedName || i.name} ? { "${i.name}": \`\${${i.envVarName || i.camelizedName || i.name}}\`  } : {})`
+            }
+          })
           .join(", ")}},
         params: {${params
           .filter((i) => i.in === "query")
@@ -260,18 +297,17 @@ const run = async () => {
 
       let verifyInput = headers
         .concat(params)
-        .filter(p => p.in !== "header" || p.envVarName)
         .concat(body)
         .filter((i) => i.required)
-        .map((i) => i.envVarName || i.name);
+        .map((i) => i.envVarName || i.camelizedName || i.name);
       let verifyErrors = headers
         .concat(params)
         .concat(body)
         .filter((i) => i.required)
         .map(
           (i) =>
-            `INVALID_${snakeCase(i.envVarName || i.name).toUpperCase()}: "A valid ${
-              i.envVarName || i.name
+            `INVALID_${snakeCase(i.envVarName || i.camelizedName || i.name).toUpperCase()}: "A valid ${
+              i.envVarName || i.camelizedName || i.name
             } field (${typeof i.sample}) was not provided in the input.",`
         )
         .join("\n");
@@ -283,9 +319,9 @@ const run = async () => {
         .map(
           (i) =>
             `if (typeof ${
-              i.envVarName || i.name
+              i.envVarName || i.camelizedName || i.name
             } !== "${typeof i.sample}") throw new Error(ERRORS.INVALID_${snakeCase(
-              i.envVarName || i.name
+              i.envVarName || i.camelizedName || i.name
             ).toUpperCase()});`
         )
         .join("\n");
@@ -321,18 +357,17 @@ const run = async () => {
         .concat(params)
         .concat(body)
         .filter((p) => p.required)
-        .filter(p => p.in !== "header" || p.envVarName)
         .map((p) => {
           if (p.sample && typeof p.sample === "string") {
             if (p.isEnvironmentVariable) {
-              return `${p.envVarName || p.name}: ${
+              return `${p.envVarName || p.camelizedName || p.name}: ${
                 p.sample && typeof p.sample === "object"
                   ? handleJSONSampleQuotes(JSON.stringify(p.sample))
                   : p.sample
               }, // Required`;
             }
 
-            return `${p.camelizedName}: "${p.sample.replace(/"/g, "")}", // Required`;
+            return `${p.camelizedName}: \`${p.sample.replace(/"/g, "")}\`, // Required`;
           }
 
           return `${p.camelizedName}: ${
@@ -348,18 +383,17 @@ const run = async () => {
         .concat(params)
         .concat(body)
         .filter((p) => !p.required)
-        .filter(p => p.in !== "header" || p.envVarName)
         .map((p) => {
           if (p.sample && typeof p.sample === "string") {
             if (p.isEnvironmentVariable) {
-              return `${p.envVarName || p.name}: ${
+              return `${p.envVarName || p.camelizedName || p.name}: ${
                 p.sample && typeof p.sample === "object"
                   ? handleJSONSampleQuotes(JSON.stringify(p.sample))
                   : p.sample
               }, // Required`;
             }
 
-            return `// ${p.camelizedName}: "${p.sample.replace(/"/g, "")}",`;
+            return `// ${p.camelizedName}: \`${p.sample.replace(/"/g, "")}\`,`;
           }
 
           return `// ${p.camelizedName}: ${
@@ -372,8 +406,6 @@ const run = async () => {
       `;
 
       let _inputFile = inputFile({ title, docs, input: inputFileInput });
-
-      // console.log(docs)
 
       let dir = `generated/${kebabCase(openApi.paths[path][method].summary)}`;
 
