@@ -3,6 +3,8 @@ const { snakeCase } = require("snake-case");
 const kebabCase = require("lodash/kebabCase")
 const get = require("lodash/get")
 const axios = require("axios")
+const {titleCase} = require("title-case")
+
 const {
   getBaseUrl,
   getFullPath,
@@ -186,10 +188,7 @@ const run = async () => {
 
       const auth = []
 
-      let title = openApi.paths[path][method].summary
-        .split(" ")
-        .map((i) => i.charAt(0).toUpperCase() + i.slice(1))
-        .join(" ");
+      let title = titleCase(openApi.paths[path][method].summary)
 
       let description =
         title + " using the Twitter v2 API";
@@ -362,8 +361,6 @@ const run = async () => {
       `;
 
       let _inputFile = inputFile({ title, docs, input: inputFileInput });
-
-      console.log(docs)
 
       let dir = `generated/${kebabCase(openApi.paths[path][method].operationId)}`;
 

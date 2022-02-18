@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { snakeCase } = require("snake-case");
 const get = require("lodash/get")
+const { titleCase } = require("title-case")
 const {
   getBaseUrl,
   getFullPath,
@@ -100,11 +101,11 @@ const run = async (input) => {
   verifyInput(input);
 
   try {
-    const result = await axios({
+    const { data } = await axios({
       ${axiosCall}
     });
 
-    return result.data;
+    return data;
   } catch (error) {
     return {
       failed: true,
@@ -180,13 +181,10 @@ const run = async () => {
 
       const body = _getBodyParameters(openApi, path, method).filter(p => !p.deprecated);;
 
-      let title = openApi.paths[path][method].summary
-        .split(" ")
-        .map((i) => i.charAt(0).toUpperCase() + i.slice(1))
-        .join(" ");
+      let title = titleCase(openApi.paths[path][method].summary)
 
       let description =
-        openApi.paths[path][method].summary + " using the GitHub API";
+        titleCase(openApi.paths[path][method].summary) + " using the GitHub API";
 
       let docs = openApi.paths[path][method].externalDocs.url;
 
