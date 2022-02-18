@@ -10,7 +10,7 @@ const {
   _getParameters,
   _getBodyParameters,
 } = require("./parse-openapi");
-// const openApi = JSON.parse(fs.readFileSync("../play/openapi-github.json"));
+const openApi = JSON.parse(fs.readFileSync("../../Desktop/result.json"));
 
 function camelize(str) {
   return str
@@ -20,25 +20,30 @@ function camelize(str) {
     .replace(/\s+/g, "");
 }
 
+function sentenceCase(theString) {
+	var newString = theString.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g,function(c){return c.toUpperCase()});
+  return newString;
+}
+
 let configFile = ({ name, title, description }) => ({
   name: name,
   title: title,
   description: description,
   type: "js-request-function",
   envVars: {
-    TWITTER_BEARER_TOKEN: {
+    SEGMENT_BEARER_TOKEN: {
       development: "",
       production: "",
     },
   },
   fee: 0,
-  image: "https://assets.buildable.dev/catalog/node-templates/twitter.svg",
+  image: "https://assets.buildable.dev/catalog/node-templates/segment.svg",
   category: "social",
   accessType: "open",
   language: "javascript",
   price: "free",
-  platform: "twitter",
-  tags: ["twitter", "social"],
+  platform: "segment",
+  tags: ["segment", "ads", "marketing"],
   stateType: "stateless",
   __version: "1.0.0",
 });
@@ -94,7 +99,6 @@ let runFile = ({
  */
 
 const axios = require("axios");
-const qs = require("qs");
 
 /**
  * The Node’s executable function
@@ -134,55 +138,52 @@ const verifyInput = ({ ${verifyInput} }) => {
 `;
 
 const run = async () => {
-  const openApi = (await axios({
-    url: "https://api.twitter.com/2/openapi.json"
-  })).data
+  // const openApi = (await axios({
+  //   url: "https://api.twitter.com/2/openapi.json"
+  // })).data
 
   for (let path in openApi.paths) {
-    console.log(path)
+    // console.log(path)
     for (let method in openApi.paths[path]) {
-      console.log(">", method)
-      if(openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data") || !get(openApi.paths[path][method], "security", []).find((i) => Object.keys(i).find(j => j === "BearerToken"))) {
+      // console.log(">", method)
+      if(openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data")) {
         //skip deprecated methods
         continue
       }
 
       const url =
-        getBaseUrl(openApi, path, method) + getFullPath(openApi, path, method);
+        "https://platform.segmentapis.com" + getFullPath(openApi, path, method);
 
-      // const headers = getHeadersArray(openApi, path, method);
-
-      // console.log(headers)
-
-      const headers = [
-        {
-          name: "authorization",
-          schema: {
-            default: "\`Bearer ${TWITTER_BEARER_TOKEN}\`"
-          }
+      const headers = getHeadersArray(openApi, path, method).map(header => {
+        if(header.value && header.value.includes("REPLACE_BEARER_TOKEN")) {
+          header.value = header.value.replace("REPLACE_BEARER_TOKEN", "${SEGMENT_BEARER_TOKEN}")
+          header.isEnvironmentVariable = true
+          header.required = true
+          header.envVarName = "SEGMENT_BEARER_TOKEN"
+          header.sample = "$trigger.env.SEGMENT_BEARER_TOKEN"
         }
-      ]
 
-      const params = [{
-        name: "TWITTER_BEARER_TOKEN",
-        required: true,
-        in: "headers",
-        schema: {
-          type: "string"
-        },
-        sample: "$trigger.env.TWITTER_BEARER_TOKEN",
-        isEnvironmentVariable: true,
-      }].concat(_getParameters(openApi, path, method, {}).filter(p => !p.deprecated).map(i => {
+        return header
+      });
+
+      const params = _getParameters(openApi, path, method, {}).filter(p => !p.deprecated).map(i => {
         i.camelizedName = camelize(i.name).replace(".", "")
 
         return i
-      }));
+      });
+
+      get(openApi, `${path}.${method}.requestBody.content.application/json.schema.example`)
 
       const body = _getBodyParameters(openApi, path, method).filter(p => !p.deprecated).map(i => {
         i.camelizedName = camelize(i.name).replace(".", "")
 
         return i
       });
+      
+      if(method === "post") {
+        console.log(path)
+        console.log(_getBodyParameters(openApi, path, method))
+      }
 
       const auth = []
 
@@ -191,15 +192,19 @@ const run = async () => {
         .map((i) => i.charAt(0).toUpperCase() + i.slice(1))
         .join(" ");
 
-      let description =
-        title + " using the Twitter v2 API";
+      
 
-      let docs = "https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2"
+      let description =
+        sentenceCase(openApi.paths[path][method].summary) + " using the Segment Config API";
+
+      let docs = "https://reference.segmentapis.com"
 
       let input = auth
+        .concat(headers)
         .concat(params)
+        .filter(p => p.in !== "header" || p.envVarName)
         .concat(body)
-        .map((i) => i.camelizedName || i.name);
+        .map((i) => i.camelizedName || i.envVarName || i.name);
 
       let axiosData =
         body.length > 0
@@ -226,9 +231,8 @@ const run = async () => {
       let axiosCall = `
         method: "${method}",
         url: \`${url.replace(/{/g, "${")}\`,
-        auth: {${auth.map((i) => `${i.field}: ${i.name}`).join(", ")}},
         headers: {${headers
-          .map((i) => `${i.name}: ${i.schema.default}`)
+          .map((i) => `"${i.name}": \`${i.value || i.example}\``)
           .join(", ")}},
         params: {${params
           .filter((i) => i.in === "query")
@@ -250,36 +254,38 @@ const run = async () => {
             return i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`
           }
           )}},
-        paramsSerializer: params => {
-          return qs.stringify(params, { arrayFormat: "comma" })
-        },
         ${axiosData}
       `;
       
 
-      let verifyInput = params
+      let verifyInput = headers
+        .concat(params)
+        .filter(p => p.in !== "header" || p.envVarName)
         .concat(body)
-        .filter((i) => i.required && !i.isEnvironmentVariable)
-        .map((i) => i.name);
-      let verifyErrors = params
+        .filter((i) => i.required)
+        .map((i) => i.envVarName || i.name);
+      let verifyErrors = headers
+        .concat(params)
         .concat(body)
-        .filter((i) => i.required && !i.isEnvironmentVariable)
+        .filter((i) => i.required)
         .map(
           (i) =>
-            `INVALID_${snakeCase(i.name).toUpperCase()}: "A valid ${
-              i.name
+            `INVALID_${snakeCase(i.envVarName || i.name).toUpperCase()}: "A valid ${
+              i.envVarName || i.name
             } field (${typeof i.sample}) was not provided in the input.",`
         )
         .join("\n");
-      let verifyChecks = params
+      let verifyChecks = headers
+        .concat(params)
         .concat(body)
-        .filter((i) => i.required && !i.isEnvironmentVariable)
+        .filter((i) => i.required)
+        .filter(p => p.in !== "header" || p.envVarName)
         .map(
           (i) =>
             `if (typeof ${
-              i.name
+              i.envVarName || i.name
             } !== "${typeof i.sample}") throw new Error(ERRORS.INVALID_${snakeCase(
-              i.name
+              i.envVarName || i.name
             ).toUpperCase()});`
         )
         .join("\n");
@@ -311,13 +317,15 @@ const run = async () => {
 
       let inputFileInput = `
       ${auth
+        .concat(headers)
         .concat(params)
         .concat(body)
         .filter((p) => p.required)
+        .filter(p => p.in !== "header" || p.envVarName)
         .map((p) => {
           if (p.sample && typeof p.sample === "string") {
             if (p.isEnvironmentVariable) {
-              return `${p.name}: ${
+              return `${p.envVarName || p.name}: ${
                 p.sample && typeof p.sample === "object"
                   ? handleJSONSampleQuotes(JSON.stringify(p.sample))
                   : p.sample
@@ -336,13 +344,15 @@ const run = async () => {
         .join("\n")}
       
       ${auth
+        .concat(headers)
         .concat(params)
         .concat(body)
         .filter((p) => !p.required)
+        .filter(p => p.in !== "header" || p.envVarName)
         .map((p) => {
           if (p.sample && typeof p.sample === "string") {
             if (p.isEnvironmentVariable) {
-              return `${p.name}: ${
+              return `${p.envVarName || p.name}: ${
                 p.sample && typeof p.sample === "object"
                   ? handleJSONSampleQuotes(JSON.stringify(p.sample))
                   : p.sample
@@ -363,9 +373,9 @@ const run = async () => {
 
       let _inputFile = inputFile({ title, docs, input: inputFileInput });
 
-      console.log(docs)
+      // console.log(docs)
 
-      let dir = `generated/${kebabCase(openApi.paths[path][method].operationId)}`;
+      let dir = `generated/${kebabCase(openApi.paths[path][method].summary)}`;
 
       fs.mkdirSync(dir, { recursive: true });
 
