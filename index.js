@@ -32,6 +32,10 @@ let configFile = ({ name, title, description }) => ({
   description: description,
   type: "js-request-function",
   envVars: {
+    TATUM_API_URL: {
+      development: "https://api-us-west1.tatum.io",
+      production: "https://api-us-west1.tatum.io",
+    },
     TATUM_API_KEY: {
       development: "",
       production: "",
@@ -44,7 +48,7 @@ let configFile = ({ name, title, description }) => ({
   language: "javascript",
   price: "free",
   platform: "tatum",
-  tags: ["blockchain", "cryptocurrency"],
+  tags: ["blockchain", "cryptocurrency", "web3"],
   stateType: "stateless",
   __version: "1.0.0",
 });
@@ -153,7 +157,7 @@ const run = async () => {
       }
 
       const url =
-        "https://api-eu1.tatum.io" + getFullPath(openApi, path, method); // free tier api keys are in eu
+        "{TATUM_API_URL}" + getFullPath(openApi, path, method); // free tier api keys are in eu
 
       const headers = getHeadersArray(openApi, path, method)
         .map(header => {
@@ -178,19 +182,24 @@ const run = async () => {
           return header
         });
 
-      const params = _getParameters(openApi, path, method, {}).filter(p => !p.deprecated && !headers.find(h => h.name === p.name)).map(i => {
+      const params = [{
+        name: "TATUM_API_URL",
+        in: "path",
+        required: true,
+        isEnvironmentVariable: true,
+        envVarName: "TATUM_API_URL",
+        sample: "$trigger.env.TATUM_API_URL"
+      }].concat(_getParameters(openApi, path, method, {}).filter(p => !p.deprecated && !headers.find(h => h.name === p.name)).map(i => {
         i.camelizedName = camelize(i.name).replace(".", "")
 
         return i
-      });
+      }));
 
       const body = _getBodyParameters(openApi, path, method).filter(p => !p.deprecated).map(i => {
         i.camelizedName = camelize(i.name).replace(".", "")
 
         return i
       });
-
-      console.log("body", body)
 
       const auth = []
 
