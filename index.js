@@ -171,13 +171,17 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
 
       const body = getEnvVarParams(config, ["body"]).concat(getBodyParameters(openApi, path, method));
 
+      let axiosAuth = auth.length > 0
+      ? `auth: {${sortAndMapRequired(auth).join(", ")}}`
+      : ""
+
       let axiosHeaders = headers.length > 0 
-      ? `headers: {${sortAndMapRequired(headers).join(", ")}},`
+      ? `headers: {${sortAndMapRequired(headers).join(", ")}}`
       : ""
 
       const queryParams = params.filter((i) => i.in === "query")
       let axiosParams = queryParams.length > 0
-      ? `params: {${sortAndMapRequired(queryParams)}},`
+      ? `params: {${sortAndMapRequired(queryParams)}}`
       : ""
 
       let axiosData =
@@ -188,7 +192,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
       let axiosCall = `
         method: "${method}",
         url: \`${url.replace(/{/g, "${")}\`,
-        ${[axiosHeaders, axiosParams, axiosData].filter(i => !!i.trim()).join("\n")}
+        ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
       `;
 
 
@@ -314,96 +318,32 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
 };
 
 run({
-  // baseURL: "{TATUM_API_URL}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  baseURL: "https://api.github.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
   config: {
-    type: "js-request-function",
+    platform: "github",
     envVars: {
-      TWITTER_BEARER_TOKEN: {
+      GITHUB_API_TOKEN: {
         development: "",
         production: "",
-        in: "header",
-        headerName: "authorization"
+        in: "auth",
+        name: "password"
+      },
+      GITHUB_API_USERNAME: {
+        development: "",
+        production: "",
+        in: "auth",
+        name: "username"
       },
     },
     fee: 0,
-    category: "social",
+    category: "git",
     accessType: "open",
     language: "javascript",
     price: "free",
-    platform: "twitter",
-    tags: ["twitter", "social"],
+    tags: ["git", "github"],
     stateType: "stateless",
     __version: "1.0.0",
   },
-  pathOrURL: "https://api.twitter.com/2/openapi.json",
-  isURL: true,
-  getDocs: (openApi, path, method) => {
-    return `https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2`
-  },
-  getRunFile: ({
-    openApi, 
-    path, 
-    method,
-    title,
-    description,
-    docs,
-    input,
-    axiosCall,
-    verifyInput,
-    verifyErrors,
-    verifyChecks,
-  }) => `
-  /**
-   * ----------------------------------------------------------------------------------------------------
-   * ${title} [Run]
-   *
-   * @description - ${description}
-   *
-   * @author    Buildable Technologies Inc.
-   * @access    open
-   * @license   MIT
-   * @docs      ${docs}
-   *
-   * ----------------------------------------------------------------------------------------------------
-   */
-  
-  const axios = require("axios");
-  const qs = require("qs");
-  
-  /**
-   * The Node’s executable function
-   *
-   * @param {Run} input - Data passed to your Node from the input function
-   */
-  const run = async (input) => {
-    const { ${input} } = input;
-  
-    verifyInput(input);
-  
-    try {
-      const { data } = await axios({
-        ${axiosCall}
-      });
-  
-      return data;
-    } catch (error) {
-      return {
-        failed: true,
-        message: error.message,
-        data: error.response.data,
-      };
-    }
-  };
-  
-  /**
-   * Verifies the input parameters
-   */
-  const verifyInput = ({ ${verifyInput} }) => {
-    const ERRORS = {
-      ${verifyErrors}
-    };
-  
-    ${verifyChecks}
-  };
-  `
+  pathOrURL: "../play/openapi-github.json",
+  isURL: false,
 });
