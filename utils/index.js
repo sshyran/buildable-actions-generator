@@ -558,7 +558,9 @@ const handleJSONSampleQuotes = (json) => {
 
 
 const requiredInputTemplate = (data) => `${data}, // Required`
-const optionalInputTemplate = (data) => `/* ${data}, */` // set to multipline comment due to multiline data
+const optionalInputTemplate = (data) => {
+  return `${data.split("\n").map(i => `// ${i}`).join("\n")},` //handle multiline data
+}
 
 const mapWithTemplate = (array = [], template = () => {}) => {
   return array.map((p) => {
