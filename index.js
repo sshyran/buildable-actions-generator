@@ -1,56 +1,38 @@
 const fs = require("fs");
+const axios = require("axios")
 const { snakeCase } = require("snake-case");
 const kebabCase = require("lodash/kebabCase")
 const {titleCase} = require("title-case")
 const get = require("lodash/get")
-const axios = require("axios")
+const union = require("lodash/union")
 const {
+  camelize,
+  sentenceCase,
   getBaseUrl,
   getFullPath,
   getHeadersArray,
+  getHeaders,
+  getParameters,
+  getBodyParameters,
   _getParameters,
   _getBodyParameters,
-} = require("./parse-openapi");
-const openApi = JSON.parse(fs.readFileSync("../../Desktop/tatum-openapi.json"));
+  getEnvVarParams,
+  getInputName,
+  sortAndMapRequired,
+  handleJSONSampleQuotes,
+  requiredInputTemplate,
+  optionalInputTemplate,
+  mapWithTemplate
+} = require("./utils")
 
-function camelize(str) {
-  return str
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
-      return index === 0 ? word.toLowerCase() : word.toUpperCase();
-    })
-    .replace(/\s+/g, "");
-}
 
-function sentenceCase(theString) {
-	var newString = theString.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g,function(c){return c.toUpperCase()});
-  return newString;
-}
 
-let configFile = ({ name, title, description }) => ({
+let configFile = ({ name, title, description, ...rest }) => ({
   name: name,
   title: title,
   description: description,
-  type: "js-request-function",
-  envVars: {
-    TATUM_API_URL: {
-      development: "https://api-us-west1.tatum.io",
-      production: "https://api-us-west1.tatum.io",
-    },
-    TATUM_API_KEY: {
-      development: "",
-      production: "",
-    },
-  },
-  fee: 0,
-  image: "https://assets.buildable.dev/catalog/node-templates/tatum.svg",
-  category: "blockchain",
-  accessType: "open",
-  language: "javascript",
-  price: "free",
-  platform: "tatum",
-  tags: ["blockchain", "cryptocurrency", "web3"],
-  stateType: "stateless",
-  __version: "1.0.0",
+  image: `https://assets.buildable.dev/catalog/node-templates/${rest.platform}.svg`,
+  ...rest
 });
 
 let inputFile = ({ title, docs, input }) => `
@@ -142,79 +124,60 @@ const verifyInput = ({ ${verifyInput} }) => {
 };
 `;
 
-const run = async () => {
-  // const openApi = (await axios({
-  //   url: "https://api.twitter.com/2/openapi.json"
-  // })).data
+const run = async ({ baseURL, config, getTitle, getDescription, getDocs, pathOrURL, isURL  } = {}) => {
+
+  let openApi
+
+  if(isURL) {
+    openApi = (await axios({
+      url: pathOrURL
+    })).data
+  } else {
+    openApi = JSON.parse(fs.readFileSync(pathOrURL));
+  }
 
   for (let path in openApi.paths) {
     // console.log(path)
     for (let method in openApi.paths[path]) {
       // console.log(">", method)
       if(openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data")) {
-        //skip deprecated methods
         continue
       }
 
-      const url =
-        "{TATUM_API_URL}" + getFullPath(openApi, path, method); // free tier api keys are in eu
+      const url = (baseURL || getBaseUrl(openApi, path, method)) + getFullPath(openApi, path, method);
 
-      const headers = getHeadersArray(openApi, path, method)
-        .map(header => {
-          if(header.value && header.value.includes("REPLACE_KEY_VALUE")) {
-            header.isEnvironmentVariable = true
-            header.required = true
-            header.envVarName = "TATUM_API_KEY"
-            header.sample = "$trigger.env.TATUM_API_KEY"
-          } else {
-            header.sample = header.sample || header.example || (header.schema && (header.schema.default || header.schema.type))
-          }
+      const auth = getEnvVarParams(["auth"])
 
-          
-          if(header.name.split("-")[0] === "x" || header.name.split("-")[0] === "X") {
-            header.camelizedName = camelize(header.name.split("-").slice(1).join("-")).replace(/-/g, "")
-          } else {
-            header.camelizedName = camelize(header.name).replace(/-/g, "")
-          }
+      const headers = getEnvVarParams(["header"]).concat(getHeaders(openApi, path, method).filter(i => i.isAuth))
 
-          
+      const params = getEnvVarParams(["path", "query"]).concat(getParameters(openApi, path, method));
 
-          return header
-        });
+      const body = getEnvVarParams(["body"]).concat(getBodyParameters(openApi, path, method));
 
-      const params = [{
-        name: "TATUM_API_URL",
-        in: "path",
-        required: true,
-        isEnvironmentVariable: true,
-        envVarName: "TATUM_API_URL",
-        sample: "$trigger.env.TATUM_API_URL"
-      }].concat(_getParameters(openApi, path, method, {}).filter(p => !p.deprecated && !headers.find(h => h.name === p.name)).map(i => {
-        i.camelizedName = camelize(i.name).replace(".", "")
+      let axiosHeaders = headers.length > 0 
+      ? `headers: {${sortAndMapRequired(headers).join(", ")}},`
+      : ""
 
-        return i
-      }));
+      let axiosParams = params.length > 0
+      ? `params: {${sortAndMapRequired(params.filter((i) => i.in === "query"))}},`
+      : ""
 
-      const body = _getBodyParameters(openApi, path, method).filter(p => !p.deprecated).map(i => {
-        i.camelizedName = camelize(i.name).replace(".", "")
+      let axiosData =
+        body.length > 0
+          ? `data: {${sortAndMapRequired(body)}}`
+          : "";
 
-        return i
-      });
-
-      const auth = []
-
-      let title = titleCase(openApi.paths[path][method].summary)     
-
-      let description =
-        sentenceCase(openApi.paths[path][method].summary) + " using the Tatum API";
-
-      let docs = `https://tatum.io/apidoc.php#operation/${openApi.paths[path][method].operationId}`
+      let axiosCall = `
+        method: "${method}",
+        url: \`${url.replace(/{/g, "${")}\`,
+        ${axiosHeaders}
+        ${axiosParams}
+        ${axiosData}
+      `;
 
 
-      let input = auth
-        .concat(headers)
-        .concat(params)
-        .concat(body)
+
+      let input = union(auth, headers, params, body)
         .sort((a, b) => { // sort required first
           if (a.isEnvironmentVariable) {
             return -1;
@@ -234,183 +197,73 @@ const run = async () => {
 
           return 0;
         })
-        .map((i) => i.envVarName || i.camelizedName || i.name)
-
-      let axiosData =
-        body.length > 0
-          ? `data: {${body
-              .sort((a, b) => { // sort required first
-                if (a.required) {
-                  return -1;
-                }
-                if (b.required) {
-                  return 1;
-                }
-
-                return 0;
-              })
-              .map((i) => {
-                if(i.name.includes(".")) {
-                  return i.required ? `"${i.name}": ${i.camelizedName}` : `...(${i.camelizedName} ? { "${i.name}": ${i.camelizedName} } : {})`
-                }
-    
-                return i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`
-              })}}`
-          : "";
-
-      let axiosCall = `
-        method: "${method}",
-        url: \`${url.replace(/{/g, "${")}\`,
-        headers: {${headers
-          .sort((a, b) => { // sort required first
-            if (a.required) {
-              return -1;
-            }
-            if (b.required) {
-              return 1;
-            }
-
-            return 0;
-          })
-          .map((i) => {
-            if(i.required) {
-              return `"${i.name}": \`\${${i.envVarName || i.camelizedName || i.name}}\``
-            } else {
-              return `...(${i.envVarName || i.camelizedName || i.name} ? { "${i.name}": \`\${${i.envVarName || i.camelizedName || i.name}}\`  } : {})`
-            }
-          })
-          .join(", ")}},
-        params: {${params
-          .filter((i) => i.in === "query")
-          .sort((a, b) => { // sort required first
-            if (a.required) {
-              return -1;
-            }
-            if (b.required) {
-              return 1;
-            }
-
-            return 0;
-          })
-          .map((i) => {
-            if(i.name.includes(".")) {
-              return i.required ? `"${i.name}": ${i.camelizedName}` : `...(${i.camelizedName} ? { "${i.name}": ${i.camelizedName} } : {})`
-            }
-
-            return i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`
-          }
-          )}},
-        ${axiosData}
-      `;
       
 
-      let verifyInput = headers
-        .concat(params)
-        .concat(body)
+      let verifyInput = input
         .filter((i) => i.required)
-        .map((i) => i.envVarName || i.camelizedName || i.name);
-      let verifyErrors = headers
-        .concat(params)
-        .concat(body)
+        .map((i) => getInputName(i));
+
+      let verifyErrors = input
         .filter((i) => i.required)
         .map(
           (i) =>
-            `INVALID_${snakeCase(i.envVarName || i.camelizedName || i.name).toUpperCase()}: "A valid ${
-              i.envVarName || i.camelizedName || i.name
+            `INVALID_${snakeCase(getInputName(i)).toUpperCase()}: "A valid ${
+              getInputName(i)
             } field (${typeof i.sample}) was not provided in the input.",`
         )
         .join("\n");
-      let verifyChecks = headers
-        .concat(params)
-        .concat(body)
+
+      const verifyChecks = input
         .filter((i) => i.required)
-        .filter(p => p.in !== "header" || p.envVarName)
         .map(
           (i) =>
             `if (typeof ${
-              i.envVarName || i.camelizedName || i.name
+              getInputName(i)
             } !== "${typeof i.sample}") throw new Error(ERRORS.INVALID_${snakeCase(
-              i.envVarName || i.camelizedName || i.name
+              getInputName(i)
             ).toUpperCase()});`
         )
         .join("\n");
 
-      let _runFile = runFile({
+    
+      
+
+      const title = getTitle ? getTitle(openApi, path, method) : titleCase(openApi.paths[path][method].summary)     
+
+      const description = getDescription ? getDescription(openApi, path, method) : sentenceCase(openApi.paths[path][method].summary) + ` using the ${titleCase(config.platform)} API`;
+
+      const docs = getDocs ? getDocs(openApi, path, method) : get(openApi.paths[path][method], "externalDocs.url") 
+
+
+      const _runFile = runFile({
         title,
         description,
         docs,
-        input,
+        input: input.map((i) => getInputName(i)),
         axiosCall,
         verifyInput,
         verifyErrors,
         verifyChecks,
       });
-
       
 
-      let _configFile = configFile({
+      const _configFile = configFile({
         title,
         description,
         name:
           camelize(openApi.paths[path][method].summary).replace(/\W/g, '') +
           "Result",
+        ...config
       });
 
-      const handleJSONSampleQuotes = (json) => {
-        return json.replace(/\uFFFF/g, '\\"');
-      };
-
-      let inputFileInput = `
-      ${auth
-        .concat(headers)
-        .concat(params)
-        .concat(body)
-        .filter((p) => p.required)
-        .map((p) => {
-          if (p.sample && typeof p.sample === "string") {
-            if (p.isEnvironmentVariable) {
-              return `${p.envVarName || p.camelizedName || p.name}: ${
-                p.sample && typeof p.sample === "object"
-                  ? handleJSONSampleQuotes(JSON.stringify(p.sample))
-                  : p.sample
-              }, // Required`;
-            }
-
-            return `${p.camelizedName}: \`${p.sample.replace(/"/g, "")}\`, // Required`;
-          }
-
-          return `${p.camelizedName}: ${
-            p.sample && typeof p.sample === "object"
-              ? handleJSONSampleQuotes(JSON.stringify(p.sample))
-              : p.sample
-          }, // Required`;
-        })
+      const inputFileInput = `
+      ${mapWithTemplate(union(auth, headers, params, body)
+        .filter((p) => p.required), requiredInputTemplate)
         .join("\n")}
       
-      ${auth
-        .concat(headers)
-        .concat(params)
-        .concat(body)
-        .filter((p) => !p.required)
-        .map((p) => {
-          if (p.sample && typeof p.sample === "string") {
-            if (p.isEnvironmentVariable) {
-              return `${p.envVarName || p.camelizedName || p.name}: ${
-                p.sample && typeof p.sample === "object"
-                  ? handleJSONSampleQuotes(JSON.stringify(p.sample))
-                  : p.sample
-              }, // Required`;
-            }
-
-            return `// ${p.camelizedName}: \`${p.sample.replace(/"/g, "")}\`,`;
-          }
-
-          return `// ${p.camelizedName}: ${
-            p.sample && typeof p.sample === "object"
-              ? handleJSONSampleQuotes(JSON.stringify(p.sample))
-              : p.sample
-          },`;
-        })
+        ${mapWithTemplate(union(auth, headers, params, body)
+          .filter((p) => p.required), optionalInputTemplate)
+          .join("\n")}
         .join("\n")}
       `;
 
@@ -427,4 +280,35 @@ const run = async () => {
   }
 };
 
-run();
+run({
+  baseURL: "{TATUM_API_URL}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  config: {
+    envVars: {
+      TATUM_API_URL: {
+        development: "https://api-us-west1.tatum.io",
+        production: "https://api-us-west1.tatum.io",
+        in: "path"
+      },
+      TATUM_API_KEY: {
+        development: "",
+        production: "",
+        in: "header"
+      },
+    },
+    type: "js-request-function",
+    fee: 0,
+    category: "blockchain",
+    accessType: "open",
+    language: "javascript",
+    price: "free",
+    platform: "tatum",
+    tags: ["blockchain", "cryptocurrency", "web3"],
+    stateType: "stateless",
+    __version: "1.0.0",
+  },
+  pathOrURL: "../../Desktop/tatum-openapi.json",
+  isURL: true,
+  getDocs = (openApi, path, method) => {
+    return `https://tatum.io/apidoc.php#operation/${openApi.paths[path][method].operationId}`
+  }
+});
