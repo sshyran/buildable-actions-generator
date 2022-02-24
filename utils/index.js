@@ -1,5 +1,7 @@
 const OpenAPISampler = require('openapi-sampler');
 const get = require("lodash/get")
+const cloneDeep = require("lodash/cloneDeep")
+const pick = require("lodash/pick")
 
 function camelize(str) {
   return str
@@ -244,7 +246,7 @@ const getHeaders = (openApi, path, method) => {
   const headers = getHeadersArray(openApi, path, method)
 
   return headers.map(header => {
-    if(header.value && header.value.includes("REPLACE_KEY_VALUE")) {
+    if(header.isAuth && header.value) {
       header.isEnvironmentVariable = true
       header.required = true
     } else {
@@ -503,7 +505,6 @@ const getEnvVarParams = (config, types = []) => {
     if(types.includes(envVarValue.in)) {
       _p.push({
         ...envVarValue,
-        name: envVar,
         required: true,
         isEnvironmentVariable: true,
         envVarName: envVar,
@@ -531,7 +532,17 @@ const sortAndMapRequired = (array = []) => {
     return 0;
   })
   .map((i = {}) => {
-    const nameFormat = i.name === getInputName(i) ? i.name : `"${i.name}": \`\${${getInputName(i)}}\``
+    if(i.value) {
+      const value = i.value.split(" ").map(v => v.includes("REPLACE") ? `\${${getInputName(i)}}` : v).join(" ")
+
+      if(i.required) {
+        return `"${i.name}": \`${value}\``
+      } else {
+        return `...(${getInputName(i)} ? { "${i.name}": \`${value}\` } : {})`
+      }
+    }
+
+    const nameFormat = i.name === getInputName(i) ? i.name : `"${i.name}": ${getInputName(i)}`
     if(i.required) {
       return nameFormat
     } else {
@@ -566,6 +577,14 @@ const mapWithTemplate = (array = [], template = () => {}) => {
   })
 }
 
+const cleanConfigEnvVars = (config, included = ["development", "production"]) => {
+  let clonedConfig = cloneDeep(config)
+  for(let envVar in clonedConfig.envVars) {
+    clonedConfig.envVars[envVar] = pick(clonedConfig.envVars[envVar], included)
+  }
+  return clonedConfig
+}
+
 module.exports = {
   camelize,
   sentenceCase,
@@ -584,5 +603,6 @@ module.exports = {
   handleJSONSampleQuotes,
   requiredInputTemplate,
   optionalInputTemplate,
-  mapWithTemplate
+  mapWithTemplate,
+  cleanConfigEnvVars
 }
