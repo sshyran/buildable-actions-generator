@@ -1,4 +1,5 @@
 const OpenAPISampler = require('openapi-sampler');
+const get = require("lodash/get")
 
 function camelize(str) {
   return str
@@ -494,10 +495,10 @@ const getInput = (openApi, path, method) => {
   return [headers, parameters, body].flat()
 }
 
-const getEnvVarParams = (types = []) => {
+const getEnvVarParams = (config, types = []) => {
   let _p = []
   const envVars = get(config, "envVars", {})
-  for(let envVar of envVars) {
+  for(let envVar of Object.keys(envVars)) {
     const envVarValue = envVars[envVar]
     if(types.includes(envVarValue.in)) {
       _p.push({
@@ -530,10 +531,11 @@ const sortAndMapRequired = (array = []) => {
     return 0;
   })
   .map((i = {}) => {
+    const nameFormat = i.name === getInputName(i) ? i.name : `"${i.name}": \`\${${getInputName(i)}}\``
     if(i.required) {
-      return `"${i.name}": \`\${${getInputName(i)}}\``
+      return nameFormat
     } else {
-      return `...(${getInputName(i)} ? { "${i.name}": \`\${${getInputName(i)}}\`  } : {})`
+      return `...(${getInputName(i)} ? { ${nameFormat} } : {})`
     }
   })
 }
@@ -545,7 +547,7 @@ const handleJSONSampleQuotes = (json) => {
 
 
 const requiredInputTemplate = (data) => `${data}, // Required`
-const optionalInputTemplate = (data) => `// ${data},`
+const optionalInputTemplate = (data) => `/* ${data}, */` // set to multipline comment due to multiline data
 
 const mapWithTemplate = (array = [], template = () => {}) => {
   return array.map((p) => {

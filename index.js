@@ -146,20 +146,35 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, pathOrU
 
       const url = (baseURL || getBaseUrl(openApi, path, method)) + getFullPath(openApi, path, method);
 
-      const auth = getEnvVarParams(["auth"])
+      const auth = getEnvVarParams(config, ["auth"])
 
-      const headers = getEnvVarParams(["header"]).concat(getHeaders(openApi, path, method).filter(i => i.isAuth))
+      const headers = [];
 
-      const params = getEnvVarParams(["path", "query"]).concat(getParameters(openApi, path, method));
+      const openApiHeaders = getHeaders(openApi, path, method)
+      const envVarHeaders = getEnvVarParams(config, ["header"])
+      for(let header of openApiHeaders) {
+        const envVarHeader = envVarHeaders.find(p => p.headerName === header.name)
+        if(header.isAuth && envVarHeader) {
+          headers.push({
+            ...envVarHeader,
+            ...header,
+          })
+        } else {
+          headers.push(header)
+        }
+      }
 
-      const body = getEnvVarParams(["body"]).concat(getBodyParameters(openApi, path, method));
+      const params = getEnvVarParams(config, ["path", "query"]).concat(getParameters(openApi, path, method));
+
+      const body = getEnvVarParams(config, ["body"]).concat(getBodyParameters(openApi, path, method));
 
       let axiosHeaders = headers.length > 0 
       ? `headers: {${sortAndMapRequired(headers).join(", ")}},`
       : ""
 
-      let axiosParams = params.length > 0
-      ? `params: {${sortAndMapRequired(params.filter((i) => i.in === "query"))}},`
+      const queryParams = params.filter((i) => i.in === "query")
+      let axiosParams = queryParams.length > 0
+      ? `params: {${sortAndMapRequired(queryParams)}},`
       : ""
 
       let axiosData =
@@ -170,11 +185,8 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, pathOrU
       let axiosCall = `
         method: "${method}",
         url: \`${url.replace(/{/g, "${")}\`,
-        ${axiosHeaders}
-        ${axiosParams}
-        ${axiosData}
+        ${[axiosHeaders, axiosParams, axiosData].filter(i => !!i.trim()).join("\n")}
       `;
-
 
 
       let input = union(auth, headers, params, body)
@@ -262,12 +274,13 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, pathOrU
         .join("\n")}
       
         ${mapWithTemplate(union(auth, headers, params, body)
-          .filter((p) => p.required), optionalInputTemplate)
+          .filter((p) => !p.required), optionalInputTemplate)
           .join("\n")}
-        .join("\n")}
       `;
 
       let _inputFile = inputFile({ title, docs, input: inputFileInput });
+
+
 
       let dir = `generated/${kebabCase(openApi.paths[path][method].summary)}`;
 
@@ -292,7 +305,8 @@ run({
       TATUM_API_KEY: {
         development: "",
         production: "",
-        in: "header"
+        in: "header",
+        headerName: "x-api-key"
       },
     },
     type: "js-request-function",
@@ -307,8 +321,8 @@ run({
     __version: "1.0.0",
   },
   pathOrURL: "../../Desktop/tatum-openapi.json",
-  isURL: true,
-  getDocs = (openApi, path, method) => {
+  isURL: false,
+  getDocs: (openApi, path, method) => {
     return `https://tatum.io/apidoc.php#operation/${openApi.paths[path][method].operationId}`
   }
 });
