@@ -134,6 +134,11 @@ const getFullPath = function (openApi, path, method) {
         typeof param.in !== 'undefined' &&
         param.in.toLowerCase() === 'header'
       ) {
+        if(param.name === "Content-Type") {
+          param.required = true,
+          param.hardcoded = true
+        }
+
         headers.push(param);
       }
     }
@@ -249,7 +254,31 @@ const getFullPath = function (openApi, path, method) {
     })
   }
 
-  return headers;
+  let _headers = []
+
+  for(let i = 0; i < headers.length; i++) {
+    let skip = false
+    for(let j = i + 1; j < headers.length; j++) {
+      if(headers[i].name === headers[j].name) {
+        headers[j] = {
+          ...headers[i],
+          ...headers[j]
+        }
+        
+        skip = true
+      }
+    }
+
+    if(skip) {
+      continue
+    }
+
+    _headers.push(headers[i])
+  }
+
+  console.log(_headers)
+
+  return _headers;
 };
 
 const getHeaders = (openApi, path, method) => {
@@ -542,8 +571,12 @@ const sortAndMapRequired = (array = []) => {
     return 0;
   })
   .map((i = {}) => {
+    if(i.hardcoded) {
+      return `"${i.name}": \`${i.sample}\``
+    }
+
     if(i.value) {
-      const value = i.value.split(" ").map(v => v.includes("REPLACE") ? `\${${getInputName(i)}}` : v).join(" ")
+      let value = i.value.split(" ").map(v => v.includes("REPLACE") ? `\${${getInputName(i)}}` : v).join(" ")
 
       if(i.required) {
         return `"${i.name}": \`${value}\``
