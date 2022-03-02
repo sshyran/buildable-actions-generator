@@ -572,7 +572,7 @@ const mapWithTemplate = (array = [], template = () => {}) => {
         : obj.sample
     }
 
-    if (p.sample && typeof p.sample === "string" && !p.isEnvironmentVariable) {
+    if (typeof p.sample === "string" && !p.isEnvironmentVariable) {
       return template(`${getInputName(p)}: \`${p.sample.replace(/"/g, "")}\``);
     }
 
