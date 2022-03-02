@@ -242,7 +242,7 @@ const getFullPath = function (openApi, path, method) {
 
   if(get(pathObj, "requestBody.content.application/x-www-form-urlencoded")) {
     headers.push({
-      name: "Accept",
+      name: "Content-Type",
       value: "application/x-www-form-urlencoded",
       required: true,
       hardcoded: true
