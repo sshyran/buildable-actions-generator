@@ -197,3 +197,29 @@ const twilio = {
     return sentenceCase(openApi.paths[path][method].description)
   },
 }
+
+const notion = {
+  baseURL: "https://api.notion.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  config: {
+    platform: "notion",
+    envVars: {
+      NOTION_API_TOKEN: {
+        development: "",
+        production: "",
+        in: "header",
+        // name: "password",
+        headerName: "authorization"
+      }
+    },
+    fee: 0,
+    category: "cms",
+    accessType: "open",
+    language: "javascript",
+    price: "free",
+    tags: ["notes", "database", "website"],
+    stateType: "stateless",
+    __version: "1.0.0",
+  },
+  pathOrURL: "/Users/mike.gindin/Downloads/openapi.json",
+  isURL: false,
+}
