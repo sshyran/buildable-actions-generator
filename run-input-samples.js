@@ -157,3 +157,43 @@ const github = {
   pathOrURL: "../play/openapi-github.json",
   isURL: false,
 }
+
+const twilio = {
+  // baseURL: "https://api.github.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  config: {
+    platform: "twilio",
+    envVars: {
+      TWILIO_ACCOUNT_SID: {
+        development: "",
+        production: "",
+        in: "auth",
+        name: "username"
+      },
+      TWILIO_AUTH_TOKEN: {
+        development: "",
+        production: "",
+        in: "auth",
+        name: "password"
+      },
+    },
+    fee: 0,
+    category: "communication",
+    accessType: "open",
+    language: "javascript",
+    price: "free",
+    tags: ["twilio", "communication", "sms"],
+    stateType: "stateless",
+    __version: "1.0.0",
+  },
+  pathOrURL: "../play/twilio-openapi.json",
+  isURL: false,
+  getDocs: () => {
+    return `https://www.twilio.com/docs`
+  },
+  getTitle: (openApi, path, method) => {
+    return titleCase(kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " "))
+  },
+  getDescription: (openApi, path, method) => {
+    return sentenceCase(openApi.paths[path][method].description)
+  },
+}

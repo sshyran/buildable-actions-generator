@@ -127,7 +127,7 @@ const verifyInput = ({ ${verifyInput} }) => {
 };
 `;
 
-const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, pathOrURL, isURL  } = {}) => {
+const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getAxiosCall, pathOrURL, isURL  } = {}) => {
 
   let openApi
 
@@ -148,7 +148,12 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
     // console.log(path)
     for (let method in openApi.paths[path]) {
       // console.log(">", method)
-      if(!httpMethods[method] || openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data")) {
+      // if(path === "/2010-04-01/Accounts/{AccountSid}/Messages.json") {
+
+      //   console.log(path, method, !httpMethods[method])
+      //   // console.log(openApi.paths[path])
+      // }
+      if(/*path !== "/2010-04-01/Accounts/{AccountSid}/Messages.json" ||*/ !httpMethods[method] || openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data")) {
         continue
       }
 
@@ -201,6 +206,12 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
           url = url.replace(match, `\${${getInputName(param)}}`)
         }
       })
+
+      // if(url === "https://api.twitter.com/2/openapi.json") {
+      //   console.log([axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n"))
+      // } else {
+      //   continue
+      // }
       
       let axiosCall = `
         method: "${method}",
@@ -270,6 +281,11 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
         openApi, 
         path, 
         method,
+        url,
+        axiosAuth, 
+        axiosHeaders, 
+        axiosParams, 
+        axiosData,
         title,
         description,
         docs,
@@ -281,6 +297,8 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
       }
 
       const _runFile = getRunFile ? getRunFile(runFileInput) : runFile(runFileInput);
+
+      const configFileName = camelize(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description) + "Result"
       
       const configFileInput = {
         openApi, 
@@ -288,9 +306,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
         method,
         title,
         description,
-        name:
-          camelize(summary) +
-          "Result",
+        name: configFileName.length > 50 || configFileName.length === 0 ? "result" : configFileName,
         ...cleanConfigEnvVars(config)
       }
 
@@ -319,7 +335,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
 
 
 
-      let dir = `generated/${kebabCase(summary)}`;
+      let dir = `generated/${kebabCase(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
 
       fs.mkdirSync(dir, { recursive: true });
 
@@ -331,41 +347,111 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
 };
 
 run({
-  // baseURL: "https://api.github.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  // baseURL: "{TATUM_API_URL}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
   config: {
-    platform: "twilio",
+    type: "js-request-function",
     envVars: {
-      TWILIO_ACCOUNT_SID: {
+      TWITTER_BEARER_TOKEN: {
         development: "",
         production: "",
-        in: "auth",
-        name: "username"
-      },
-      TWILIO_AUTH_TOKEN: {
-        development: "",
-        production: "",
-        in: "auth",
-        name: "password"
+        in: "header",
+        headerName: "authorization"
       },
     },
     fee: 0,
-    category: "communication",
+    category: "social",
     accessType: "open",
     language: "javascript",
     price: "free",
-    tags: ["twilio", "communication", "sms"],
+    platform: "twitter",
+    tags: ["twitter", "social"],
     stateType: "stateless",
     __version: "1.0.0",
   },
-  pathOrURL: "../play/twilio-openapi.json",
-  isURL: false,
-  getDocs: () => {
-    return `https://www.twilio.com/docs`
+  pathOrURL: "https://api.twitter.com/2/openapi.json",
+  isURL: true,
+  getDocs: (openApi, path, method) => {
+    return `https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2`
   },
-  getTitle: (openApi, path, method) => {
-    return titleCase(kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " "))
-  },
-  getDescription: (openApi, path, method) => {
-    return sentenceCase(openApi.paths[path][method].description)
-  },
+  getRunFile: ({
+    openApi, 
+    path, 
+    method,
+    url, 
+    axiosAuth, 
+    axiosHeaders, 
+    axiosParams, 
+    axiosData,
+    title,
+    description,
+    docs,
+    input,
+    axiosCall,
+    verifyInput,
+    verifyErrors,
+    verifyChecks,
+  }) => {
+    axiosParams = axiosParams.trim().length > 0 ? axiosParams + `,
+      paramsSerializer: (params) => {
+        return qs.stringify(params, { arrayFormat: "comma" });
+      }
+      ` : ""
+
+    return `
+    /**
+     * ----------------------------------------------------------------------------------------------------
+     * ${title} [Run]
+     *
+     * @description - ${description}
+     *
+     * @author    Buildable Technologies Inc.
+     * @access    open
+     * @license   MIT
+     * @docs      ${docs}
+     *
+     * ----------------------------------------------------------------------------------------------------
+     */
+    
+    const axios = require("axios");${axiosParams.trim().length > 0 ? `\nconst qs = require("qs");` : ""}
+    
+    
+    /**
+     * The Node’s executable function
+     *
+     * @param {Run} input - Data passed to your Node from the input function
+     */
+    const run = async (input) => {
+      const { ${input} } = input;
+    
+      verifyInput(input);
+    
+      try {
+        const { data } = await axios({
+          method: "${method}",
+          url: \`${url}\`,
+          ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
+        });
+    
+        return data;
+      } catch (error) {
+        return {
+          failed: true,
+          message: error.message,
+          data: error.response.data,
+        };
+      }
+    };
+    
+    /**
+     * Verifies the input parameters
+     */
+    const verifyInput = ({ ${verifyInput} }) => {
+      const ERRORS = {
+        ${verifyErrors}
+      };
+    
+      ${verifyChecks}
+    };
+    `
+  }
 });
