@@ -2,6 +2,7 @@ const OpenAPISampler = require('openapi-sampler');
 const get = require("lodash/get")
 const cloneDeep = require("lodash/cloneDeep")
 const pick = require("lodash/pick")
+const prettier = require("prettier")
 
 function camelize(str) {
   return str
@@ -602,7 +603,18 @@ const handleJSONSampleQuotes = (json) => {
 
 const requiredInputTemplate = (data) => `${data}, // Required`
 const optionalInputTemplate = (data) => {
-  return `${data.split("\n").map(i => `// ${i}`).join("\n")},` //handle multiline data
+  let _data = prettier.format("{" + data + "}", {
+    "semi": true,
+    "trailingComma": "all",
+    "singleQuote": false,
+    "printWidth": 100,
+    "useTabs": false,
+    "tabWidth": 2,
+    parser: "json"
+  })
+  
+  _data = _data.substring(1, _data.length - 2) //remove added braces (for prettier)
+  return `${(_data).split("\n").map(i => `// ${i}`).join("\n")},` //handle multiline data
 }
 
 const mapWithTemplate = (array = [], template = () => {}) => {
