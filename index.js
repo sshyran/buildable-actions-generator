@@ -68,6 +68,7 @@ let runFile = ({
   title,
   description,
   docs,
+  imports,
   input,
   axiosCall,
   verifyInput,
@@ -88,7 +89,7 @@ let runFile = ({
  * ----------------------------------------------------------------------------------------------------
  */
 
-const axios = require("axios");
+${imports || `const axios = require("axios");`}
 
 /**
  * The Node’s executable function
@@ -148,12 +149,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
     // console.log(path)
     for (let method in openApi.paths[path]) {
       // console.log(">", method)
-      // if(path === "/2010-04-01/Accounts/{AccountSid}/Messages.json") {
-
-      //   console.log(path, method, !httpMethods[method])
-      //   // console.log(openApi.paths[path])
-      // }
-      if(/*path !== "/2010-04-01/Accounts/{AccountSid}/Messages.json" ||*/ !httpMethods[method] || openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data")) {
+      if(!httpMethods[method] || openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "multipart/form-data")) {
         continue
       }
 
@@ -199,19 +195,21 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
         body.length > 0
           ? `data: {${sortAndMapRequired(body)}}`
           : "";
+      
+
+      let imports = ""
+      
+      if(get(openApi.paths[path][method], "requestBody.content.application/x-www-form-urlencoded")) {
+        imports = `const axios = require("axios");\nconst qs = require("qs");`
+        axiosData = body.length > 0 ? `data: qs.stringify({${sortAndMapRequired(body)}})` : "";
+      }
 
       (url.match(/{\w*}/g) || []).forEach(match => {
-        const param = params.find(p => p.name === match.substring(1, match.length - 1))
+        const param = params.find(p => getInputName(p) === match.substring(1, match.length - 1))
         if(param) {
           url = url.replace(match, `\${${getInputName(param)}}`)
         }
-      })
-
-      // if(url === "https://api.twitter.com/2/openapi.json") {
-      //   console.log([axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n"))
-      // } else {
-      //   continue
-      // }
+      });
       
       let axiosCall = `
         method: "${method}",
@@ -221,6 +219,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
 
 
       let input = union(auth, headers, params, body)
+        .filter(i => !i.hardcoded)
         .sort((a, b) => { // sort required first
           if (a.isEnvironmentVariable) {
             return -1;
@@ -281,16 +280,17 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
         openApi, 
         path, 
         method,
+        title,
+        description,
+        docs,
+        imports,
+        input: input.map((i) => getInputName(i)),
+        axiosCall,
         url,
         axiosAuth, 
         axiosHeaders, 
         axiosParams, 
         axiosData,
-        title,
-        description,
-        docs,
-        input: input.map((i) => getInputName(i)),
-        axiosCall,
         verifyInput,
         verifyErrors,
         verifyChecks,
@@ -314,10 +314,12 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
 
       const inputFileParams = `
         ${mapWithTemplate(union(auth, headers, params, body)
+          .filter(i => !i.hardcoded)
           .filter((p) => p.required), requiredInputTemplate)
           .join("\n")}
         
         ${mapWithTemplate(union(auth, headers, params, body)
+          .filter(i => !i.hardcoded)
           .filter((p) => !p.required), optionalInputTemplate)
           .join("\n")}
       `;

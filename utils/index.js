@@ -240,6 +240,15 @@ const getFullPath = function (openApi, path, method) {
     });
   }
 
+  if(get(pathObj, "requestBody.content.application/x-www-form-urlencoded")) {
+    headers.push({
+      name: "Accept",
+      value: "application/x-www-form-urlencoded",
+      required: true,
+      hardcoded: true
+    })
+  }
+
   return headers;
 };
 
@@ -408,7 +417,7 @@ const _getBodyParameters = function (openApi, path, method) {
       const content = openApi.paths[path][method].requestBody.content[type];
       if (content && content.schema) {
 
-        if (type === 'application/json') {            
+        if (type === 'application/json' || type === 'application/x-www-form-urlencoded') {            
           const parameters = []
 
           //todo: handle allOf and others
