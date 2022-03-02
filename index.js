@@ -1,4 +1,5 @@
 const fs = require("fs");
+const http = require("http")
 const axios = require("axios")
 const { snakeCase } = require("snake-case");
 const kebabCase = require("lodash/kebabCase")
@@ -138,15 +139,20 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
     openApi = JSON.parse(fs.readFileSync(pathOrURL));
   }
 
+  const httpMethods = {}
+  http.METHODS.forEach(method => {
+    httpMethods[method.toLowerCase()] = method
+  })
+
   for (let path in openApi.paths) {
     // console.log(path)
     for (let method in openApi.paths[path]) {
       // console.log(">", method)
-      if(openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data")) {
+      if(!httpMethods[method] || openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data")) {
         continue
       }
 
-      const url = (baseURL || getBaseUrl(openApi, path, method)) + getFullPath(openApi, path, method);
+      let url = (baseURL || getBaseUrl(openApi, path, method)) + getFullPath(openApi, path, method);
 
       const auth = getEnvVarParams(config, ["auth"])
 
@@ -162,7 +168,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
             ...header,
             ...envVarHeader,
           })
-        } else {
+        } else if (!header.isAuth) {
           headers.push(header)
         }
       }
@@ -189,9 +195,16 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
           ? `data: {${sortAndMapRequired(body)}}`
           : "";
 
+      (url.match(/{\w*}/g) || []).forEach(match => {
+        const param = params.find(p => p.name === match.substring(1, match.length - 1))
+        if(param) {
+          url = url.replace(match, `\${${getInputName(param)}}`)
+        }
+      })
+      
       let axiosCall = `
         method: "${method}",
-        url: \`${url.replace(/{/g, "${")}\`,
+        url: \`${url}\`,
         ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
       `;
 
@@ -245,11 +258,11 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
         .join("\n");
 
     
-      
+      const summary = openApi.paths[path][method].summary || openApi.paths[path][method].description || kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
 
-      const title = getTitle ? getTitle(openApi, path, method) : titleCase(openApi.paths[path][method].summary)     
+      const title = (getTitle ? getTitle(openApi, path, method) : titleCase(summary)).substring(0, 100)
 
-      const description = getDescription ? getDescription(openApi, path, method) : sentenceCase(openApi.paths[path][method].summary) + ` using the ${titleCase(config.platform)} API`;
+      const description = getDescription ? getDescription(openApi, path, method) : sentenceCase(summary) + ` using the ${titleCase(config.platform)} API`;
 
       const docs = getDocs ? getDocs(openApi, path, method) : get(openApi.paths[path][method], "externalDocs.url") 
 
@@ -276,7 +289,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
         title,
         description,
         name:
-          camelize(openApi.paths[path][method].summary).replace(/\W/g, '') +
+          camelize(summary) +
           "Result",
         ...cleanConfigEnvVars(config)
       }
@@ -306,7 +319,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
 
 
 
-      let dir = `generated/${kebabCase(openApi.paths[path][method].summary)}`;
+      let dir = `generated/${kebabCase(summary)}`;
 
       fs.mkdirSync(dir, { recursive: true });
 
@@ -318,32 +331,41 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
 };
 
 run({
-  baseURL: "https://api.github.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  // baseURL: "https://api.github.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
   config: {
-    platform: "github",
+    platform: "twilio",
     envVars: {
-      GITHUB_API_TOKEN: {
-        development: "",
-        production: "",
-        in: "auth",
-        name: "password"
-      },
-      GITHUB_API_USERNAME: {
+      TWILIO_ACCOUNT_SID: {
         development: "",
         production: "",
         in: "auth",
         name: "username"
       },
+      TWILIO_AUTH_TOKEN: {
+        development: "",
+        production: "",
+        in: "auth",
+        name: "password"
+      },
     },
     fee: 0,
-    category: "git",
+    category: "communication",
     accessType: "open",
     language: "javascript",
     price: "free",
-    tags: ["git", "github"],
+    tags: ["twilio", "communication", "sms"],
     stateType: "stateless",
     __version: "1.0.0",
   },
-  pathOrURL: "../play/openapi-github.json",
+  pathOrURL: "../play/twilio-openapi.json",
   isURL: false,
+  getDocs: () => {
+    return `https://www.twilio.com/docs`
+  },
+  getTitle: (openApi, path, method) => {
+    return titleCase(kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " "))
+  },
+  getDescription: (openApi, path, method) => {
+    return sentenceCase(openApi.paths[path][method].description)
+  },
 });
