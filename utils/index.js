@@ -277,8 +277,6 @@ const getFullPath = function (openApi, path, method) {
     _headers.push(headers[i])
   }
 
-  console.log(_headers)
-
   return _headers;
 };
 
@@ -573,7 +571,7 @@ const sortAndMapRequired = (array = []) => {
   })
   .map((i = {}) => {
     if(i.hardcoded) {
-      return `"${i.name}": \`${i.sample}\``
+      return `"${i.name}": \`${i.sample || i.value}\``
     }
 
     if(i.value) {
