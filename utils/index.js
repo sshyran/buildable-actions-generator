@@ -594,6 +594,10 @@ const getTemplateObjectAttribute = (i = {}) => {
 
     }).join(" ")
 
+    if(splitValue.length > 1) {
+      value = getTemplateString(value)
+    }
+
     if(i.required) {
       return `"${i.name}": ${value}`
     } else {
