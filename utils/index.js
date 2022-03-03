@@ -571,16 +571,16 @@ const sortAndMapRequired = (array = []) => {
   })
   .map((i = {}) => {
     if(i.hardcoded) {
-      return `"${i.name}": \`${i.sample || i.value}\``
+      return `"${i.name}": ${getTemplateString(i.sample || i.value)}`
     }
 
     if(i.value) {
       let value = i.value.split(" ").map(v => v.includes("REPLACE") ? `\${${getInputName(i)}}` : v).join(" ")
 
       if(i.required) {
-        return `"${i.name}": \`${value}\``
+        return `"${i.name}": ${getTemplateString(value)}`
       } else {
-        return `...(${getInputName(i)} ? { "${i.name}": \`${value}\` } : {})`
+        return `...(${getInputName(i)} ? { "${i.name}": ${getTemplateString(value)} } : {})`
       }
     }
 
@@ -625,7 +625,7 @@ const mapWithTemplate = (array = [], template = () => {}) => {
     }
 
     if (typeof p.sample === "string" && !p.isEnvironmentVariable) {
-      return template(`${getInputName(p)}: \`${p.sample.replace(/"/g, "")}\``);
+      return template(`${getInputName(p)}: ${getTemplateString(p.sample.replace(/"/g, ""))}`);
     }
 
     return template(`${getInputName(p)}: ${handleObjectQuotes(p)}`);
@@ -638,6 +638,18 @@ const cleanConfigEnvVars = (config, included = ["development", "production"]) =>
     clonedConfig.envVars[envVar] = pick(clonedConfig.envVars[envVar], included)
   }
   return clonedConfig
+}
+
+const getTemplateString = (value) => {
+  if(typeof value === "string") {
+    if(value.includes("\n") || value.includes("${")) {
+      return `\`${value}\``
+    }
+
+    return `"${value}"`
+  }
+
+  return value
 }
 
 module.exports = {
@@ -659,5 +671,6 @@ module.exports = {
   requiredInputTemplate,
   optionalInputTemplate,
   mapWithTemplate,
-  cleanConfigEnvVars
+  cleanConfigEnvVars,
+  getTemplateString
 }

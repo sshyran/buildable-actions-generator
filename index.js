@@ -25,7 +25,8 @@ const {
   requiredInputTemplate,
   optionalInputTemplate,
   mapWithTemplate,
-  cleanConfigEnvVars
+  cleanConfigEnvVars,
+  getTemplateString
 } = require("./utils")
 
 
@@ -212,8 +213,8 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
       });
       
       let axiosCall = `
-        method: "${method}",
-        url: \`${url}\`,
+        method: ${getTemplateString(method)},
+        url: ${getTemplateString(url)},
         ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
       `;
 
