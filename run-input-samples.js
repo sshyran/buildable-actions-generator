@@ -59,6 +59,83 @@ const twitter = {
   getDocs: (openApi, path, method) => {
     return `https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2`
   },
+  getRunFile: ({
+    title,
+    description,
+    docs,
+    imports,
+    input,
+    url,
+    method,
+    axiosHeaders,
+    axiosAuth,
+    axiosParams,
+    axiosData,
+    verifyInput,
+    verifyErrors,
+    verifyChecks,
+  }) => {
+    return `
+    /**
+     * ----------------------------------------------------------------------------------------------------
+     * ${title} [Run]
+     *
+     * @description - ${description}
+     *
+     * @author    Buildable Technologies Inc.
+     * @access    open
+     * @license   MIT
+     * @docs      ${docs}
+     *
+     * ----------------------------------------------------------------------------------------------------
+     */
+    
+     const axios = require("axios");${axiosParams.length > 0 ? `\nconst qs = require("qs");` : ""}
+    
+    /**
+     * The Node’s executable function
+     *
+     * @param {Run} input - Data passed to your Node from the input function
+     */
+    const run = async (input) => {
+      const { ${input} } = input;
+    
+      verifyInput(input);
+    
+      try {
+        const { ${input.includes("data") ? "data: _data" : "data"} } = await axios({
+          method: ${getTemplateString(method)},
+          url: ${getTemplateString(url)},
+          ${[
+            axiosHeaders, 
+            axiosAuth, 
+            axiosParams, 
+            axiosParams.length > 0 ? `paramsSerializer: (params) => { return qs.stringify(params, { arrayFormat: "comma" }); }` : "", 
+            axiosData].filter(i => !!i.trim()).join(",\n")}
+        });
+    
+        return ${input.includes("data") ? "_data" : "data"};
+      } catch (error) {
+        return {
+          failed: true,
+          message: error.message,
+          data: error.response.data,
+        };
+      }
+    };
+    
+    /**
+     * Verifies the input parameters
+     */
+    const verifyInput = ({ ${verifyInput} }) => {
+      const ERRORS = {
+        ${verifyErrors}
+      };
+    
+      ${verifyChecks}
+    };`
+    
+  }
 }
 
 const github = {
