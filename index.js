@@ -20,13 +20,14 @@ const {
   _getBodyParameters,
   getEnvVarParams,
   getInputName,
-  sortAndMapRequired,
   handleJSONSampleQuotes,
   requiredInputTemplate,
   optionalInputTemplate,
   mapWithTemplate,
   cleanConfigEnvVars,
-  getTemplateString
+  getTemplateString,
+  getTemplateObjectAttribute,
+  requiredSort
 } = require("./utils")
 
 
@@ -180,21 +181,21 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
       const body = getEnvVarParams(config, ["body"]).concat(getBodyParameters(openApi, path, method));
 
       let axiosAuth = auth.length > 0
-      ? `auth: {${sortAndMapRequired(auth).join(", ")}}`
+      ? `auth: {${auth.sort(requiredSort).map(getTemplateObjectAttribute).join(", ")}}`
       : ""
 
       let axiosHeaders = headers.length > 0 
-      ? `headers: {${sortAndMapRequired(headers).join(", ")}}`
+      ? `headers: {${headers.sort(requiredSort).map(getTemplateObjectAttribute).join(", ")}}`
       : ""
 
       const queryParams = params.filter((i) => i.in === "query")
       let axiosParams = queryParams.length > 0
-      ? `params: {${sortAndMapRequired(queryParams)}}`
+      ? `params: {${queryParams.sort(requiredSort).map(getTemplateObjectAttribute)}}`
       : ""
 
       let axiosData =
         body.length > 0
-          ? `data: {${sortAndMapRequired(body)}}`
+          ? `data: {${body.sort(requiredSort).map(getTemplateObjectAttribute)}}`
           : "";
       
 
@@ -202,7 +203,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
       
       if(get(openApi.paths[path][method], "requestBody.content.application/x-www-form-urlencoded")) {
         imports = `const axios = require("axios");\nconst qs = require("qs");`
-        axiosData = body.length > 0 ? `data: qs.stringify({${sortAndMapRequired(body)}})` : "";
+        axiosData = body.length > 0 ? `data: qs.stringify({${body.sort(requiredSort).map(getTemplateObjectAttribute)}})` : "";
       }
 
       (url.match(/{\w*}/g) || []).forEach(match => {
@@ -218,28 +219,17 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
         ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
       `;
 
+      // first display env vars, then required, then optional
+      const inputUnion = union(auth, headers, params, body)
 
-      let input = union(auth, headers, params, body)
-        .filter(i => !i.hardcoded)
-        .sort((a, b) => { // sort required first
-          if (a.isEnvironmentVariable) {
-            return -1;
-          }
-
-          if (b.isEnvironmentVariable) {
-            return 1;
-          }
-
-          if (a.required) {
-            return -1;
-          }
-
-          if (b.required) {
-            return 1;
-          }
-
-          return 0;
-        })
+      let inputEnvs = inputUnion
+        .filter(i => !i.hardcoded && i.isEnvironmentVariable)
+      
+      let inputNonEnvs = inputUnion
+        .filter(i => !i.hardcoded && !i.isEnvironmentVariable)
+        .sort(requiredSort)
+      
+      let input = inputEnvs.concat(inputNonEnvs)
       
 
       let verifyInput = input

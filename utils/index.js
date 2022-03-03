@@ -558,39 +558,55 @@ const getInputName = (input = {}) => {
   return input.envVarName || input.camelizedName || input.name
 }
 
-const sortAndMapRequired = (array = []) => {
-  return array.sort((a = {}, b = {}) => { // sort required first
-    if (a.required) {
-      return -1;
-    }
-    if (b.required) {
-      return 1;
-    }
+const requiredSort = (a = {}, b = {}) => {
+  if(a.required && b.required) {
+    return 0
+  }
 
-    return 0;
-  })
-  .map((i = {}) => {
-    if(i.hardcoded) {
-      return `"${i.name}": ${getTemplateString(i.sample || i.value)}`
-    }
+  if(a.required) {
+    return -1
+  }
 
-    if(i.value) {
-      let value = i.value.split(" ").map(v => v.includes("REPLACE") ? `\${${getInputName(i)}}` : v).join(" ")
+  if(b.required) {
+    return 1
+  }
 
-      if(i.required) {
-        return `"${i.name}": ${getTemplateString(value)}`
-      } else {
-        return `...(${getInputName(i)} ? { "${i.name}": ${getTemplateString(value)} } : {})`
+  return 0
+}
+
+const getTemplateObjectAttribute = (i = {}) => {
+  if(i.hardcoded) {
+    return `"${i.name}": ${getTemplateString(i.sample || i.value)}`
+  }
+
+  if(i.value) {
+    let splitValue = i.value.split(" ")
+    let value = splitValue.map(v => {
+      
+      if(v.includes("REPLACE")) {
+        v = getInputName(i)
+        if(splitValue.length > 1) {
+          v = `\${${v}}`
+        }
       }
-    }
+      
+      return v
 
-    const nameFormat = i.name === getInputName(i) ? i.name : `"${i.name}": ${getInputName(i)}`
+    }).join(" ")
+
     if(i.required) {
-      return nameFormat
+      return `"${i.name}": ${value}`
     } else {
-      return `...(${getInputName(i)} ? { ${nameFormat} } : {})`
+      return `...(${getInputName(i)} ? { "${i.name}": ${value} } : {})`
     }
-  })
+  }
+
+  const nameFormat = i.name === getInputName(i) ? i.name : `"${i.name}": ${getInputName(i)}`
+  if(i.required) {
+    return nameFormat
+  } else {
+    return `...(${getInputName(i)} ? { ${nameFormat} } : {})`
+  }
 }
 
 const handleJSONSampleQuotes = (json) => {
@@ -666,11 +682,12 @@ module.exports = {
   getInput,
   getEnvVarParams,
   getInputName,
-  sortAndMapRequired,
   handleJSONSampleQuotes,
   requiredInputTemplate,
   optionalInputTemplate,
   mapWithTemplate,
   cleanConfigEnvVars,
-  getTemplateString
+  getTemplateString,
+  getTemplateObjectAttribute,
+  requiredSort
 }
