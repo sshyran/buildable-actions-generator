@@ -601,17 +601,17 @@ const handleJSONSampleQuotes = (json) => {
 
 const requiredInputTemplate = (data) => `${data}, // Required`
 const optionalInputTemplate = (data) => {
-  let _data = prettier.format("{" + data + "}", {
-    "semi": true,
-    "trailingComma": "all",
+  // run prettier on code before commenting (prettier doesn't touch comments)
+  let _data = prettier.format("let x = {" + data + "}", {
+    "semi": false,
+    "trailingComma": "none",
     "singleQuote": false,
     "printWidth": 100,
     "useTabs": false,
     "tabWidth": 2,
-    parser: "json"
+    parser: "babel"
   })
-  
-  _data = _data.substring(1, _data.length - 2) //remove added braces (for prettier)
+  _data = _data.substring("let x = {".length, _data.length - 2).trim() //remove added code (for prettier)
   return `${(_data).split("\n").map(i => `// ${i}`).join("\n")},` //handle multiline data
 }
 
