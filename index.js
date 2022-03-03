@@ -205,7 +205,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
       }
 
       (url.match(/{\w*}/g) || []).forEach(match => {
-        const param = params.find(p => getInputName(p) === match.substring(1, match.length - 1))
+        const param = params.find(p => [p.name, p.camelizedName, p.envVarName].includes(match.substring(1, match.length - 1)))
         if(param) {
           url = url.replace(match, `\${${getInputName(param)}}`)
         }
