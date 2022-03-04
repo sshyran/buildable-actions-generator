@@ -20,7 +20,6 @@ const {
   _getBodyParameters,
   getEnvVarParams,
   getInputName,
-  handleJSONSampleQuotes,
   requiredInputTemplate,
   optionalInputTemplate,
   mapWithTemplate,
