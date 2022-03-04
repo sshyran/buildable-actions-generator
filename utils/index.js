@@ -613,10 +613,6 @@ const getTemplateObjectAttribute = (i = {}) => {
   }
 }
 
-const handleJSONSampleQuotes = (json) => {
-  return json.replace(/\uFFFF/g, '\\"');
-};
-
 
 
 const requiredInputTemplate = (data) => `${data}, // Required`
@@ -640,7 +636,7 @@ const mapWithTemplate = (array = [], template = () => {}) => {
     
     const handleObjectQuotes = obj => {
       return obj.sample && typeof obj.sample === "object"
-        ? handleJSONSampleQuotes(JSON.stringify(obj.sample))
+        ? JSON.stringify(obj.sample)
         : obj.sample
     }
 
@@ -686,7 +682,6 @@ module.exports = {
   getInput,
   getEnvVarParams,
   getInputName,
-  handleJSONSampleQuotes,
   requiredInputTemplate,
   optionalInputTemplate,
   mapWithTemplate,
