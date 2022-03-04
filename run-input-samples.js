@@ -142,6 +142,7 @@ const github = {
   baseURL: "https://api.github.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
   config: {
     platform: "github",
+    type: "js-request-function",
     envVars: {
       GITHUB_API_TOKEN: {
         development: "",
@@ -195,6 +196,7 @@ const twilio = {
     tags: ["twilio", "communication", "sms"],
     stateType: "stateless",
     __version: "1.0.0",
+    type: "js-request-function",
   },
   pathOrURL: "../play/twilio-openapi.json",
   isURL: false,
@@ -213,6 +215,7 @@ const notion = {
   baseURL: "https://api.notion.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
   config: {
     platform: "notion",
+    type: "js-request-function",
     envVars: {
       NOTION_API_TOKEN: {
         development: "",
