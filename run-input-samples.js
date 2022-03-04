@@ -231,6 +231,35 @@ const notion = {
     stateType: "stateless",
     __version: "1.0.0",
   },
-  pathOrURL: "/Users/mike.gindin/Downloads/openapi.json",
+  pathOrURL: "./notion/openapi.json",
   isURL: false,
+  getDocs: (openApi, path, method) => {
+    const title = openApi["paths"][path][method].summary;
+
+    const docLinks = {
+      "Query a database": "https://developers.notion.com/reference/post-database-query",
+      "Create a database": "https://developers.notion.com/reference/create-a-database",
+      "Update database": "https://developers.notion.com/reference/update-a-database",
+      "Retrieve a database": "https://developers.notion.com/reference/retrieve-a-database",
+      
+      "Retrieve a page": "https://developers.notion.com/reference/retrieve-a-page",
+      "Create a Page with Content": "https://developers.notion.com/reference/post-page",
+      "Update Page Properties": "https://developers.notion.com/reference/patch-page",
+      "Retrieve a Page Property Item": "https://developers.notion.com/reference/retrieve-a-page-property",
+      
+      "Retrieve a block": "https://developers.notion.com/reference/retrieve-a-block",
+      "Update a block": "https://developers.notion.com/reference/update-a-block",
+      "Retrieve block children": "https://developers.notion.com/reference/get-block-children",
+      "Append block children": "https://developers.notion.com/reference/patch-block-children",
+      "Delete a block": "https://developers.notion.com/reference/delete-a-block",
+
+      "Retrieve a user": "https://developers.notion.com/reference/get-user",
+      "List all users": "https://developers.notion.com/reference/get-users",
+      "Retrieve your token's bot user": "https://developers.notion.com/reference/get-self",
+
+      "Search": "https://developers.notion.com/reference/post-search"
+    };
+
+    return docLinks[title] || "https://developers.notion.com/reference/intro";
+  }
 }
