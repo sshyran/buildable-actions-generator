@@ -130,7 +130,7 @@ const verifyInput = ({ ${verifyInput} }) => {
 };
 `;
 
-const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getAxiosCall, pathOrURL, isURL  } = {}) => {
+const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getAxiosCall, pathOrURL, isURL  } = {}) => {
 
   let openApi
 
@@ -176,7 +176,7 @@ const run = async ({ baseURL, config, getTitle, getDescription, getDocs, getRunF
         }
       }
 
-      const params = getEnvVarParams(config, ["path", "query"]).concat(getParameters(openApi, path, method));
+      const params = getParams ? getParams(openApi, path, method) : getEnvVarParams(config, ["path", "query"]).concat(getParameters(openApi, path, method));
 
       const body = getEnvVarParams(config, ["body"]).concat(getBodyParameters(openApi, path, method));
 
