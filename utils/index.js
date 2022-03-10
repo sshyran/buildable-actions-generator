@@ -4,6 +4,9 @@ const cloneDeep = require("lodash/cloneDeep")
 const pick = require("lodash/pick")
 const prettier = require("prettier")
 
+const sampleOverrides = require("../sampler-override")
+OpenAPISampler._registerSampler("string", sampleOverrides.sampleString)
+
 function camelize(str) {
   return str
     .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
