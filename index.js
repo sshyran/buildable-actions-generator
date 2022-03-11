@@ -339,112 +339,145 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
   }
 };
 
+// run({
+//   // baseURL: "{TATUM_API_URL}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+//   config: {
+//     type: "js-request-function",
+//     envVars: {
+//       TWITTER_BEARER_TOKEN: {
+//         development: "",
+//         production: "",
+//         in: "header",
+//         headerName: "authorization"
+//       },
+//     },
+//     fee: 0,
+//     category: "social",
+//     accessType: "open",
+//     language: "javascript",
+//     price: "free",
+//     platform: "twitter",
+//     tags: ["twitter", "social"],
+//     stateType: "stateless",
+//     __version: "1.0.0",
+//   },
+//   pathOrURL: "https://api.twitter.com/2/openapi.json",
+//   isURL: true,
+//   getDocs: (openApi, path, method) => {
+//     return `https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2`
+//   },
+//   getRunFile: ({
+//     openApi, 
+//     path, 
+//     method,
+//     url, 
+//     axiosAuth, 
+//     axiosHeaders, 
+//     axiosParams, 
+//     axiosData,
+//     title,
+//     description,
+//     docs,
+//     input,
+//     axiosCall,
+//     verifyInput,
+//     verifyErrors,
+//     verifyChecks,
+//   }) => {
+//     axiosParams = axiosParams.trim().length > 0 ? axiosParams + `,
+//       paramsSerializer: (params) => {
+//         return qs.stringify(params, { arrayFormat: "comma" });
+//       }
+//       ` : ""
+
+//     return `
+//     /**
+//      * ----------------------------------------------------------------------------------------------------
+//      * ${title} [Run]
+//      *
+//      * @description - ${description}
+//      *
+//      * @author    Buildable Technologies Inc.
+//      * @access    open
+//      * @license   MIT
+//      * @docs      ${docs}
+//      *
+//      * ----------------------------------------------------------------------------------------------------
+//      */
+    
+//     const axios = require("axios");${axiosParams.trim().length > 0 ? `\nconst qs = require("qs");` : ""}
+    
+    
+//     /**
+//      * The Node’s executable function
+//      *
+//      * @param {Run} input - Data passed to your Node from the input function
+//      */
+//     const run = async (input) => {
+//       const { ${input} } = input;
+    
+//       verifyInput(input);
+    
+//       try {
+//         const { data } = await axios({
+//           method: "${method}",
+//           url: \`${url}\`,
+//           ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
+//         });
+    
+//         return data;
+//       } catch (error) {
+//         return {
+//           failed: true,
+//           message: error.message,
+//           data: error.response.data,
+//         };
+//       }
+//     };
+    
+//     /**
+//      * Verifies the input parameters
+//      */
+//     const verifyInput = ({ ${verifyInput} }) => {
+//       const ERRORS = {
+//         ${verifyErrors}
+//       };
+    
+//       ${verifyChecks}
+//     };
+//     `
+//   }
+// });
+
+
 run({
-  // baseURL: "{TATUM_API_URL}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  baseURL: "https://{SPOTIFY_BASE_URI}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
   config: {
+    platform: "spotify",
     type: "js-request-function",
     envVars: {
-      TWITTER_BEARER_TOKEN: {
+      SPOTIFY_BASE_URI: {
+        development: "https://api.spotify.com/v1",
+        production: "https://api.spotify.com/v1",
+        in: "path"
+      },
+      SPOTIFY_ACCESS_TOKEN: {
         development: "",
         production: "",
         in: "header",
+        // name: "password",
         headerName: "authorization"
-      },
+      }
     },
     fee: 0,
-    category: "social",
+    category: "media",
     accessType: "open",
     language: "javascript",
     price: "free",
-    platform: "twitter",
-    tags: ["twitter", "social"],
+    tags: ["music", "podcasts"],
     stateType: "stateless",
     __version: "1.0.0",
   },
-  pathOrURL: "https://api.twitter.com/2/openapi.json",
-  isURL: true,
-  getDocs: (openApi, path, method) => {
-    return `https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2`
-  },
-  getRunFile: ({
-    openApi, 
-    path, 
-    method,
-    url, 
-    axiosAuth, 
-    axiosHeaders, 
-    axiosParams, 
-    axiosData,
-    title,
-    description,
-    docs,
-    input,
-    axiosCall,
-    verifyInput,
-    verifyErrors,
-    verifyChecks,
-  }) => {
-    axiosParams = axiosParams.trim().length > 0 ? axiosParams + `,
-      paramsSerializer: (params) => {
-        return qs.stringify(params, { arrayFormat: "comma" });
-      }
-      ` : ""
-
-    return `
-    /**
-     * ----------------------------------------------------------------------------------------------------
-     * ${title} [Run]
-     *
-     * @description - ${description}
-     *
-     * @author    Buildable Technologies Inc.
-     * @access    open
-     * @license   MIT
-     * @docs      ${docs}
-     *
-     * ----------------------------------------------------------------------------------------------------
-     */
-    
-    const axios = require("axios");${axiosParams.trim().length > 0 ? `\nconst qs = require("qs");` : ""}
-    
-    
-    /**
-     * The Node’s executable function
-     *
-     * @param {Run} input - Data passed to your Node from the input function
-     */
-    const run = async (input) => {
-      const { ${input} } = input;
-    
-      verifyInput(input);
-    
-      try {
-        const { data } = await axios({
-          method: "${method}",
-          url: \`${url}\`,
-          ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
-        });
-    
-        return data;
-      } catch (error) {
-        return {
-          failed: true,
-          message: error.message,
-          data: error.response.data,
-        };
-      }
-    };
-    
-    /**
-     * Verifies the input parameters
-     */
-    const verifyInput = ({ ${verifyInput} }) => {
-      const ERRORS = {
-        ${verifyErrors}
-      };
-    
-      ${verifyChecks}
-    };
-    `
-  }
+  pathOrURL: "./openapi-specs/spotify.json",
+  isURL: false,
 });

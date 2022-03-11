@@ -344,3 +344,30 @@ const notion = {
     return docLinks[title] || "https://developers.notion.com/reference/intro";
   }
 }
+
+const spotify = {
+  baseURL: `https://${SPOTIFY_BASE_URI}`, // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  config: {
+    platform: "spotify",
+    type: "js-request-function",
+    envVars: {
+      SPOTIFY_ACCESS_TOKEN: {
+        development: "",
+        production: "",
+        in: "header",
+        // name: "password",
+        headerName: "authorization"
+      }
+    },
+    fee: 0,
+    category: "media",
+    accessType: "open",
+    language: "javascript",
+    price: "free",
+    tags: ["music", "podcasts"],
+    stateType: "stateless",
+    __version: "1.0.0",
+  },
+  pathOrURL: "./openapi-specs/spotify.json",
+  isURL: false,
+}
