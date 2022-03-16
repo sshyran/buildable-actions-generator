@@ -451,7 +451,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
 
 run({
-  baseURL: "https://{SPOTIFY_BASE_URI}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  baseURL: "{SPOTIFY_BASE_URI}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
   config: {
     platform: "spotify",
     type: "js-request-function",
