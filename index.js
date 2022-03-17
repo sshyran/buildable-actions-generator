@@ -27,7 +27,9 @@ const {
   getTemplateString,
   getTemplateObjectAttribute,
   requiredSort
-} = require("./utils")
+} = require("./utils");
+
+const { generateChangelogs } = require("./generate-changelogs");
 
 
 
@@ -337,6 +339,8 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
       fs.writeFileSync(`${dir}/input.js`, _inputFile);
     }
   }
+
+  await generateChangelogs(config.platform); // Generate changelogs
 };
 
 // run({
