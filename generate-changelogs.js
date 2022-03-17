@@ -34,7 +34,8 @@ const generateChangelogs = async (name) => {
   
   for (let directory of actionDirectories) {
     const templateData = {
-      templateName: `${name}/${directory.split("/")[1]}`
+      templateName: `${name}/${directory.split("/")[1]}`,
+      date: new Date().toLocaleString().split(",")[0]
     };
 
     const output = Mustache.render(changelogTemplate, templateData);
