@@ -1,56 +1,44 @@
 const fs = require("fs");
+const http = require("http")
+const axios = require("axios")
 const { snakeCase } = require("snake-case");
 const kebabCase = require("lodash/kebabCase")
 const {titleCase} = require("title-case")
 const get = require("lodash/get")
-const axios = require("axios")
+const union = require("lodash/union")
+const omit = require("lodash/omit")
 const {
+  camelize,
+  sentenceCase,
   getBaseUrl,
   getFullPath,
   getHeadersArray,
+  getHeaders,
+  getParameters,
+  getBodyParameters,
   _getParameters,
   _getBodyParameters,
-} = require("./parse-openapi");
-const openApi = JSON.parse(fs.readFileSync("../../Desktop/tatum-openapi.json"));
+  getEnvVarParams,
+  getInputName,
+  requiredInputTemplate,
+  optionalInputTemplate,
+  mapWithTemplate,
+  cleanConfigEnvVars,
+  getTemplateString,
+  getTemplateObjectAttribute,
+  requiredSort
+} = require("./utils");
 
-function camelize(str) {
-  return str
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
-      return index === 0 ? word.toLowerCase() : word.toUpperCase();
-    })
-    .replace(/\s+/g, "");
-}
+const { generateChangelogs } = require("./generate-changelogs");
 
-function sentenceCase(theString) {
-	var newString = theString.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g,function(c){return c.toUpperCase()});
-  return newString;
-}
 
-let configFile = ({ name, title, description }) => ({
+
+let configFile = ({ name, title, description, ...rest }) => ({
   name: name,
   title: title,
   description: description,
-  type: "js-request-function",
-  envVars: {
-    TATUM_API_URL: {
-      development: "https://api-us-west1.tatum.io",
-      production: "https://api-us-west1.tatum.io",
-    },
-    TATUM_API_KEY: {
-      development: "",
-      production: "",
-    },
-  },
-  fee: 0,
-  image: "https://assets.buildable.dev/catalog/node-templates/tatum.svg",
-  category: "blockchain",
-  accessType: "open",
-  language: "javascript",
-  price: "free",
-  platform: "tatum",
-  tags: ["blockchain", "cryptocurrency", "web3"],
-  stateType: "stateless",
-  __version: "1.0.0",
+  image: `https://assets.buildable.dev/catalog/node-templates/${rest.platform}.svg`,
+  ...rest
 });
 
 let inputFile = ({ title, docs, input }) => `
@@ -62,6 +50,7 @@ let inputFile = ({ title, docs, input }) => `
  * @access    open
  * @license   MIT
  * @docs      ${docs}
+ * 
  * ----------------------------------------------------------------------------------------------------
  */
 
@@ -83,6 +72,7 @@ let runFile = ({
   title,
   description,
   docs,
+  imports,
   input,
   axiosCall,
   verifyInput,
@@ -103,7 +93,7 @@ let runFile = ({
  * ----------------------------------------------------------------------------------------------------
  */
 
-const axios = require("axios");
+${imports || `const axios = require("axios");`}
 
 /**
  * The Node’s executable function
@@ -142,281 +132,205 @@ const verifyInput = ({ ${verifyInput} }) => {
 };
 `;
 
-const run = async () => {
-  // const openApi = (await axios({
-  //   url: "https://api.twitter.com/2/openapi.json"
-  // })).data
+const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getAxiosCall, pathOrURL, isURL  } = {}) => {
+
+  let openApi
+
+  if(isURL) {
+    openApi = (await axios({
+      url: pathOrURL
+    })).data
+  } else {
+    openApi = JSON.parse(fs.readFileSync(pathOrURL));
+  }
+
+  const httpMethods = {}
+  http.METHODS.forEach(method => {
+    httpMethods[method.toLowerCase()] = method
+  })
 
   for (let path in openApi.paths) {
     // console.log(path)
     for (let method in openApi.paths[path]) {
       // console.log(">", method)
-      if(openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "application/x-www-form-urlencoded" || i === "multipart/form-data")) {
-        //skip deprecated methods
+      if(!httpMethods[method] || openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "multipart/form-data")) {
         continue
       }
 
-      const url =
-        "{TATUM_API_URL}" + getFullPath(openApi, path, method); // free tier api keys are in eu
+      let url = (baseURL || getBaseUrl(openApi, path, method)) + getFullPath(openApi, path, method);
 
-      const headers = getHeadersArray(openApi, path, method)
-        .map(header => {
-          if(header.value && header.value.includes("REPLACE_KEY_VALUE")) {
-            header.isEnvironmentVariable = true
-            header.required = true
-            header.envVarName = "TATUM_API_KEY"
-            header.sample = "$trigger.env.TATUM_API_KEY"
-          } else {
-            header.sample = header.sample || header.example || (header.schema && (header.schema.default || header.schema.type))
-          }
+      const auth = getEnvVarParams(config, ["auth"])
 
-          
-          if(header.name.split("-")[0] === "x" || header.name.split("-")[0] === "X") {
-            header.camelizedName = camelize(header.name.split("-").slice(1).join("-")).replace(/-/g, "")
-          } else {
-            header.camelizedName = camelize(header.name).replace(/-/g, "")
-          }
+      const headers = [];
 
-          
+      const openApiHeaders = getHeaders(openApi, path, method)
+      const envVarHeaders = getEnvVarParams(config, ["header"])
+      
+      for(let header of openApiHeaders) {
+        const envVarHeader = envVarHeaders.find(p => p.headerName.toLowerCase() === header.name.toLowerCase())
+        if(header.isAuth && envVarHeader) {
+          headers.push({
+            ...header,
+            ...envVarHeader,
+          })
+        } else if (!header.isAuth) {
+          headers.push(header)
+        }
+      }
 
-          return header
-        });
+      const params = getParams ? getParams(openApi, path, method) : getEnvVarParams(config, ["path", "query"]).concat(getParameters(openApi, path, method));
 
-      const params = [{
-        name: "TATUM_API_URL",
-        in: "path",
-        required: true,
-        isEnvironmentVariable: true,
-        envVarName: "TATUM_API_URL",
-        sample: "$trigger.env.TATUM_API_URL"
-      }].concat(_getParameters(openApi, path, method, {}).filter(p => !p.deprecated && !headers.find(h => h.name === p.name)).map(i => {
-        i.camelizedName = camelize(i.name).replace(".", "")
+      const body = getEnvVarParams(config, ["body"]).concat(getBodyParameters(openApi, path, method));
 
-        return i
-      }));
+      let axiosAuth = auth.length > 0
+      ? `auth: {${auth.sort(requiredSort).map(getTemplateObjectAttribute).join(", ")}}`
+      : ""
 
-      const body = _getBodyParameters(openApi, path, method).filter(p => !p.deprecated).map(i => {
-        i.camelizedName = camelize(i.name).replace(".", "")
+      let axiosHeaders = headers.length > 0 
+      ? `headers: {${headers.sort(requiredSort).map(getTemplateObjectAttribute).join(", ")}}`
+      : ""
 
-        return i
-      });
-
-      const auth = []
-
-      let title = titleCase(openApi.paths[path][method].summary)     
-
-      let description =
-        sentenceCase(openApi.paths[path][method].summary) + " using the Tatum API";
-
-      let docs = `https://tatum.io/apidoc.php#operation/${openApi.paths[path][method].operationId}`
-
-
-      let input = auth
-        .concat(headers)
-        .concat(params)
-        .concat(body)
-        .sort((a, b) => { // sort required first
-          if (a.isEnvironmentVariable) {
-            return -1;
-          }
-
-          if (b.isEnvironmentVariable) {
-            return 1;
-          }
-
-          if (a.required) {
-            return -1;
-          }
-
-          if (b.required) {
-            return 1;
-          }
-
-          return 0;
-        })
-        .map((i) => i.envVarName || i.camelizedName || i.name)
+      const queryParams = params.filter((i) => i.in === "query")
+      let axiosParams = queryParams.length > 0
+      ? `params: {${queryParams.sort(requiredSort).map(getTemplateObjectAttribute)}}`
+      : ""
 
       let axiosData =
         body.length > 0
-          ? `data: {${body
-              .sort((a, b) => { // sort required first
-                if (a.required) {
-                  return -1;
-                }
-                if (b.required) {
-                  return 1;
-                }
-
-                return 0;
-              })
-              .map((i) => {
-                if(i.name.includes(".")) {
-                  return i.required ? `"${i.name}": ${i.camelizedName}` : `...(${i.camelizedName} ? { "${i.name}": ${i.camelizedName} } : {})`
-                }
-    
-                return i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`
-              })}}`
+          ? `data: {${body.sort(requiredSort).map(getTemplateObjectAttribute)}}`
           : "";
-
-      let axiosCall = `
-        method: "${method}",
-        url: \`${url.replace(/{/g, "${")}\`,
-        headers: {${headers
-          .sort((a, b) => { // sort required first
-            if (a.required) {
-              return -1;
-            }
-            if (b.required) {
-              return 1;
-            }
-
-            return 0;
-          })
-          .map((i) => {
-            if(i.required) {
-              return `"${i.name}": \`\${${i.envVarName || i.camelizedName || i.name}}\``
-            } else {
-              return `...(${i.envVarName || i.camelizedName || i.name} ? { "${i.name}": \`\${${i.envVarName || i.camelizedName || i.name}}\`  } : {})`
-            }
-          })
-          .join(", ")}},
-        params: {${params
-          .filter((i) => i.in === "query")
-          .sort((a, b) => { // sort required first
-            if (a.required) {
-              return -1;
-            }
-            if (b.required) {
-              return 1;
-            }
-
-            return 0;
-          })
-          .map((i) => {
-            if(i.name.includes(".")) {
-              return i.required ? `"${i.name}": ${i.camelizedName}` : `...(${i.camelizedName} ? { "${i.name}": ${i.camelizedName} } : {})`
-            }
-
-            return i.required ? `${i.name}` : `...(${i.name} ? { ${i.name} } : {})`
-          }
-          )}},
-        ${axiosData}
-      `;
       
 
-      let verifyInput = headers
-        .concat(params)
-        .concat(body)
+      let imports = ""
+      
+      if(get(openApi.paths[path][method], "requestBody.content.application/x-www-form-urlencoded")) {
+        imports = `const axios = require("axios");\nconst qs = require("qs");`
+        axiosData = body.length > 0 ? `data: qs.stringify({${body.sort(requiredSort).map(getTemplateObjectAttribute)}})` : "";
+      }
+
+      (url.match(/{\w*}/g) || []).forEach(match => {
+        const param = params.find(p => [p.name, p.camelizedName, p.envVarName].includes(match.substring(1, match.length - 1)))
+        if(param) {
+          url = url.replace(match, `\${${getInputName(param)}}`)
+        }
+      });
+      
+      let axiosCall = `
+        method: ${getTemplateString(method)},
+        url: ${getTemplateString(url)},
+        ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
+      `;
+
+      // first display env vars, then required, then optional
+      const inputUnion = union(auth, headers, params, body)
+
+      let inputEnvs = inputUnion
+        .filter(i => !i.hardcoded && i.isEnvironmentVariable)
+      
+      let inputNonEnvs = inputUnion
+        .filter(i => !i.hardcoded && !i.isEnvironmentVariable)
+        .sort(requiredSort)
+      
+      let input = inputEnvs.concat(inputNonEnvs)
+      
+
+      let verifyInput = input
         .filter((i) => i.required)
-        .map((i) => i.envVarName || i.camelizedName || i.name);
-      let verifyErrors = headers
-        .concat(params)
-        .concat(body)
+        .map((i) => getInputName(i));
+
+      let verifyErrors = input
         .filter((i) => i.required)
         .map(
           (i) =>
-            `INVALID_${snakeCase(i.envVarName || i.camelizedName || i.name).toUpperCase()}: "A valid ${
-              i.envVarName || i.camelizedName || i.name
+            `INVALID_${snakeCase(getInputName(i)).toUpperCase()}: "A valid ${
+              getInputName(i)
             } field (${typeof i.sample}) was not provided in the input.",`
         )
         .join("\n");
-      let verifyChecks = headers
-        .concat(params)
-        .concat(body)
+
+      const verifyChecks = input
         .filter((i) => i.required)
-        .filter(p => p.in !== "header" || p.envVarName)
         .map(
           (i) =>
             `if (typeof ${
-              i.envVarName || i.camelizedName || i.name
+              getInputName(i)
             } !== "${typeof i.sample}") throw new Error(ERRORS.INVALID_${snakeCase(
-              i.envVarName || i.camelizedName || i.name
+              getInputName(i)
             ).toUpperCase()});`
         )
         .join("\n");
 
-      let _runFile = runFile({
+    
+      const summary = openApi.paths[path][method].summary || openApi.paths[path][method].description || kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
+
+      const title = (getTitle ? getTitle(openApi, path, method) : titleCase(summary)).substring(0, 100)
+
+      const description = getDescription ? getDescription(openApi, path, method) : sentenceCase(summary) + ` using the ${titleCase(config.platform)} API`;
+
+      const docs = getDocs ? getDocs(openApi, path, method) : get(openApi.paths[path][method], "externalDocs.url") 
+
+      const runFileInput = {
+        openApi, 
+        path, 
+        method,
         title,
         description,
         docs,
-        input,
+        imports,
+        input: input.map((i) => getInputName(i)),
         axiosCall,
+        url,
+        axiosAuth, 
+        axiosHeaders, 
+        axiosParams, 
+        axiosData,
         verifyInput,
         verifyErrors,
         verifyChecks,
-      });
+      }
 
+      const _runFile = getRunFile ? getRunFile(runFileInput) : runFile(runFileInput);
+
+      const configFileName = camelize(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description) + "Result"
       
-
-      let _configFile = configFile({
+      const configFileInput = {
+        openApi, 
+        path, 
+        method,
         title,
         description,
-        name:
-          camelize(openApi.paths[path][method].summary).replace(/\W/g, '') +
-          "Result",
-      });
+        name: configFileName.length > 50 || configFileName.length === 0 ? "result" : configFileName,
+        ...cleanConfigEnvVars(config)
+      }
 
-      const handleJSONSampleQuotes = (json) => {
-        return json.replace(/\uFFFF/g, '\\"');
-      };
+      const _configFile = getConfigFile ? getConfigFile(configFileInput) : configFile(omit(configFileInput, ["openApi", "path", "method"]));
 
-      let inputFileInput = `
-      ${auth
-        .concat(headers)
-        .concat(params)
-        .concat(body)
-        .filter((p) => p.required)
-        .map((p) => {
-          if (p.sample && typeof p.sample === "string") {
-            if (p.isEnvironmentVariable) {
-              return `${p.envVarName || p.camelizedName || p.name}: ${
-                p.sample && typeof p.sample === "object"
-                  ? handleJSONSampleQuotes(JSON.stringify(p.sample))
-                  : p.sample
-              }, // Required`;
-            }
-
-            return `${p.camelizedName}: \`${p.sample.replace(/"/g, "")}\`, // Required`;
-          }
-
-          return `${p.camelizedName}: ${
-            p.sample && typeof p.sample === "object"
-              ? handleJSONSampleQuotes(JSON.stringify(p.sample))
-              : p.sample
-          }, // Required`;
-        })
-        .join("\n")}
-      
-      ${auth
-        .concat(headers)
-        .concat(params)
-        .concat(body)
-        .filter((p) => !p.required)
-        .map((p) => {
-          if (p.sample && typeof p.sample === "string") {
-            if (p.isEnvironmentVariable) {
-              return `${p.envVarName || p.camelizedName || p.name}: ${
-                p.sample && typeof p.sample === "object"
-                  ? handleJSONSampleQuotes(JSON.stringify(p.sample))
-                  : p.sample
-              }, // Required`;
-            }
-
-            return `// ${p.camelizedName}: \`${p.sample.replace(/"/g, "")}\`,`;
-          }
-
-          return `// ${p.camelizedName}: ${
-            p.sample && typeof p.sample === "object"
-              ? handleJSONSampleQuotes(JSON.stringify(p.sample))
-              : p.sample
-          },`;
-        })
-        .join("\n")}
+      const inputFileParams = `
+        ${mapWithTemplate(union(auth, headers, params, body)
+          .filter(i => !i.hardcoded)
+          .filter((p) => p.required), requiredInputTemplate)
+          .join("\n")}
+        
+        ${mapWithTemplate(union(auth, headers, params, body)
+          .filter(i => !i.hardcoded)
+          .filter((p) => !p.required), optionalInputTemplate)
+          .join("\n")}
       `;
 
-      let _inputFile = inputFile({ title, docs, input: inputFileInput });
+      const inputFileInput = {
+        openApi, 
+        path, 
+        method,
+        title, 
+        docs, 
+        input: inputFileParams,
+      }
 
-      let dir = `generated/${kebabCase(openApi.paths[path][method].summary)}`;
+      let _inputFile = getInputFile ? getInputFile(inputFileInput) : inputFile(inputFileInput);
+
+
+
+      let dir = `generated/${kebabCase(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
 
       fs.mkdirSync(dir, { recursive: true });
 
@@ -425,6 +339,245 @@ const run = async () => {
       fs.writeFileSync(`${dir}/input.js`, _inputFile);
     }
   }
+
+  await generateChangelogs(config.platform); // Generate changelogs
 };
 
-run();
+// run({
+//   // baseURL: "{TATUM_API_URL}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+//   config: {
+//     type: "js-request-function",
+//     envVars: {
+//       TWITTER_BEARER_TOKEN: {
+//         development: "",
+//         production: "",
+//         in: "header",
+//         headerName: "authorization"
+//       },
+//     },
+//     fee: 0,
+//     category: "social",
+//     accessType: "open",
+//     language: "javascript",
+//     price: "free",
+//     platform: "twitter",
+//     tags: ["twitter", "social"],
+//     stateType: "stateless",
+//     __version: "1.0.0",
+//   },
+//   pathOrURL: "https://api.twitter.com/2/openapi.json",
+//   isURL: true,
+//   getDocs: (openApi, path, method) => {
+//     return `https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2`
+//   },
+//   getRunFile: ({
+//     openApi, 
+//     path, 
+//     method,
+//     url, 
+//     axiosAuth, 
+//     axiosHeaders, 
+//     axiosParams, 
+//     axiosData,
+//     title,
+//     description,
+//     docs,
+//     input,
+//     axiosCall,
+//     verifyInput,
+//     verifyErrors,
+//     verifyChecks,
+//   }) => {
+//     axiosParams = axiosParams.trim().length > 0 ? axiosParams + `,
+//       paramsSerializer: (params) => {
+//         return qs.stringify(params, { arrayFormat: "comma" });
+//       }
+//       ` : ""
+
+//     return `
+//     /**
+//      * ----------------------------------------------------------------------------------------------------
+//      * ${title} [Run]
+//      *
+//      * @description - ${description}
+//      *
+//      * @author    Buildable Technologies Inc.
+//      * @access    open
+//      * @license   MIT
+//      * @docs      ${docs}
+//      *
+//      * ----------------------------------------------------------------------------------------------------
+//      */
+    
+//     const axios = require("axios");${axiosParams.trim().length > 0 ? `\nconst qs = require("qs");` : ""}
+    
+    
+//     /**
+//      * The Node’s executable function
+//      *
+//      * @param {Run} input - Data passed to your Node from the input function
+//      */
+//     const run = async (input) => {
+//       const { ${input} } = input;
+    
+//       verifyInput(input);
+    
+//       try {
+//         const { data } = await axios({
+//           method: "${method}",
+//           url: \`${url}\`,
+//           ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
+//         });
+    
+//         return data;
+//       } catch (error) {
+//         return {
+//           failed: true,
+//           message: error.message,
+//           data: error.response.data,
+//         };
+//       }
+//     };
+    
+//     /**
+//      * Verifies the input parameters
+//      */
+//     const verifyInput = ({ ${verifyInput} }) => {
+//       const ERRORS = {
+//         ${verifyErrors}
+//       };
+    
+//       ${verifyChecks}
+//     };
+//     `
+//   }
+// });
+
+
+run({
+  baseURL: "{SPOTIFY_BASE_URI}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  config: {
+    platform: "spotify",
+    type: "js-request-function",
+    envVars: {
+      SPOTIFY_BASE_URI: {
+        development: "https://api.spotify.com/v1",
+        production: "https://api.spotify.com/v1",
+        in: "path"
+      },
+      SPOTIFY_CLIENT_ID: {
+        development: "",
+        production: "",
+        in: "auth",
+        name: "username"
+      },
+      SPOTIFY_CLIENT_SECRET: {
+        development: "",
+        production: "",
+        in: "auth",
+        name: "password"
+      }
+    },
+    fee: 0,
+    category: "media",
+    accessType: "open",
+    language: "javascript",
+    price: "free",
+    tags: ["music", "podcasts"],
+    stateType: "stateless",
+    __version: "1.0.0",
+  },
+  pathOrURL: "./openapi-specs/spotify.json",
+  isURL: false,
+  getRunFile: ({
+    title,
+    description,
+    docs,
+    imports,
+    input,
+    url,
+    method,
+    axiosHeaders,
+    axiosAuth,
+    axiosParams,
+    axiosData,
+    verifyInput,
+    verifyErrors,
+    verifyChecks,
+  }) => {
+    return `
+    /**
+     * ----------------------------------------------------------------------------------------------------
+     * ${title} [Run]
+     *
+     * @description - ${description}
+     *
+     * @author    Buildable Technologies Inc.
+     * @access    open
+     * @license   MIT
+     * @docs      ${docs}
+     *
+     * ----------------------------------------------------------------------------------------------------
+     */
+    
+     const axios = require("axios");
+     const qs = require("qs");
+    
+    /**
+     * The Node’s executable function
+     *
+     * @param {Run} input - Data passed to your Node from the input function
+     */
+    const run = async (input) => {
+      const { ${input} } = input;
+    
+      verifyInput(input);
+    
+      try {
+        const { data: { access_token } } = await axios({
+          method: "post",
+          url: "https://accounts.spotify.com/api/token",
+          headers: { 
+            "Content-Type": "application/x-www-form-urlencoded" 
+          },
+          auth: {
+            username: SPOTIFY_CLIENT_ID,
+            password: SPOTIFY_CLIENT_SECRET
+          },
+          data: qs.stringify({ grant_type: "client_credentials" })
+        });
+        
+        const { ${input.includes("data") ? "data: _data" : "data"} } = await axios({
+          method: ${getTemplateString(method)},
+          url: ${getTemplateString(url)},
+          headers: {
+            Authorization: \`Bearer \${access_token}\`
+          },
+          ${[
+            axiosParams,
+            axiosData].filter(i => !!i.trim()).join(",\n")}
+        });
+    
+        return data;
+      } catch (error) {
+        return {
+          failed: true,
+          message: error.message,
+          data: error.response.data,
+        };
+      }
+    };
+    
+    /**
+     * Verifies the input parameters
+     */
+    const verifyInput = ({ ${verifyInput} }) => {
+      const ERRORS = {
+        ${verifyErrors}
+      };
+    
+      ${verifyChecks}
+    };`
+    
+  }
+});
