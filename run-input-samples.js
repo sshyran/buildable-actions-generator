@@ -371,3 +371,30 @@ const spotify = {
   pathOrURL: "./openapi-specs/spotify.json",
   isURL: false,
 }
+
+const stripe = {
+  baseURL: `https://api.stripe.com`,
+  config: {
+    platform: "stripe",
+    type: "js-request-function",
+    envVars: {
+      STRIPE_API_KEY: {
+        development: "",
+        production: "",
+        in: "header",
+        // name: "password",
+        headerName: "authorization"
+      }
+    },
+    fee: 0,
+    category: "payments",
+    accessType: "open",
+    language: "javascript",
+    price: "free",
+    tags: ["payments", "accounts"],
+    stateType: "stateless",
+    __version: "1.0.0",
+  },
+  pathOrURL: "./openapi-specs/stripe.json",
+  isURL: false,
+}

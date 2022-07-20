@@ -112,9 +112,9 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
   })
 
   for (let path in openApi.paths) {
-    // console.log(path)
+    console.log(path)
     for (let method in openApi.paths[path]) {
-      // console.log(">", method)
+      console.log(">", method)
       if(!httpMethods[method] || openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "multipart/form-data")) {
         continue
       }
@@ -417,129 +417,28 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
 
 run({
-  baseURL: "{SPOTIFY_BASE_URI}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  baseURL: `https://api.stripe.com`,
   config: {
-    platform: "spotify",
+    platform: "stripe",
     type: "js-request-function",
     envVars: {
-      SPOTIFY_BASE_URI: {
-        development: "https://api.spotify.com/v1",
-        production: "https://api.spotify.com/v1",
-        in: "path"
-      },
-      SPOTIFY_CLIENT_ID: {
+      STRIPE_API_KEY: {
         development: "",
         production: "",
-        in: "auth",
-        name: "username"
-      },
-      SPOTIFY_CLIENT_SECRET: {
-        development: "",
-        production: "",
-        in: "auth",
-        name: "password"
+        in: "header",
+        // name: "password",
+        headerName: "authorization"
       }
     },
     fee: 0,
-    category: "media",
+    category: "payments",
     accessType: "open",
     language: "javascript",
     price: "free",
-    tags: ["music", "podcasts"],
+    tags: ["payments", "accounts"],
     stateType: "stateless",
     __version: "1.0.0",
   },
-  pathOrURL: "./openapi-specs/spotify.json",
+  pathOrURL: "./openapi-specs/stripe.json",
   isURL: false,
-  getRunFile: ({
-    title,
-    description,
-    docs,
-    imports,
-    input,
-    url,
-    method,
-    axiosHeaders,
-    axiosAuth,
-    axiosParams,
-    axiosData,
-    verifyInput,
-    verifyErrors,
-    verifyChecks,
-  }) => {
-    return `
-    /**
-     * ----------------------------------------------------------------------------------------------------
-     * ${title} [Run]
-     *
-     * @description - ${description}
-     *
-     * @author    Buildable Technologies Inc.
-     * @access    open
-     * @license   MIT
-     * @docs      ${docs}
-     *
-     * ----------------------------------------------------------------------------------------------------
-     */
-    
-     const axios = require("axios");
-     const qs = require("qs");
-    
-    /**
-     * The Node’s executable function
-     *
-     * @param {Run} input - Data passed to your Node from the input function
-     */
-    const run = async (input) => {
-      const { ${input} } = input;
-    
-      verifyInput(input);
-    
-      try {
-        const { data: { access_token } } = await axios({
-          method: "post",
-          url: "https://accounts.spotify.com/api/token",
-          headers: { 
-            "Content-Type": "application/x-www-form-urlencoded" 
-          },
-          auth: {
-            username: SPOTIFY_CLIENT_ID,
-            password: SPOTIFY_CLIENT_SECRET
-          },
-          data: qs.stringify({ grant_type: "client_credentials" })
-        });
-        
-        const { ${input.includes("data") ? "data: _data" : "data"} } = await axios({
-          method: ${getTemplateString(method)},
-          url: ${getTemplateString(url)},
-          headers: {
-            Authorization: \`Bearer \${access_token}\`
-          },
-          ${[
-            axiosParams,
-            axiosData].filter(i => !!i.trim()).join(",\n")}
-        });
-    
-        return data;
-      } catch (error) {
-        return {
-          failed: true,
-          message: error.message,
-          data: error.response.data,
-        };
-      }
-    };
-    
-    /**
-     * Verifies the input parameters
-     */
-    const verifyInput = ({ ${verifyInput} }) => {
-      const ERRORS = {
-        ${verifyErrors}
-      };
-    
-      ${verifyChecks}
-    };`
-    
-  }
 });
