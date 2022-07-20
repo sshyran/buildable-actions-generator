@@ -42,25 +42,6 @@ let configFile = ({ name, title, description, ...rest }) => ({
 });
 
 let inputFile = ({ title, docs, input }) => `
-/**
- * ----------------------------------------------------------------------------------------------------
- * ${title} [Input]
- *
- * @author    Buildable Technologies Inc.
- * @access    open
- * @license   MIT
- * @docs      ${docs}
- * 
- * ----------------------------------------------------------------------------------------------------
- */
-
-/**
- * Lets you select the input for your Node's run function
- *
- * @param {Params} params
- * @param {Object} $trigger - This Flow's request object
- * @param {Object} $nodes - Data from above Nodes
- */
 const nodeInput = ({ $trigger, $nodes }) => {
   return {
     ${input}
@@ -79,27 +60,8 @@ let runFile = ({
   verifyErrors,
   verifyChecks,
 }) => `
-/**
- * ----------------------------------------------------------------------------------------------------
- * ${title} [Run]
- *
- * @description - ${description}
- *
- * @author    Buildable Technologies Inc.
- * @access    open
- * @license   MIT
- * @docs      ${docs}
- *
- * ----------------------------------------------------------------------------------------------------
- */
-
 ${imports || `const axios = require("axios");`}
 
-/**
- * The Node’s executable function
- *
- * @param {Run} input - Data passed to your Node from the input function
- */
 const run = async (input) => {
   const { ${input} } = input;
 
