@@ -144,13 +144,13 @@ const github = {
     platform: "github",
     type: "js-request-function",
     envVars: {
-      GITHUB_API_TOKEN: {
+      BUILDABLE_GITHUB_ACCESS_TOKEN: {
         development: "",
         production: "",
         in: "auth",
         name: "password"
       },
-      GITHUB_API_USERNAME: {
+      BUILDABLE_GITHUB_ACCOUNT_ID: {
         development: "",
         production: "",
         in: "auth",
@@ -165,8 +165,14 @@ const github = {
     tags: ["git", "code"],
     stateType: "stateless",
     __version: "1.0.0",
+    connections: [
+      {
+        id: "627aceaf971c67182d1d76ca",
+        type: "integration"
+      }
+    ]
   },
-  pathOrURL: "../play/openapi-github.json",
+  pathOrURL: "./openapi-specs/openapi-github.json",
   isURL: false,
 }
 
