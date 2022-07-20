@@ -42,7 +42,7 @@ let configFile = ({ name, title, description, ...rest }) => ({
 });
 
 let inputFile = ({ title, docs, input }) => `
-const nodeInput = ({ $trigger, $nodes }) => {
+const nodeInput = ({ $body, $headers, $env, $data }) => {
   return {
     ${input}
   };

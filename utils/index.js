@@ -549,7 +549,7 @@ const getEnvVarParams = (config, types = []) => {
         required: true,
         isEnvironmentVariable: true,
         envVarName: envVar,
-        sample: `$trigger.env.${envVar}`
+        sample: `$env.${envVar}`
       })
     }
   }
