@@ -2,12 +2,12 @@ const tatum = {
   baseURL: "{TATUM_API_URL}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
   config: {
     envVars: {
-      TATUM_API_URL: {
+      BUILDABLE_TATUM_API_URL: {
         development: "https://api-us-west1.tatum.io",
         production: "https://api-us-west1.tatum.io",
         in: "path"
       },
-      TATUM_API_KEY: {
+      BUILDABLE_TATUM_API_KEY: {
         development: "",
         production: "",
         in: "header",
@@ -29,7 +29,13 @@ const tatum = {
   isURL: false,
   getDocs: (openApi, path, method) => {
     return `https://tatum.io/apidoc.php#operation/${openApi.paths[path][method].operationId}`
-  }
+  },
+  connections: [
+    { 
+      id: "62d868570bd36f737a23f634",
+      type: "integration"
+    }
+  ]
 }
 
 const twitter = {
@@ -37,7 +43,7 @@ const twitter = {
   config: {
     type: "js-request-function",
     envVars: {
-      TWITTER_BEARER_TOKEN: {
+      BUILDABLE_TWITTER_BEARER_TOKEN: {
         development: "",
         production: "",
         in: "header",
@@ -56,6 +62,12 @@ const twitter = {
   },
   pathOrURL: "https://api.twitter.com/2/openapi.json",
   isURL: true,
+  connections: [
+    {
+      id: "62d86a790bd36f737a23f636",
+      type: "integration"
+    }
+  ],
   getDocs: (openApi, path, method) => {
     return `https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2`
   },
@@ -76,27 +88,8 @@ const twitter = {
     verifyChecks,
   }) => {
     return `
-    /**
-     * ----------------------------------------------------------------------------------------------------
-     * ${title} [Run]
-     *
-     * @description - ${description}
-     *
-     * @author    Buildable Technologies Inc.
-     * @access    open
-     * @license   MIT
-     * @docs      ${docs}
-     *
-     * ----------------------------------------------------------------------------------------------------
-     */
-    
-     const axios = require("axios");${axiosParams.length > 0 ? `\nconst qs = require("qs");` : ""}
-    
-    /**
-     * The Node’s executable function
-     *
-     * @param {Run} input - Data passed to your Node from the input function
-     */
+    const axios = require("axios");${axiosParams.length > 0 ? `\nconst qs = require("qs");` : ""}
+
     const run = async (input) => {
       const { ${input} } = input;
     
@@ -181,13 +174,13 @@ const twilio = {
   config: {
     platform: "twilio",
     envVars: {
-      TWILIO_ACCOUNT_SID: {
+      BUILDABLE_TWILIO_ACCOUNT_SID: {
         development: "",
         production: "",
         in: "auth",
         name: "username"
       },
-      TWILIO_AUTH_TOKEN: {
+      BUILDABLE_TWILIO_AUTH_TOKEN: {
         development: "",
         production: "",
         in: "auth",
@@ -204,8 +197,14 @@ const twilio = {
     __version: "1.0.0",
     type: "js-request-function",
   },
-  pathOrURL: "../play/twilio-openapi.json",
+  pathOrURL: "./openapi-specs/twilio-openapi.json",
   isURL: false,
+  connections: [
+    {
+      id: "62d8691d0bd36f737a23f635",
+      type: "integration"
+    }
+  ],
   getParams: (openApi, path, method) => {
     return getParameters(openApi, path, method).filter(p => p.name !== "AccountSid")
   },
@@ -233,28 +232,9 @@ const twilio = {
     verifyInput,
     verifyErrors,
     verifyChecks,
-  }) => `
-  /**
-   * ----------------------------------------------------------------------------------------------------
-   * ${title} [Run]
-   *
-   * @description - ${description}
-   *
-   * @author    Buildable Technologies Inc.
-   * @access    open
-   * @license   MIT
-   * @docs      ${docs}
-   *
-   * ----------------------------------------------------------------------------------------------------
-   */
-  
-  ${imports || `const axios = require("axios");`}
-  
-  /**
-   * The Node’s executable function
-   *
-   * @param {Run} input - Data passed to your Node from the input function
-   */
+  }) => `  
+  ${imports || axiosParams.length > 0 ? `const axios = require("axios");\nconst qs = require("qs");` : `const axios = require("axios");`}
+
   const run = async (input) => {
     const { ${input} } = input;
   
@@ -263,7 +243,7 @@ const twilio = {
     try {
       const { ${input.includes("data") ? "data: _data" : "data"} } = await axios({
         method: ${getTemplateString(method)},
-        url: ${getTemplateString(url.replace(/\{AccountSid}/g, "${TWILIO_ACCOUNT_SID}"))},
+        url: ${getTemplateString(url.replace(/\{AccountSid}/g, "${BUILDABLE_TWILIO_ACCOUNT_SID}"))},
         ${[
           axiosHeaders, 
           axiosAuth, 
@@ -301,7 +281,7 @@ const notion = {
     platform: "notion",
     type: "js-request-function",
     envVars: {
-      NOTION_API_TOKEN: {
+      BUILDABLE_NOTION_API_TOKEN: {
         development: "",
         production: "",
         in: "header",
@@ -348,7 +328,13 @@ const notion = {
     };
 
     return docLinks[title] || "https://developers.notion.com/reference/intro";
-  }
+  },
+  connections: [
+    {
+      id: "62d8577d0bd36f737a23f62c",
+      type: "integration"
+    }
+  ]
 }
 
 const spotify = {
@@ -357,7 +343,7 @@ const spotify = {
     platform: "spotify",
     type: "js-request-function",
     envVars: {
-      SPOTIFY_ACCESS_TOKEN: {
+      BUILDABLE_SPOTIFY_ACCESS_TOKEN: {
         development: "",
         production: "",
         in: "header",
@@ -376,6 +362,12 @@ const spotify = {
   },
   pathOrURL: "./openapi-specs/spotify.json",
   isURL: false,
+  connections: [
+    {
+      id: "62d865290bd36f737a23f632",
+      type: "integration"
+    }
+  ]
 }
 
 const stripe = {
