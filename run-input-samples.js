@@ -384,7 +384,7 @@ const stripe = {
     platform: "stripe",
     type: "js-request-function",
     envVars: {
-      STRIPE_API_KEY: {
+      BUILDABLE_STRIPE_API_KEY: {
         development: "",
         production: "",
         in: "header",
@@ -400,6 +400,12 @@ const stripe = {
     tags: ["payments", "accounts"],
     stateType: "stateless",
     __version: "1.0.0",
+    connections: [
+      {
+        id: "627aceaf971c67182d1d76ca",
+        type: "datastore"
+      }
+    ]
   },
   pathOrURL: "./openapi-specs/stripe.json",
   isURL: false,
