@@ -31,7 +31,7 @@ const tatum = {
       }
     ]
   },
-  pathOrURL: "../../Desktop/tatum-openapi.json",
+  pathOrURL: "./openapi-specs/tatum-openapi.json",
   isURL: false,
   getDocs: (openApi, path, method) => {
     return `https://tatum.io/apidoc.php#operation/${openApi.paths[path][method].operationId}`
