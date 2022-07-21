@@ -24,18 +24,18 @@ const tatum = {
     tags: ["blockchain", "crypto", "nft"],
     stateType: "stateless",
     __version: "1.0.0",
+    connections: [
+      { 
+        id: "62d868570bd36f737a23f634",
+        type: "integration"
+      }
+    ]
   },
   pathOrURL: "../../Desktop/tatum-openapi.json",
   isURL: false,
   getDocs: (openApi, path, method) => {
     return `https://tatum.io/apidoc.php#operation/${openApi.paths[path][method].operationId}`
   },
-  connections: [
-    { 
-      id: "62d868570bd36f737a23f634",
-      type: "integration"
-    }
-  ]
 }
 
 const twitter = {
