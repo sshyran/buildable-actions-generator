@@ -439,7 +439,7 @@ run({
     stateType: "stateless",
     __version: "1.0.0",
   },
-  pathOrURL: "./notion/openapi.json",
+  pathOrURL: "./openapi-specs/notion.json",
   isURL: false,
   getDocs: (openApi, path, method) => {
     const title = openApi["paths"][path][method].summary;
