@@ -59,15 +59,15 @@ const twitter = {
     tags: ["news", "tweet"],
     stateType: "stateless",
     __version: "1.0.0",
+    connections: [
+      {
+        id: "62d86a790bd36f737a23f636",
+        type: "integration"
+      }
+    ],
   },
   pathOrURL: "https://api.twitter.com/2/openapi.json",
   isURL: true,
-  connections: [
-    {
-      id: "62d86a790bd36f737a23f636",
-      type: "integration"
-    }
-  ],
   getDocs: (openApi, path, method) => {
     return `https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2`
   },
@@ -128,7 +128,7 @@ const twitter = {
       ${verifyChecks}
     };`
     
-  }
+  },
 }
 
 const github = {
@@ -160,7 +160,7 @@ const github = {
     __version: "1.0.0",
     connections: [
       {
-        id: "627aceaf971c67182d1d76ca",
+        id: "62d56b4f1b6b3fa97cb9a82a",
         type: "integration"
       }
     ]
@@ -196,15 +196,15 @@ const twilio = {
     stateType: "stateless",
     __version: "1.0.0",
     type: "js-request-function",
+    connections: [
+      {
+        id: "62d8691d0bd36f737a23f635",
+        type: "integration"
+      }
+    ],
   },
   pathOrURL: "./openapi-specs/twilio-openapi.json",
   isURL: false,
-  connections: [
-    {
-      id: "62d8691d0bd36f737a23f635",
-      type: "integration"
-    }
-  ],
   getParams: (openApi, path, method) => {
     return getParameters(openApi, path, method).filter(p => p.name !== "AccountSid")
   },
@@ -272,7 +272,7 @@ const twilio = {
   
     ${verifyChecks}
   };
-  `
+  `,
 }
 
 const notion = {
@@ -297,6 +297,12 @@ const notion = {
     tags: ["notes", "database", "website"],
     stateType: "stateless",
     __version: "1.0.0",
+    connections: [
+      {
+        id: "62d8577d0bd36f737a23f62c",
+        type: "integration"
+      }
+    ]
   },
   pathOrURL: "./openapi-specs/notion.json",
   isURL: false,
@@ -329,12 +335,6 @@ const notion = {
 
     return docLinks[title] || "https://developers.notion.com/reference/intro";
   },
-  connections: [
-    {
-      id: "62d8577d0bd36f737a23f62c",
-      type: "integration"
-    }
-  ]
 }
 
 const spotify = {
@@ -359,15 +359,15 @@ const spotify = {
     tags: ["music", "podcasts"],
     stateType: "stateless",
     __version: "1.0.0",
+    connections: [
+      {
+        id: "62d865290bd36f737a23f632",
+        type: "integration"
+      }
+    ]
   },
   pathOrURL: "./openapi-specs/spotify.json",
   isURL: false,
-  connections: [
-    {
-      id: "62d865290bd36f737a23f632",
-      type: "integration"
-    }
-  ]
 }
 
 const stripe = {
@@ -395,7 +395,7 @@ const stripe = {
     connections: [
       {
         id: "627aceaf971c67182d1d76ca",
-        type: "datastore"
+        type: "integration"
       }
     ]
   },
