@@ -143,7 +143,7 @@ const github = {
         in: "auth",
         name: "password"
       },
-      BUILDABLE_GITHUB_ACCOUNT_ID: {
+      BUILDABLE_GITHUB_USERNAME: {
         development: "",
         production: "",
         in: "auth",
