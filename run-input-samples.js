@@ -338,7 +338,7 @@ const notion = {
 }
 
 const spotify = {
-  baseURL: `https://${SPOTIFY_BASE_URI}`, // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  baseURL: `https://{SPOTIFY_BASE_URI}`, // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
   config: {
     platform: "spotify",
     type: "js-request-function",
@@ -361,7 +361,7 @@ const spotify = {
     __version: "1.0.0",
     connections: [
       {
-        id: "62d865290bd36f737a23f632",
+        id: "62d8668e0bd36f737a23f633",
         type: "integration"
       }
     ]
@@ -400,5 +400,38 @@ const stripe = {
     ]
   },
   pathOrURL: "./openapi-specs/stripe.json",
+  isURL: false,
+}
+
+const slack = {
+  baseURL: `https://slack.com/api`,
+  config: {
+    platform: "slack",
+    type: "js-request-function",
+    envVars: {
+      BUILDABLE_SLACK_ACCESS_TOKEN: {
+        development: "",
+        production: "",
+        in: "header",
+        // name: "password",
+        headerName: "authorization"
+      }
+    },
+    fee: 0,
+    category: "communication",
+    accessType: "open",
+    language: "javascript",
+    price: "free",
+    tags: ["business", "messaging", "chat"],
+    stateType: "stateless",
+    __version: "1.0.0",
+    connections: [
+      {
+        id: "62d863cd0bd36f737a23f631",
+        type: "integration"
+      }
+    ]
+  },
+  pathOrURL: "./openapi-specs/slack.json",
   isURL: false,
 }
