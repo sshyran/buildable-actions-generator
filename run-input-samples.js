@@ -483,6 +483,14 @@ const stripe = {
   },
   pathOrURL: "./openapi-specs/stripe.json",
   isURL: false,
+  getTitle: (openApi, path, method) => {
+    return titleCase(kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " "))
+  },
+  getDescription: (openApi, path, method) => {
+    return sentenceCase(openApi.paths[path][method].description.replace( /(<([^>]+)>)/ig, ''))
+      .replace(/[\n\r]/g, '')
+      .split(".")[0] + ' using the Stripe API.' // Shorten description
+  },
 }
 
 const slack = {

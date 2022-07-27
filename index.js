@@ -482,116 +482,42 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
 
 run({
-  baseURL: "{BUILDABLE_SPOTIFY_BASE_URI}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  baseURL: `https://api.stripe.com`,
   config: {
-    platform: "spotify",
+    platform: "stripe",
     type: "js-request-function",
     envVars: {
-      BUILDABLE_SPOTIFY_BASE_URI: {
-        development: "https://api.spotify.com/v1",
-        production: "https://api.spotify.com/v1",
-        in: "path"
-      },
-      BUILDABLE_SPOTIFY_CLIENT_ID: {
+      BUILDABLE_STRIPE_API_KEY: {
         development: "",
         production: "",
-        in: "auth",
-        name: "username"
-      },
-      BUILDABLE_SPOTIFY_CLIENT_SECRET: {
-        development: "",
-        production: "",
-        in: "auth",
-        name: "password"
+        in: "header",
+        // name: "password",
+        headerName: "authorization"
       }
     },
     fee: 0,
-    category: "media",
+    category: "payments",
     accessType: "open",
     language: "javascript",
     price: "free",
-    tags: ["music", "podcasts"],
+    tags: ["payments", "accounts"],
     stateType: "stateless",
     __version: "1.0.0",
     connections: [
       {
-        id: "62d865290bd36f737a23f632",
+        id: "627aceaf971c67182d1d76ca",
         type: "integration"
       }
-    ],
+    ]
   },
-  pathOrURL: "./openapi-specs/spotify.json",
+  pathOrURL: "./openapi-specs/stripe.json",
   isURL: false,
-  getRunFile: ({
-    title,
-    description,
-    docs,
-    imports,
-    input,
-    url,
-    method,
-    axiosHeaders,
-    axiosAuth,
-    axiosParams,
-    axiosData,
-    verifyInput,
-    verifyErrors,
-    verifyChecks,
-  }) => {
-    return `
-    const axios = require("axios");
-    const qs = require("qs");
-    
-    const run = async (input) => {
-      const { ${input} } = input;
-    
-      verifyInput(input);
-    
-      try {
-        const { data: { access_token } } = await axios({
-          method: "post",
-          url: "https://accounts.spotify.com/api/token",
-          headers: { 
-            "Content-Type": "application/x-www-form-urlencoded" 
-          },
-          auth: {
-            username: BUILDABLE_SPOTIFY_CLIENT_ID,
-            password: BUILDABLE_SPOTIFY_CLIENT_SECRET
-          },
-          data: qs.stringify({ grant_type: "client_credentials" })
-        });
-        
-        const { ${input.includes("data") ? "data: _data" : "data"} } = await axios({
-          method: ${getTemplateString(method)},
-          url: ${getTemplateString(url)},
-          headers: {
-            Authorization: \`Bearer \${access_token}\`
-          },
-          ${[
-            axiosParams,
-            axiosData].filter(i => !!i.trim()).join(",\n")}
-        });
-    
-        return data;
-      } catch (error) {
-        return {
-          failed: true,
-          message: error.message,
-          data: error.response.data,
-        };
-      }
-    };
-    
-    /**
-     * Verifies the input parameters
-     */
-    const verifyInput = ({ ${verifyInput} }) => {
-      const ERRORS = {
-        ${verifyErrors}
-      };
-    
-      ${verifyChecks}
-    };`
-    
-  }
+  getTitle: (openApi, path, method) => {
+    return titleCase(kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " "))
+  },
+  getDescription: (openApi, path, method) => {
+    return sentenceCase(openApi.paths[path][method].description.replace( /(<([^>]+)>)/ig, ''))
+      .replace(/[\n\r]/g, '')
+      .split(".")[0] + ' using the Stripe API.' // Shorten description
+  },
 })
