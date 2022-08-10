@@ -482,42 +482,28 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
 
 run({
-  baseURL: `https://api.stripe.com`,
+  baseURL: `https://circleci.com/api/v1`,
   config: {
-    platform: "stripe",
+    platform: "circleci",
     type: "js-request-function",
     envVars: {
-      BUILDABLE_STRIPE_API_KEY: {
+      BUILDABLE_CIRCLECI_PERSONAL_API_KEY: {
         development: "",
         production: "",
         in: "header",
-        // name: "password",
-        headerName: "authorization"
+        // name: "Circle-Token",
+        headerName: "Circle-Token"
       }
     },
     fee: 0,
-    category: "payments",
+    category: "devops",
     accessType: "open",
     language: "javascript",
     price: "free",
-    tags: ["payments", "accounts"],
+    tags: ["ci", "cicd"],
     stateType: "stateless",
     __version: "1.0.0",
-    connections: [
-      {
-        id: "627aceaf971c67182d1d76ca",
-        type: "integration"
-      }
-    ]
   },
-  pathOrURL: "./openapi-specs/stripe.json",
+  pathOrURL: "./openapi-specs/circleci.json",
   isURL: false,
-  getTitle: (openApi, path, method) => {
-    return titleCase(kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " "))
-  },
-  getDescription: (openApi, path, method) => {
-    return sentenceCase(openApi.paths[path][method].description.replace( /(<([^>]+)>)/ig, ''))
-      .replace(/[\n\r]/g, '')
-      .split(".")[0] + ' using the Stripe API.' // Shorten description
-  },
 })
