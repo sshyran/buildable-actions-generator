@@ -77,8 +77,8 @@ const run = async (input) => {
   } catch (error) {
     return {
       failed: true,
-      message: error.message,
-      data: error.response.data,
+      message: error?.message,
+      data: error?.response?.data,
     };
   }
 };
