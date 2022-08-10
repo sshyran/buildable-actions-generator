@@ -286,10 +286,6 @@ const getFullPath = function (openApi, path, method) {
 const getHeaders = (openApi, path, method) => {
   const headers = getHeadersArray(openApi, path, method)
 
-  return addHeadersAttributes(headers)
-}
-
-const addHeadersAttributes = (headers) => {
   return headers.map(header => {
     if(header.isAuth && header.value) {
       header.isEnvironmentVariable = true
@@ -696,5 +692,4 @@ module.exports = {
   getTemplateString,
   getTemplateObjectAttribute,
   requiredSort,
-  addHeadersAttributes
 }
