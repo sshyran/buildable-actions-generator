@@ -491,7 +491,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
 
 run({
-  baseURL: `https://circleci.com/api/v2`,
+  baseURL: `https://circleci.com/api/v1`,
   config: {
     platform: "circleci",
     type: "js-request-function",
@@ -500,8 +500,9 @@ run({
         development: "",
         production: "",
         in: "header",
-        headerName: "circle-token"
-      },
+        // name: "Circle-Token",
+        headerName: "Circle-Token"
+      }
     },
     fee: 0,
     category: "devops",
