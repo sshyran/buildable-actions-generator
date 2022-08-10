@@ -511,6 +511,12 @@ run({
     tags: ["ci", "cicd"],
     stateType: "stateless",
     __version: "1.0.0",
+    connections: [
+      {
+        id: "62f403ceaf5b59234588c878",
+        type: "integration"
+      }
+    ]
   },
   pathOrURL: "./openapi-specs/circleci.json",
   isURL: false,
