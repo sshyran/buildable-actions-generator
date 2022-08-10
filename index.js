@@ -26,7 +26,8 @@ const {
   cleanConfigEnvVars,
   getTemplateString,
   getTemplateObjectAttribute,
-  requiredSort
+  requiredSort,
+  addHeadersAttributes
 } = require("./utils");
 
 const { generateChangelogs } = require("./generate-changelogs");
@@ -136,6 +137,14 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
             ...envVarHeader,
           })
         } else if (!header.isAuth) {
+          headers.push(header)
+        }
+      }
+
+      for(let header of addHeadersAttributes(envVarHeaders.map(n => ({ ...n, name: n.headerName })))) {
+        const found = headers.find(h => h.name === header.headerName)
+
+        if(!found) {
           headers.push(header)
         }
       }
