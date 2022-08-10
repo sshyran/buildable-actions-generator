@@ -15,7 +15,7 @@
   ],
   "security": [
     {
-      "api_key_header": []
+      "circle-token": []
     },
     {
       "basic_auth": []
@@ -10747,11 +10747,12 @@
   },
   "components": {
     "securitySchemes": {
-      "api_key_header": {
+      "circle-token": {
         "type": "apiKey",
-        "name": "Circle-Token",
+        "name": "circle-token",
         "in": "header"
       },
+
       "basic_auth": {
         "description": "HTTP basic authentication. The username should be set as the circle-token value, and the password should be left blank. Note that project tokens are currently not supported on API v2.",
         "type": "http",
