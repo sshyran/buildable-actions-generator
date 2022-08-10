@@ -76,8 +76,8 @@ const run = async (input) => {
   } catch (error) {
     return {
       failed: true,
-      message: error.message,
-      data: error.response.data,
+      message: error?.message,
+      data: error?.response?.data,
     };
   }
 };
@@ -170,7 +170,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
         axiosData = body.length > 0 ? `data: qs.stringify({${body.sort(requiredSort).map(getTemplateObjectAttribute)}})` : "";
       }
 
-      (url.match(/{\w*}/g) || []).forEach(match => {
+      (url.match(/{(\w|-)*}/g) || []).forEach(match => {
         const param = params.find(p => [p.name, p.camelizedName, p.envVarName].includes(match.substring(1, match.length - 1)))
         if(param) {
           url = url.replace(match, `\${${getInputName(param)}}`)
@@ -482,42 +482,33 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
 
 run({
-  baseURL: `https://api.stripe.com`,
+  baseURL: `https://circleci.com/api/v2`,
   config: {
-    platform: "stripe",
+    platform: "circleci",
     type: "js-request-function",
     envVars: {
-      BUILDABLE_STRIPE_API_KEY: {
+      BUILDABLE_CIRCLECI_PERSONAL_API_KEY: {
         development: "",
         production: "",
-        in: "header",
-        // name: "password",
-        headerName: "authorization"
+        in: "auth",
+        name: "username"
       }
     },
     fee: 0,
-    category: "payments",
+    category: "devops",
     accessType: "open",
     language: "javascript",
     price: "free",
-    tags: ["payments", "accounts"],
+    tags: ["ci", "cicd"],
     stateType: "stateless",
     __version: "1.0.0",
     connections: [
       {
-        id: "627aceaf971c67182d1d76ca",
+        id: "62f403ceaf5b59234588c878",
         type: "integration"
       }
     ]
   },
-  pathOrURL: "./openapi-specs/stripe.json",
+  pathOrURL: "./openapi-specs/circleci.json",
   isURL: false,
-  getTitle: (openApi, path, method) => {
-    return titleCase(kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " "))
-  },
-  getDescription: (openApi, path, method) => {
-    return sentenceCase(openApi.paths[path][method].description.replace( /(<([^>]+)>)/ig, ''))
-      .replace(/[\n\r]/g, '')
-      .split(".")[0] + ' using the Stripe API.' // Shorten description
-  },
 })
