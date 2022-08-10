@@ -21,6 +21,10 @@ function sentenceCase(theString) {
   return newString;
 }
 
+const capitalCase = (str) => {
+  return str.charAt(0).toUpperCase() + str.substring(1, str.length).toLowerCase()
+}
+
 /**
 * Returns the value referenced in the given reference string
 *
@@ -294,9 +298,10 @@ const getHeaders = (openApi, path, method) => {
       header.sample = header.sample || header.example || (header.schema && (header.schema.default || header.schema.type))
     }
 
-    
-    if(header.name.split("-")[0] === "x" || header.name.split("-")[0] === "X") {
-      header.camelizedName = camelize(header.name.split("-").slice(1).join("-")).replace(/-/g, "")
+    let splitHeaderName = header.name.split("-")
+    splitHeaderName = splitHeaderName.map(i => capitalCase(i))
+    if(splitHeaderName[0] === "x" || splitHeaderName[0] === "X") {
+      header.camelizedName = camelize(splitHeaderName.slice(1).join("-")).replace(/-/g, "")
     } else {
       header.camelizedName = camelize(header.name).replace(/-/g, "")
     }
