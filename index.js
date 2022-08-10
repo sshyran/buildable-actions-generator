@@ -179,7 +179,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
         axiosData = body.length > 0 ? `data: qs.stringify({${body.sort(requiredSort).map(getTemplateObjectAttribute)}})` : "";
       }
 
-      (url.match(/{\w*}/g) || []).forEach(match => {
+      (url.match(/{(\w|-)*}/g) || []).forEach(match => {
         const param = params.find(p => [p.name, p.camelizedName, p.envVarName].includes(match.substring(1, match.length - 1)))
         if(param) {
           url = url.replace(match, `\${${getInputName(param)}}`)
@@ -491,7 +491,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
 
 run({
-  baseURL: `https://circleci.com/api/v1`,
+  baseURL: `https://circleci.com/api/v2`,
   config: {
     platform: "circleci",
     type: "js-request-function",
@@ -499,9 +499,8 @@ run({
       BUILDABLE_CIRCLECI_PERSONAL_API_KEY: {
         development: "",
         production: "",
-        in: "header",
-        // name: "Circle-Token",
-        headerName: "Circle-Token"
+        in: "auth",
+        name: "username"
       }
     },
     fee: 0,
