@@ -482,33 +482,35 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
 
 run({
-  baseURL: `https://circleci.com/api/v2`,
+  baseURL: `https://api.pagerduty.com`,
   config: {
-    platform: "circleci",
+    platform: "pagerduty",
     type: "js-request-function",
     envVars: {
-      BUILDABLE_CIRCLECI_PERSONAL_API_KEY: {
+      BUILDABLE_PAGERDUTY_API_KEY: {
         development: "",
         production: "",
-        in: "auth",
-        name: "username"
+        in: "header",
+        // name: "password",
+        headerName: "authorization",
+        value: "Token token= ${BUILDABLE_PAGERDUTY_API_KEY}"
       }
     },
     fee: 0,
-    category: "devops",
+    category: "alerts",
     accessType: "open",
     language: "javascript",
     price: "free",
-    tags: ["ci", "cicd"],
+    tags: ["alerts"],
     stateType: "stateless",
     __version: "1.0.0",
     connections: [
       {
-        id: "62f403ceaf5b59234588c878",
+        id: "627aceaf971c67182d1d76ca",
         type: "integration"
       }
     ]
   },
-  pathOrURL: "./openapi-specs/circleci.json",
+  pathOrURL: "./openapi-specs/pagerduty-openapi.json",
   isURL: false,
 })
