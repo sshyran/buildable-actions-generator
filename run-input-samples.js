@@ -569,7 +569,8 @@ const pagerduty = {
         production: "",
         in: "header",
         // name: "password",
-        headerName: "authorization"
+        headerName: "authorization",
+        value: "Token token= ${BUILDABLE_PAGERDUTY_API_KEY}"
       }
     },
     fee: 0,
