@@ -343,18 +343,18 @@ const spotify = {
     platform: "spotify",
     type: "js-request-function",
     envVars: {
-      SPOTIFY_BASE_URI: {
+      BUILDABLE_SPOTIFY_BASE_URI: {
         development: "https://api.spotify.com/v1",
         production: "https://api.spotify.com/v1",
         in: "path"
       },
-      SPOTIFY_CLIENT_ID: {
+      BUILDABLE_SPOTIFY_CLIENT_ID: {
         development: "",
         production: "",
         in: "auth",
         name: "username"
       },
-      SPOTIFY_CLIENT_SECRET: {
+      BUILDABLE_SPOTIFY_CLIENT_SECRET: {
         development: "",
         production: "",
         in: "auth",
