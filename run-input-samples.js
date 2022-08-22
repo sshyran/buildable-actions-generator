@@ -143,7 +143,7 @@ const github = {
         in: "auth",
         name: "password"
       },
-      BUILDABLE_GITHUB_USERNAME: {
+      BUILDABLE_GITHUB_ACCOUNT_USERNAME: {
         development: "",
         production: "",
         in: "auth",
@@ -160,7 +160,7 @@ const github = {
     __version: "1.0.0",
     connections: [
       {
-        id: "62d56b4f1b6b3fa97cb9a82a",
+        id: "62dace890bd36f737a23f655",
         type: "integration"
       }
     ]
@@ -338,17 +338,27 @@ const notion = {
 }
 
 const spotify = {
-  baseURL: `https://${SPOTIFY_BASE_URI}`, // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  baseURL: "{SPOTIFY_BASE_URI}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
   config: {
     platform: "spotify",
     type: "js-request-function",
     envVars: {
-      BUILDABLE_SPOTIFY_ACCESS_TOKEN: {
+      SPOTIFY_BASE_URI: {
+        development: "https://api.spotify.com/v1",
+        production: "https://api.spotify.com/v1",
+        in: "path"
+      },
+      SPOTIFY_CLIENT_ID: {
         development: "",
         production: "",
-        in: "header",
-        // name: "password",
-        headerName: "authorization"
+        in: "auth",
+        name: "username"
+      },
+      SPOTIFY_CLIENT_SECRET: {
+        development: "",
+        production: "",
+        in: "auth",
+        name: "password"
       }
     },
     fee: 0,
@@ -359,15 +369,87 @@ const spotify = {
     tags: ["music", "podcasts"],
     stateType: "stateless",
     __version: "1.0.0",
-    connections: [
-      {
-        id: "62d865290bd36f737a23f632",
-        type: "integration"
-      }
-    ]
   },
-  pathOrURL: "./openapi-specs/spotify.json",
+  pathOrURL: "openapi.json",
   isURL: false,
+  connections: [
+    {
+      id: "62d865290bd36f737a23f632",
+      type: "integration"
+    }
+  ],
+  getRunFile: ({
+    title,
+    description,
+    docs,
+    imports,
+    input,
+    url,
+    method,
+    axiosHeaders,
+    axiosAuth,
+    axiosParams,
+    axiosData,
+    verifyInput,
+    verifyErrors,
+    verifyChecks,
+  }) => {
+    return `
+    const axios = require("axios");
+    const qs = require("qs");
+    
+    const run = async (input) => {
+      const { ${input} } = input;
+    
+      verifyInput(input);
+    
+      try {
+        const { data: { access_token } } = await axios({
+          method: "post",
+          url: "https://accounts.spotify.com/api/token",
+          headers: { 
+            "Content-Type": "application/x-www-form-urlencoded" 
+          },
+          auth: {
+            username: SPOTIFY_CLIENT_ID,
+            password: SPOTIFY_CLIENT_SECRET
+          },
+          data: qs.stringify({ grant_type: "client_credentials" })
+        });
+        
+        const { ${input.includes("data") ? "data: _data" : "data"} } = await axios({
+          method: ${getTemplateString(method)},
+          url: ${getTemplateString(url)},
+          headers: {
+            Authorization: \`Bearer \${access_token}\`
+          },
+          ${[
+            axiosParams,
+            axiosData].filter(i => !!i.trim()).join(",\n")}
+        });
+    
+        return data;
+      } catch (error) {
+        return {
+          failed: true,
+          message: error.message,
+          data: error.response.data,
+        };
+      }
+    };
+    
+    /**
+     * Verifies the input parameters
+     */
+    const verifyInput = ({ ${verifyInput} }) => {
+      const ERRORS = {
+        ${verifyErrors}
+      };
+    
+      ${verifyChecks}
+    };`
+    
+  }
 }
 
 const stripe = {
@@ -401,7 +483,82 @@ const stripe = {
   },
   pathOrURL: "./openapi-specs/stripe.json",
   isURL: false,
+  getTitle: (openApi, path, method) => {
+    return titleCase(kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " "))
+  },
+  getDescription: (openApi, path, method) => {
+    return sentenceCase(openApi.paths[path][method].description.replace( /(<([^>]+)>)/ig, ''))
+      .replace(/[\n\r]/g, '')
+      .split(".")[0] + ' using the Stripe API.' // Shorten description
+  },
 }
+
+const slack = {
+  baseURL: `https://slack.com/api`,
+  config: {
+    platform: "slack",
+    type: "js-request-function",
+    envVars: {
+      BUILDABLE_SLACK_ACCESS_TOKEN: {
+        development: "",
+        production: "",
+        in: "header",
+        // name: "password",
+        headerName: "authorization"
+      }
+    },
+    fee: 0,
+    category: "communication",
+    accessType: "open",
+    language: "javascript",
+    price: "free",
+    tags: ["business", "messaging", "chat"],
+    stateType: "stateless",
+    __version: "1.0.0",
+    connections: [
+      {
+        id: "62d863cd0bd36f737a23f631",
+        type: "integration"
+      }
+    ]
+  },
+  pathOrURL: "./openapi-specs/slack.json",
+  isURL: false,
+}
+
+const circleci = {
+  baseURL: `https://circleci.com/api/v2`,
+  config: {
+    platform: "circleci",
+    type: "js-request-function",
+    envVars: {
+      BUILDABLE_CIRCLECI_PERSONAL_API_KEY: {
+        development: "",
+        production: "",
+        in: "auth",
+        name: "username"
+      }
+    },
+    fee: 0,
+    category: "devops",
+    accessType: "open",
+    language: "javascript",
+    price: "free",
+    tags: ["ci", "cicd"],
+    stateType: "stateless",
+    __version: "1.0.0",
+    connections: [
+      {
+        id: "62f403ceaf5b59234588c878",
+        type: "integration"
+      }
+    ]
+  },
+  pathOrURL: "./openapi-specs/circleci.json",
+  isURL: false,
+};
+
+
 
 const pagerduty = {
   baseURL: `https://api.pagerduty.com`,
