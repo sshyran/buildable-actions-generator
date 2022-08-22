@@ -458,7 +458,7 @@ const stripe = {
     platform: "stripe",
     type: "js-request-function",
     envVars: {
-      BUILDABLE_STRIPE_API_KEY: {
+      BUILDABLE_STRIPE_SECRET_KEY: {
         development: "",
         production: "",
         in: "header",
@@ -481,16 +481,11 @@ const stripe = {
       }
     ]
   },
-  pathOrURL: "./openapi-specs/stripe.json",
+  pathOrURL: "./openapi-specs/stripe-merged.json",
   isURL: false,
-  getTitle: (openApi, path, method) => {
-    return titleCase(kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " "))
-  },
-  getDescription: (openApi, path, method) => {
-    return sentenceCase(openApi.paths[path][method].description.replace( /(<([^>]+)>)/ig, ''))
-      .replace(/[\n\r]/g, '')
-      .split(".")[0] + ' using the Stripe API.' // Shorten description
-  },
+  getDirName({ openApi, path, method }) {
+    return kebabCase(openApi.paths[path][method].summary || openApi.paths[path][method].operationId)
+  }
 }
 
 const slack = {
