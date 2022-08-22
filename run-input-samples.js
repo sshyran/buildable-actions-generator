@@ -343,18 +343,18 @@ const spotify = {
     platform: "spotify",
     type: "js-request-function",
     envVars: {
-      SPOTIFY_BASE_URI: {
+      BUILDABLE_SPOTIFY_BASE_URI: {
         development: "https://api.spotify.com/v1",
         production: "https://api.spotify.com/v1",
         in: "path"
       },
-      SPOTIFY_CLIENT_ID: {
+      BUILDABLE_SPOTIFY_CLIENT_ID: {
         development: "",
         production: "",
         in: "auth",
         name: "username"
       },
-      SPOTIFY_CLIENT_SECRET: {
+      BUILDABLE_SPOTIFY_CLIENT_SECRET: {
         development: "",
         production: "",
         in: "auth",
@@ -558,3 +558,35 @@ const circleci = {
   isURL: false,
 };
 
+const pagerduty = {
+  baseURL: `https://api.pagerduty.com`,
+  config: {
+    platform: "pagerduty",
+    type: "js-request-function",
+    envVars: {
+      BUILDABLE_PAGERDUTY_API_KEY: {
+        development: "",
+        production: "",
+        in: "header",
+        // name: "password",
+        headerName: "authorization"
+      }
+    },
+    fee: 0,
+    category: "alerts",
+    accessType: "open",
+    language: "javascript",
+    price: "free",
+    tags: ["alerts"],
+    stateType: "stateless",
+    __version: "1.0.0",
+    connections: [
+      {
+        id: "627aceaf971c67182d1d76ca",
+        type: "integration"
+      }
+    ]
+  },
+  pathOrURL: "./openapi-specs/pagerduty-openapi.json",
+  isURL: false,
+}
