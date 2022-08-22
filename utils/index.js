@@ -696,5 +696,5 @@ module.exports = {
   cleanConfigEnvVars,
   getTemplateString,
   getTemplateObjectAttribute,
-  requiredSort
+  requiredSort,
 }

@@ -558,8 +558,6 @@ const circleci = {
   isURL: false,
 };
 
-
-
 const pagerduty = {
   baseURL: `https://api.pagerduty.com`,
   config: {

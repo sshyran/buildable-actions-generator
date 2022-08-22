@@ -76,8 +76,8 @@ const run = async (input) => {
   } catch (error) {
     return {
       failed: true,
-      message: error.message,
-      data: error.response.data,
+      message: error?.message,
+      data: error?.response?.data,
     };
   }
 };
@@ -170,7 +170,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
         axiosData = body.length > 0 ? `data: qs.stringify({${body.sort(requiredSort).map(getTemplateObjectAttribute)}})` : "";
       }
 
-      (url.match(/{\w*}/g) || []).forEach(match => {
+      (url.match(/{(\w|-)*}/g) || []).forEach(match => {
         const param = params.find(p => [p.name, p.camelizedName, p.envVarName].includes(match.substring(1, match.length - 1)))
         if(param) {
           url = url.replace(match, `\${${getInputName(param)}}`)
@@ -227,7 +227,9 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
       const title = (getTitle ? getTitle(openApi, path, method) : titleCase(summary)).substring(0, 100)
 
-      const description = getDescription ? getDescription(openApi, path, method) : sentenceCase(summary) + ` using the ${titleCase(config.platform)} API`;
+      const formattedSummary = sentenceCase(summary).endsWith(".") ? sentenceCase(summary).slice(0, -1) : sentenceCase(summary)
+
+      const description = getDescription ? getDescription(openApi, path, method) : formattedSummary + ` using the ${titleCase(config.platform)} API`;
 
       const docs = getDocs ? getDocs(openApi, path, method) : get(openApi.paths[path][method], "externalDocs.url") 
 
@@ -416,64 +418,97 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 // });
 
 
+// run({
+//   baseURL: "https://api.notion.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+//   config: {
+//     platform: "notion",
+//     type: "js-request-function",
+//     envVars: {
+//       BUILDABLE_NOTION_API_TOKEN: {
+//         development: "",
+//         production: "",
+//         in: "header",
+//         // name: "password",
+//         headerName: "authorization"
+//       }
+//     },
+//     fee: 0,
+//     category: "cms",
+//     accessType: "open",
+//     language: "javascript",
+//     price: "free",
+//     tags: ["notes", "database", "website"],
+//     stateType: "stateless",
+//     __version: "1.0.0",
+//   },
+//   pathOrURL: "./openapi-specs/notion.json",
+//   isURL: false,
+//   getDocs: (openApi, path, method) => {
+//     const title = openApi["paths"][path][method].summary;
+
+//     const docLinks = {
+//       "Query a database": "https://developers.notion.com/reference/post-database-query",
+//       "Create a database": "https://developers.notion.com/reference/create-a-database",
+//       "Update database": "https://developers.notion.com/reference/update-a-database",
+//       "Retrieve a database": "https://developers.notion.com/reference/retrieve-a-database",
+      
+//       "Retrieve a page": "https://developers.notion.com/reference/retrieve-a-page",
+//       "Create a Page with Content": "https://developers.notion.com/reference/post-page",
+//       "Update Page Properties": "https://developers.notion.com/reference/patch-page",
+//       "Retrieve a Page Property Item": "https://developers.notion.com/reference/retrieve-a-page-property",
+      
+//       "Retrieve a block": "https://developers.notion.com/reference/retrieve-a-block",
+//       "Update a block": "https://developers.notion.com/reference/update-a-block",
+//       "Retrieve block children": "https://developers.notion.com/reference/get-block-children",
+//       "Append block children": "https://developers.notion.com/reference/patch-block-children",
+//       "Delete a block": "https://developers.notion.com/reference/delete-a-block",
+
+//       "Retrieve a user": "https://developers.notion.com/reference/get-user",
+//       "List all users": "https://developers.notion.com/reference/get-users",
+//       "Retrieve your token's bot user": "https://developers.notion.com/reference/get-self",
+
+//       "Search": "https://developers.notion.com/reference/post-search"
+//     };
+
+//     return docLinks[title] || "https://developers.notion.com/reference/intro";
+//   },
+//   connections: [
+//     {
+//       id: "62d8577d0bd36f737a23f62c",
+//       type: "integration"
+//     }
+//   ]
+// });
+
+
 run({
-  baseURL: "https://api.notion.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  baseURL: `https://circleci.com/api/v2`,
   config: {
-    platform: "notion",
+    platform: "circleci",
     type: "js-request-function",
     envVars: {
-      BUILDABLE_NOTION_API_TOKEN: {
+      BUILDABLE_CIRCLECI_PERSONAL_API_KEY: {
         development: "",
         production: "",
-        in: "header",
-        // name: "password",
-        headerName: "authorization"
+        in: "auth",
+        name: "username"
       }
     },
     fee: 0,
-    category: "cms",
+    category: "devops",
     accessType: "open",
     language: "javascript",
     price: "free",
-    tags: ["notes", "database", "website"],
+    tags: ["ci", "cicd"],
     stateType: "stateless",
     __version: "1.0.0",
+    connections: [
+      {
+        id: "62f403ceaf5b59234588c878",
+        type: "integration"
+      }
+    ]
   },
-  pathOrURL: "./openapi-specs/notion.json",
+  pathOrURL: "./openapi-specs/circleci.json",
   isURL: false,
-  getDocs: (openApi, path, method) => {
-    const title = openApi["paths"][path][method].summary;
-
-    const docLinks = {
-      "Query a database": "https://developers.notion.com/reference/post-database-query",
-      "Create a database": "https://developers.notion.com/reference/create-a-database",
-      "Update database": "https://developers.notion.com/reference/update-a-database",
-      "Retrieve a database": "https://developers.notion.com/reference/retrieve-a-database",
-      
-      "Retrieve a page": "https://developers.notion.com/reference/retrieve-a-page",
-      "Create a Page with Content": "https://developers.notion.com/reference/post-page",
-      "Update Page Properties": "https://developers.notion.com/reference/patch-page",
-      "Retrieve a Page Property Item": "https://developers.notion.com/reference/retrieve-a-page-property",
-      
-      "Retrieve a block": "https://developers.notion.com/reference/retrieve-a-block",
-      "Update a block": "https://developers.notion.com/reference/update-a-block",
-      "Retrieve block children": "https://developers.notion.com/reference/get-block-children",
-      "Append block children": "https://developers.notion.com/reference/patch-block-children",
-      "Delete a block": "https://developers.notion.com/reference/delete-a-block",
-
-      "Retrieve a user": "https://developers.notion.com/reference/get-user",
-      "List all users": "https://developers.notion.com/reference/get-users",
-      "Retrieve your token's bot user": "https://developers.notion.com/reference/get-self",
-
-      "Search": "https://developers.notion.com/reference/post-search"
-    };
-
-    return docLinks[title] || "https://developers.notion.com/reference/intro";
-  },
-  connections: [
-    {
-      id: "62d8577d0bd36f737a23f62c",
-      type: "integration"
-    }
-  ]
-});
+})
