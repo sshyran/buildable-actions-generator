@@ -94,7 +94,7 @@ const verifyInput = ({ ${verifyInput} }) => {
 };
 `;
 
-const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getAxiosCall, getDirName, pathOrURL, isURL  } = {}) => {
+const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getConfigName, getAxiosCall, getDirName, pathOrURL, isURL  } = {}) => {
 
   let openApi
 
@@ -255,7 +255,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
       const _runFile = getRunFile ? getRunFile(runFileInput) : runFile(runFileInput);
 
-      const configName = camelize(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description) + "Result"
+      const configName = getConfigName ? getConfigName({ openApi, path, method }) : camelize(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description) + "Result"
       
       const configFileInput = {
         openApi, 
@@ -339,6 +339,9 @@ run({
   },
   pathOrURL: "./openapi-specs/stripe-merged.json",
   isURL: false,
+  getConfigName({ openApi, path, method }) {
+    return camelize(openApi.paths[path][method].summary || openApi.paths[path][method].operationId) + "Result"
+  },
   getDirName({ openApi, path, method }) {
     return kebabCase(openApi.paths[path][method].summary || openApi.paths[path][method].operationId)
   }

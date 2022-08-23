@@ -483,6 +483,9 @@ const stripe = {
   },
   pathOrURL: "./openapi-specs/stripe-merged.json",
   isURL: false,
+  getConfigName({ openApi, path, method }) {
+    return camelize(openApi.paths[path][method].summary || openApi.paths[path][method].operationId) + "Result"
+  },
   getDirName({ openApi, path, method }) {
     return kebabCase(openApi.paths[path][method].summary || openApi.paths[path][method].operationId)
   }
