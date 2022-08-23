@@ -94,7 +94,7 @@ const verifyInput = ({ ${verifyInput} }) => {
 };
 `;
 
-const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getAxiosCall, pathOrURL, isURL  } = {}) => {
+const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getConfigName, getAxiosCall, getDirName, pathOrURL, isURL  } = {}) => {
 
   let openApi
 
@@ -255,7 +255,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
       const _runFile = getRunFile ? getRunFile(runFileInput) : runFile(runFileInput);
 
-      const configFileName = camelize(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description) + "Result"
+      const configName = getConfigName ? getConfigName({ openApi, path, method }) : camelize(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description) + "Result"
       
       const configFileInput = {
         openApi, 
@@ -263,7 +263,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
         method,
         title,
         description,
-        name: configFileName.length > 50 || configFileName.length === 0 ? "result" : configFileName,
+        name: configName.length > 50 || configName.length === 0 ? "result" : configName,
         ...cleanConfigEnvVars(config)
       }
 
@@ -294,7 +294,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
 
 
-      let dir = `generated/${kebabCase(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
+      let dir = `generated/${getDirName ? getDirName({ openApi, path, method }) : kebabCase(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
 
       fs.mkdirSync(dir, { recursive: true });
 
@@ -307,201 +307,27 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
   await generateChangelogs(config.platform); // Generate changelogs
 };
 
-// run({
-//   // baseURL: "{TATUM_API_URL}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
-//   config: {
-//     type: "js-request-function",
-//     envVars: {
-//       TWITTER_BEARER_TOKEN: {
-//         development: "",
-//         production: "",
-//         in: "header",
-//         headerName: "authorization"
-//       },
-//     },
-//     fee: 0,
-//     category: "social",
-//     accessType: "open",
-//     language: "javascript",
-//     price: "free",
-//     platform: "twitter",
-//     tags: ["twitter", "social"],
-//     stateType: "stateless",
-//     __version: "1.0.0",
-//   },
-//   pathOrURL: "https://api.twitter.com/2/openapi.json",
-//   isURL: true,
-//   getDocs: (openApi, path, method) => {
-//     return `https://developer.twitter.com/en/docs/api-reference-index#twitter-api-v2`
-//   },
-//   getRunFile: ({
-//     openApi, 
-//     path, 
-//     method,
-//     url, 
-//     axiosAuth, 
-//     axiosHeaders, 
-//     axiosParams, 
-//     axiosData,
-//     title,
-//     description,
-//     docs,
-//     input,
-//     axiosCall,
-//     verifyInput,
-//     verifyErrors,
-//     verifyChecks,
-//   }) => {
-//     axiosParams = axiosParams.trim().length > 0 ? axiosParams + `,
-//       paramsSerializer: (params) => {
-//         return qs.stringify(params, { arrayFormat: "comma" });
-//       }
-//       ` : ""
-
-//     return `
-//     /**
-//      * ----------------------------------------------------------------------------------------------------
-//      * ${title} [Run]
-//      *
-//      * @description - ${description}
-//      *
-//      * @author    Buildable Technologies Inc.
-//      * @access    open
-//      * @license   MIT
-//      * @docs      ${docs}
-//      *
-//      * ----------------------------------------------------------------------------------------------------
-//      */
-    
-//     const axios = require("axios");${axiosParams.trim().length > 0 ? `\nconst qs = require("qs");` : ""}
-    
-    
-//     /**
-//      * The Node’s executable function
-//      *
-//      * @param {Run} input - Data passed to your Node from the input function
-//      */
-//     const run = async (input) => {
-//       const { ${input} } = input;
-    
-//       verifyInput(input);
-    
-//       try {
-//         const { data } = await axios({
-//           method: "${method}",
-//           url: \`${url}\`,
-//           ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
-//         });
-    
-//         return data;
-//       } catch (error) {
-//         return {
-//           failed: true,
-//           message: error.message,
-//           data: error.response.data,
-//         };
-//       }
-//     };
-    
-//     /**
-//      * Verifies the input parameters
-//      */
-//     const verifyInput = ({ ${verifyInput} }) => {
-//       const ERRORS = {
-//         ${verifyErrors}
-//       };
-    
-//       ${verifyChecks}
-//     };
-//     `
-//   }
-// });
-
-
-// run({
-//   baseURL: "https://api.notion.com", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
-//   config: {
-//     platform: "notion",
-//     type: "js-request-function",
-//     envVars: {
-//       BUILDABLE_NOTION_API_TOKEN: {
-//         development: "",
-//         production: "",
-//         in: "header",
-//         // name: "password",
-//         headerName: "authorization"
-//       }
-//     },
-//     fee: 0,
-//     category: "cms",
-//     accessType: "open",
-//     language: "javascript",
-//     price: "free",
-//     tags: ["notes", "database", "website"],
-//     stateType: "stateless",
-//     __version: "1.0.0",
-//   },
-//   pathOrURL: "./openapi-specs/notion.json",
-//   isURL: false,
-//   getDocs: (openApi, path, method) => {
-//     const title = openApi["paths"][path][method].summary;
-
-//     const docLinks = {
-//       "Query a database": "https://developers.notion.com/reference/post-database-query",
-//       "Create a database": "https://developers.notion.com/reference/create-a-database",
-//       "Update database": "https://developers.notion.com/reference/update-a-database",
-//       "Retrieve a database": "https://developers.notion.com/reference/retrieve-a-database",
-      
-//       "Retrieve a page": "https://developers.notion.com/reference/retrieve-a-page",
-//       "Create a Page with Content": "https://developers.notion.com/reference/post-page",
-//       "Update Page Properties": "https://developers.notion.com/reference/patch-page",
-//       "Retrieve a Page Property Item": "https://developers.notion.com/reference/retrieve-a-page-property",
-      
-//       "Retrieve a block": "https://developers.notion.com/reference/retrieve-a-block",
-//       "Update a block": "https://developers.notion.com/reference/update-a-block",
-//       "Retrieve block children": "https://developers.notion.com/reference/get-block-children",
-//       "Append block children": "https://developers.notion.com/reference/patch-block-children",
-//       "Delete a block": "https://developers.notion.com/reference/delete-a-block",
-
-//       "Retrieve a user": "https://developers.notion.com/reference/get-user",
-//       "List all users": "https://developers.notion.com/reference/get-users",
-//       "Retrieve your token's bot user": "https://developers.notion.com/reference/get-self",
-
-//       "Search": "https://developers.notion.com/reference/post-search"
-//     };
-
-//     return docLinks[title] || "https://developers.notion.com/reference/intro";
-//   },
-//   connections: [
-//     {
-//       id: "62d8577d0bd36f737a23f62c",
-//       type: "integration"
-//     }
-//   ]
-// });
-
 
 run({
-  baseURL: `https://api.pagerduty.com`,
+  baseURL: `https://api.stripe.com`,
   config: {
-    platform: "pagerduty",
+    platform: "stripe",
     type: "js-request-function",
     envVars: {
-      BUILDABLE_PAGERDUTY_API_KEY: {
+      BUILDABLE_STRIPE_SECRET_KEY: {
         development: "",
         production: "",
         in: "header",
         // name: "password",
-        headerName: "authorization",
-        value: "Token token= ${BUILDABLE_PAGERDUTY_API_KEY}"
+        headerName: "authorization"
       }
     },
     fee: 0,
-    category: "alerts",
+    category: "payments",
     accessType: "open",
     language: "javascript",
     price: "free",
-    tags: ["alerts"],
+    tags: ["payments", "accounts"],
     stateType: "stateless",
     __version: "1.0.0",
     connections: [
@@ -511,6 +337,12 @@ run({
       }
     ]
   },
-  pathOrURL: "./openapi-specs/pagerduty-openapi.json",
+  pathOrURL: "./openapi-specs/stripe-merged.json",
   isURL: false,
+  getConfigName({ openApi, path, method }) {
+    return camelize(openApi.paths[path][method].summary || openApi.paths[path][method].operationId) + "Result"
+  },
+  getDirName({ openApi, path, method }) {
+    return kebabCase(openApi.paths[path][method].summary || openApi.paths[path][method].operationId)
+  }
 })
