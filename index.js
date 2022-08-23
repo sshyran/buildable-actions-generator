@@ -255,7 +255,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
       const _runFile = getRunFile ? getRunFile(runFileInput) : runFile(runFileInput);
 
-      const configFileName = camelize(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description) + "Result"
+      const configName = camelize(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description) + "Result"
       
       const configFileInput = {
         openApi, 
@@ -263,7 +263,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
         method,
         title,
         description,
-        name: configFileName.length > 50 || configFileName.length === 0 ? "result" : configFileName,
+        name: configName.length > 50 || configName.length === 0 ? "result" : configName,
         ...cleanConfigEnvVars(config)
       }
 
