@@ -153,7 +153,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -162,7 +163,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           }
         ],
         "responses": {
@@ -300,7 +302,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -309,7 +312,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -508,7 +512,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -517,7 +522,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -767,7 +773,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -776,7 +783,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -951,7 +959,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -960,7 +969,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -1167,7 +1177,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -1176,7 +1187,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -1365,7 +1377,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -1374,7 +1387,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -1626,7 +1640,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time.  You __MUST__ pass in this header and the above value.  Do not use this endpoint in production, as it may change!\n",
-            "example": "analytics-v2"
+            "example": "analytics-v2",
+            "required": true
           },
           {
             "name": "Accept",
@@ -1635,7 +1650,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -1644,7 +1660,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -1861,7 +1878,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time.  You __MUST__ pass in this header and the above value.  Do not use this endpoint in production, as it may change!\n",
-            "example": "analytics-v2"
+            "example": "analytics-v2",
+            "required": true
           },
           {
             "name": "Accept",
@@ -1870,7 +1888,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -1879,7 +1898,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -2096,7 +2116,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time.  You __MUST__ pass in this header and the above value.  Do not use this endpoint in production, as it may change!\n",
-            "example": "analytics-v2"
+            "example": "analytics-v2",
+            "required": true
           },
           {
             "name": "Accept",
@@ -2105,7 +2126,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -2114,7 +2136,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -2335,7 +2358,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time.  You __MUST__ pass in this header and the above value.  Do not use this endpoint in production, as it may change!\n",
-            "example": "analytics-v2"
+            "example": "analytics-v2",
+            "required": true
           },
           {
             "name": "Accept",
@@ -2344,7 +2368,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -2353,7 +2378,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -2546,7 +2572,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -2555,7 +2582,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -2564,7 +2592,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time.  You __MUST__ pass in this header and the above value.  Do not use this endpoint in production, as it may change!\n",
-            "example": "analytics-v2"
+            "example": "analytics-v2",
+            "required": true
           },
           {
             "name": "id",
@@ -2702,7 +2731,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -2711,7 +2741,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -3143,7 +3174,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -3152,7 +3184,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -3366,7 +3399,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -3375,7 +3409,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -3560,7 +3595,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -3569,7 +3605,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -3754,7 +3791,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -3763,7 +3801,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -3923,7 +3962,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -3932,7 +3972,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -4102,7 +4143,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "id",
@@ -4273,7 +4315,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "id",
@@ -4444,7 +4487,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "id",
@@ -4674,7 +4718,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -4872,7 +4917,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -4881,7 +4927,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `business-impact-early-access`. Do not use this endpoint in production, as it may change!",
-            "example": "business-impact-early-access"
+            "example": "business-impact-early-access",
+            "required": true
           },
           {
             "name": "additional_fields[]",
@@ -5147,7 +5194,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -5330,7 +5378,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -5339,7 +5388,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `business-impact-early-access`. Do not use this endpoint in production, as it may change!",
-            "example": "business-impact-early-access"
+            "example": "business-impact-early-access",
+            "required": true
           },
           {
             "name": "ids[]",
@@ -5550,7 +5600,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -5559,7 +5610,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `business-impact-early-access`. Do not use this endpoint in production, as it may change!",
-            "example": "business-impact-early-access"
+            "example": "business-impact-early-access",
+            "required": true
           },
           {
             "name": "additional_fields[]",
@@ -5798,7 +5850,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -5807,7 +5860,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `business-impact-early-access`. Do not use this endpoint in production, as it may change!",
-            "example": "business-impact-early-access"
+            "example": "business-impact-early-access",
+            "required": true
           }
         ],
         "responses": {
@@ -5999,7 +6053,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -6008,7 +6063,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `business-impact-early-access`. Do not use this endpoint in production, as it may change!",
-            "example": "business-impact-early-access"
+            "example": "business-impact-early-access",
+            "required": true
           }
         ],
         "responses": {
@@ -6154,7 +6210,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -6163,7 +6220,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `business-impact-early-access`. Do not use this endpoint in production, as it may change!",
-            "example": "business-impact-early-access"
+            "example": "business-impact-early-access",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -6384,7 +6442,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -6393,7 +6452,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -6681,7 +6741,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -6690,7 +6751,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           }
         ],
         "responses": {
@@ -6739,7 +6801,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -6748,7 +6811,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -7017,7 +7081,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -7026,7 +7091,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -7250,7 +7316,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -7259,7 +7326,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -7536,7 +7604,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -7545,7 +7614,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "since",
@@ -7870,7 +7940,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -7879,7 +7950,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -8269,7 +8341,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -8278,7 +8351,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -8532,7 +8606,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -8541,7 +8616,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "include[]",
@@ -8739,7 +8815,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -8748,7 +8825,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -8975,7 +9053,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -8984,7 +9063,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -9239,7 +9319,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -9248,7 +9329,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -9636,7 +9718,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -9645,7 +9728,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -9864,7 +9948,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -9873,7 +9958,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -10085,7 +10171,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -10094,7 +10181,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -10372,7 +10460,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -10381,7 +10470,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -10573,7 +10663,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -10582,7 +10673,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "include[]",
@@ -10783,7 +10875,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -10792,7 +10885,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -10966,7 +11060,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -10975,7 +11070,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -11180,7 +11276,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -11189,7 +11286,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -11383,7 +11481,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -11392,7 +11491,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -11998,7 +12098,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -12007,7 +12108,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -12016,7 +12118,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -12495,7 +12598,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -12504,7 +12608,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -12513,7 +12618,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -12785,7 +12891,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -12794,7 +12901,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -13135,7 +13243,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -13144,7 +13253,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -13153,7 +13263,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -13435,7 +13546,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -13444,7 +13556,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -13864,7 +13977,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -13873,7 +13987,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -13882,7 +13997,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -14207,7 +14323,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -14216,7 +14333,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -14519,7 +14637,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -14528,7 +14647,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -14537,7 +14657,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -14781,7 +14902,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -14790,7 +14912,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `business-impact-early-access`. Do not use this endpoint in production, as it may change!",
-            "example": "business-impact-early-access"
+            "example": "business-impact-early-access",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -15009,7 +15132,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -15018,7 +15142,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `business-impact-early-access`. Do not use this endpoint in production, as it may change!",
-            "example": "business-impact-early-access"
+            "example": "business-impact-early-access",
+            "required": true
           },
           {
             "name": "id",
@@ -15246,7 +15371,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -15255,7 +15381,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -15680,7 +15807,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -15689,7 +15817,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -15698,7 +15827,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -15909,7 +16039,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -15918,7 +16049,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -16162,7 +16294,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -16171,7 +16304,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -16180,7 +16314,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -16403,7 +16538,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -16412,7 +16548,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "since",
@@ -16739,7 +16876,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -16748,7 +16886,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -16960,7 +17099,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -16969,7 +17109,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "additional_details[]",
@@ -17446,7 +17587,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -17455,7 +17597,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -17464,7 +17607,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -17770,7 +17914,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -17779,7 +17924,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -17788,7 +17934,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -18110,7 +18257,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -18119,7 +18267,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -18128,7 +18277,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -18344,7 +18494,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "id",
@@ -18596,7 +18747,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -18811,7 +18963,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -18994,7 +19147,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -19003,7 +19157,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -19380,7 +19535,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -19389,7 +19545,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "time_zone",
@@ -19686,7 +19843,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -19695,7 +19853,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -19704,7 +19863,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -19911,7 +20071,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -19920,7 +20081,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "query",
@@ -20259,7 +20421,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -20268,7 +20431,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -20277,7 +20441,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -20477,7 +20642,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -20486,7 +20652,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "include[]",
@@ -20695,7 +20862,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -20704,7 +20872,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -20933,7 +21102,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -20942,7 +21112,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -21180,7 +21351,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -21189,7 +21361,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -21234,7 +21407,8 @@
               "type": "string"
             },
             "description": "(Required) The start of the date range over which you want to search. The time element is optional.",
-            "example": "<dateTime>"
+            "example": "<dateTime>",
+            "required": true
           },
           {
             "name": "until",
@@ -21243,7 +21417,8 @@
               "type": "string"
             },
             "description": "(Required) The end of the date range over which you want to search. This should be in the same format as since. The size of the date range must be less than 3 months.",
-            "example": "<dateTime>"
+            "example": "<dateTime>",
+            "required": true
           },
           {
             "name": "filter",
@@ -21453,7 +21628,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -21462,7 +21638,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "time_zone",
@@ -21757,7 +21934,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -21766,7 +21944,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -22007,7 +22186,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -22016,7 +22196,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -22290,7 +22471,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -22299,7 +22481,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -22475,7 +22658,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -22484,7 +22668,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -22742,7 +22927,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -22751,7 +22937,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -22963,7 +23150,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -22972,7 +23160,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -23129,7 +23318,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -23138,7 +23328,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -23147,7 +23338,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -23300,7 +23492,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -23309,7 +23502,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -23566,7 +23760,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -23575,7 +23770,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -23772,7 +23968,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -23781,7 +23978,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -24016,7 +24214,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -24025,7 +24224,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -24286,7 +24486,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -24295,7 +24496,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -24522,7 +24724,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -24531,7 +24734,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -25014,7 +25218,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -25023,7 +25228,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -25330,7 +25536,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -25339,7 +25546,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -25729,7 +25937,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -25738,7 +25947,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -26081,7 +26291,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -26090,7 +26301,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -26327,7 +26539,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -26336,7 +26549,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -27092,7 +27306,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -27101,7 +27316,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -27458,7 +27674,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -27467,7 +27684,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "time_zone",
@@ -27870,7 +28088,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -27879,7 +28098,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -28265,7 +28485,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -28274,7 +28495,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -28669,7 +28891,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -28678,7 +28901,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -29066,7 +29290,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -29075,7 +29300,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "since",
@@ -29084,7 +29310,8 @@
               "type": "string"
             },
             "description": "(Required) The start of the date range over which you want to search.",
-            "example": "<dateTime>"
+            "example": "<dateTime>",
+            "required": true
           },
           {
             "name": "until",
@@ -29093,7 +29320,8 @@
               "type": "string"
             },
             "description": "(Required) The end of the date range over which you want to search.",
-            "example": "<dateTime>"
+            "example": "<dateTime>",
+            "required": true
           },
           {
             "name": "editable",
@@ -29372,7 +29600,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -29381,7 +29610,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -29608,7 +29838,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -29617,7 +29848,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -29817,7 +30049,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -29826,7 +30059,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "since",
@@ -30315,7 +30549,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -30324,7 +30559,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -30732,7 +30968,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -30741,7 +30978,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -30937,7 +31175,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -30946,7 +31185,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -31177,7 +31417,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -31186,7 +31427,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -31382,7 +31624,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -31391,7 +31634,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -31589,7 +31833,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -31598,7 +31843,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "query",
@@ -32104,7 +32350,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -32113,7 +32360,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -32378,7 +32626,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -32387,7 +32636,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "include[]",
@@ -32661,7 +32911,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -32670,7 +32921,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -32889,7 +33141,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -32898,7 +33151,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -33173,7 +33427,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -33182,7 +33437,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -33637,7 +33893,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -33646,7 +33903,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -33949,7 +34207,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -33958,7 +34217,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -34230,7 +34490,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -34239,7 +34500,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "include[]",
@@ -34486,7 +34748,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -34495,7 +34758,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -34966,7 +35230,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -34975,7 +35240,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -35278,7 +35544,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -35287,7 +35554,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -35669,7 +35937,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -35678,7 +35947,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -36017,7 +36287,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -36026,7 +36297,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -36263,7 +36535,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "limit",
@@ -36490,7 +36763,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -36499,7 +36773,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -36634,7 +36909,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "id",
@@ -36810,7 +37086,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -36819,7 +37096,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -36981,7 +37259,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "id",
@@ -37119,7 +37398,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "id",
@@ -37259,7 +37539,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "id",
@@ -37375,7 +37656,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -37384,7 +37666,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `status-dashboards`. Do not use this endpoint in production, as it may change!",
-            "example": "status-dashboards"
+            "example": "status-dashboards",
+            "required": true
           }
         ],
         "responses": {
@@ -37532,7 +37815,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -37541,7 +37825,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `status-dashboards`. Do not use this endpoint in production, as it may change!",
-            "example": "status-dashboards"
+            "example": "status-dashboards",
+            "required": true
           },
           {
             "name": "id",
@@ -37746,7 +38031,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -37755,7 +38041,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `status-dashboards`. Do not use this endpoint in production, as it may change!",
-            "example": "status-dashboards"
+            "example": "status-dashboards",
+            "required": true
           },
           {
             "name": "additional_fields[]",
@@ -37995,7 +38282,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -38004,7 +38292,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `status-dashboards`. Do not use this endpoint in production, as it may change!",
-            "example": "status-dashboards"
+            "example": "status-dashboards",
+            "required": true
           },
           {
             "name": "url_slug",
@@ -38209,7 +38498,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -38218,7 +38508,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header with the value `status-dashboards`. Do not use this endpoint in production, as it may change!",
-            "example": "status-dashboards"
+            "example": "status-dashboards",
+            "required": true
           },
           {
             "name": "additional_fields[]",
@@ -38489,7 +38780,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -38498,7 +38790,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -38687,7 +38980,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -38696,7 +38990,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -38899,7 +39194,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -38908,7 +39204,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -39117,7 +39414,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -39126,7 +39424,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -39304,7 +39603,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -39313,7 +39613,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -39491,7 +39792,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -39500,7 +39802,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -39643,7 +39946,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -39652,7 +39956,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -39884,7 +40189,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -39893,7 +40199,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -40101,7 +40408,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -40110,7 +40418,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -40366,7 +40675,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -40375,7 +40685,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "include[]",
@@ -40622,7 +40933,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -40631,7 +40943,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "reassignment_team",
@@ -40832,7 +41145,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -40841,7 +41155,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -41061,7 +41376,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -41070,7 +41386,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -41458,7 +41775,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -41467,7 +41785,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -41705,7 +42024,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -41714,7 +42034,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -41951,7 +42272,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -41960,7 +42282,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -42214,7 +42537,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "id",
@@ -42455,7 +42779,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -42670,7 +42995,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -42853,7 +43179,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -42862,7 +43189,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -43109,7 +43437,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -43118,7 +43447,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -43363,7 +43693,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -43372,7 +43703,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "query",
@@ -43723,7 +44055,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -43732,7 +44065,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "From",
@@ -43741,7 +44075,8 @@
               "type": "string"
             },
             "description": "(Required) The email address of a valid user associated with the account making the request.",
-            "example": "<email>"
+            "example": "<email>",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -43979,7 +44314,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -43988,7 +44324,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "include[]",
@@ -44235,7 +44572,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -44244,7 +44582,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -44464,7 +44803,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -44473,7 +44813,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -44749,7 +45090,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -44758,7 +45100,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -45146,7 +45489,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -45155,7 +45499,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -45374,7 +45719,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -45383,7 +45729,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -45575,7 +45922,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -45584,7 +45932,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -45804,7 +46153,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -45813,7 +46163,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -46015,7 +46366,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -46024,7 +46376,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -46254,7 +46607,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -46263,7 +46617,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "include[]",
@@ -46491,7 +46846,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -46500,7 +46856,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -46720,7 +47077,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -46729,7 +47087,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "include[]",
@@ -46958,7 +47317,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -46967,7 +47327,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -47169,7 +47530,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -47178,7 +47540,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -47436,7 +47799,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "id",
@@ -47677,7 +48041,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -47892,7 +48257,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -48075,7 +48441,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -48084,7 +48451,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -48291,7 +48659,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -48300,7 +48669,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -48516,7 +48886,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -48525,7 +48896,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -48741,7 +49113,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -48750,7 +49123,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -48948,7 +49322,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -48957,7 +49332,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -49211,7 +49587,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -49220,7 +49597,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -49434,7 +49812,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -49443,7 +49822,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -49614,7 +49994,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -49623,7 +50004,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -49848,7 +50230,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -49857,7 +50240,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
@@ -50048,7 +50432,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -50057,7 +50442,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -50274,7 +50660,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -50283,7 +50670,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -50292,7 +50680,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header and the above value. Do not use this endpoint in production, as it may change!\n",
-            "example": "status-update-notification-rules"
+            "example": "status-update-notification-rules",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -50505,7 +50894,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -50514,7 +50904,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -50523,7 +50914,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header and the above value. Do not use this endpoint in production, as it may change!\n",
-            "example": "status-update-notification-rules"
+            "example": "status-update-notification-rules",
+            "required": true
           },
           {
             "name": "include[]",
@@ -50745,7 +51137,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -50754,7 +51147,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -50763,7 +51157,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header and the above value. Do not use this endpoint in production, as it may change!\n",
-            "example": "status-update-notification-rules"
+            "example": "status-update-notification-rules",
+            "required": true
           },
           {
             "name": "id",
@@ -50958,7 +51353,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -50967,7 +51363,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "X-EARLY-ACCESS",
@@ -50976,7 +51373,8 @@
               "type": "string"
             },
             "description": "(Required) This header indicates that this API endpoint is __UNDER CONSTRUCTION__ and may change at any time. You __MUST__ pass in this header and the above value. Do not use this endpoint in production, as it may change!\n",
-            "example": "status-update-notification-rules"
+            "example": "status-update-notification-rules",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -51227,7 +51625,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -51236,7 +51635,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "include[]",
@@ -51391,7 +51791,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -51400,7 +51801,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "limit",
@@ -51621,7 +52023,8 @@
               "type": "string"
             },
             "description": "(Required) The `Accept` header is used as a versioning header.",
-            "example": "application/vnd.pagerduty+json;version=2"
+            "example": "application/vnd.pagerduty+json;version=2",
+            "required": true
           },
           {
             "name": "Content-Type",
@@ -51630,7 +52033,8 @@
               "type": "string"
             },
             "description": "(Required) ",
-            "example": "application/json"
+            "example": "application/json",
+            "required": true
           },
           {
             "name": "id",
