@@ -33,7 +33,7 @@ const capitalCase = (str) => {
 * @return {any}
 */
 const resolveRef = function (openApi, ref) {
-  const parts = ref.split('/');
+  const parts = ref.split('/').map(part => part.replace(/application~1json/g, "application/json"));
 
   if (parts.length <= 1) return {}; // = 3
 
