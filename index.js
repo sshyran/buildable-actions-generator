@@ -272,7 +272,24 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
       const inputFileParams = `
         ${mapWithTemplate(union(auth, headers, params, body)
           .filter(i => !i.hardcoded)
-          .filter((p) => p.required), requiredInputTemplate)
+          .filter((p) => p.required)
+          .sort((a, b) => {
+            if(a.isEnvironmentVariable) {
+              return -1
+            }
+
+            if(b.isEnvironmentVariable) {
+              return 1
+            }
+
+            if(a.in === "header") {
+              return -1
+            }
+
+            if(b.in === "header") {
+              return 1
+            }
+          }), requiredInputTemplate)
           .join("\n")}
         
         ${mapWithTemplate(union(auth, headers, params, body)
