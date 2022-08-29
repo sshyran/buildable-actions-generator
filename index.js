@@ -5,6 +5,7 @@ const { snakeCase } = require("snake-case");
 const kebabCase = require("lodash/kebabCase")
 const {titleCase} = require("title-case")
 const get = require("lodash/get")
+const set = require("lodash/set")
 const union = require("lodash/union")
 const omit = require("lodash/omit")
 const {
@@ -94,16 +95,16 @@ const verifyInput = ({ ${verifyInput} }) => {
 };
 `;
 
-const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getConfigName, getAxiosCall, getDirName, pathOrURL, isURL  } = {}) => {
+const run2 = async ({ baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getConfigName, getAxiosCall, getDirName, pathOrURL, isURL  } = {}) => {
 
-  let openApi
+  let openapi
 
   if(isURL) {
-    openApi = (await axios({
+    openapi = (await axios({
       url: pathOrURL
     })).data
   } else {
-    openApi = JSON.parse(fs.readFileSync(pathOrURL));
+    openapi = JSON.parse(fs.readFileSync(pathOrURL));
   }
 
   const httpMethods = {}
@@ -111,24 +112,24 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
     httpMethods[method.toLowerCase()] = method
   })
 
-  for (let path in openApi.paths) {
+  for (let path in openapi.paths) {
     console.log(path)
-    for (let method in openApi.paths[path]) {
+    for (let method in openapi.paths[path]) {
       console.log(">", method)
-      if(!httpMethods[method] || openApi.paths[path][method].deprecated || Object.keys(get(openApi.paths[path][method], "requestBody.content", [])).find(i => i === "multipart/form-data")) {
+      if(!httpMethods[method] || openapi.paths[path][method].deprecated || Object.keys(get(openapi.paths[path][method], "requestBody.content", [])).find(i => i === "multipart/form-data")) {
         continue
       }
 
-      let url = (baseURL || getBaseUrl(openApi, path, method)) + getFullPath(openApi, path, method);
+      let url = (baseURL || getBaseUrl(openapi, path, method)) + getFullPath(openapi, path, method);
 
       const auth = getEnvVarParams(config, ["auth"])
 
       const headers = [];
 
-      const openApiHeaders = getHeaders(openApi, path, method)
+      const openapiHeaders = getHeaders(openapi, path, method)
       const envVarHeaders = getEnvVarParams(config, ["header"])
       
-      for(let header of openApiHeaders) {
+      for(let header of openapiHeaders) {
         const envVarHeader = envVarHeaders.find(p => p.headerName.toLowerCase() === header.name.toLowerCase())
         if(header.isAuth && envVarHeader) {
           headers.push({
@@ -140,9 +141,9 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
         }
       }
 
-      const params = getParams ? getParams(openApi, path, method) : getEnvVarParams(config, ["path", "query"]).concat(getParameters(openApi, path, method));
+      const params = getParams ? getParams(openapi, path, method) : getEnvVarParams(config, ["path", "query"]).concat(getParameters(openapi, path, method));
 
-      const body = getEnvVarParams(config, ["body"]).concat(getBodyParameters(openApi, path, method));
+      const body = getEnvVarParams(config, ["body"]).concat(getBodyParameters(openapi, path, method));
 
       let axiosAuth = auth.length > 0
       ? `auth: {${auth.sort(requiredSort).map(getTemplateObjectAttribute).join(", ")}}`
@@ -165,7 +166,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
       let imports = ""
       
-      if(get(openApi.paths[path][method], "requestBody.content.application/x-www-form-urlencoded")) {
+      if(get(openapi.paths[path][method], "requestBody.content.application/x-www-form-urlencoded")) {
         imports = `const axios = require("axios");\nconst qs = require("qs");`
         axiosData = body.length > 0 ? `data: qs.stringify({${body.sort(requiredSort).map(getTemplateObjectAttribute)}})` : "";
       }
@@ -223,18 +224,18 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
         .join("\n");
 
     
-      const summary = openApi.paths[path][method].summary || openApi.paths[path][method].description || kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
+      const summary = openapi.paths[path][method].summary || openapi.paths[path][method].description || kebabCase(openapi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
 
-      const title = (getTitle ? getTitle(openApi, path, method) : titleCase(summary)).substring(0, 100)
+      const title = (getTitle ? getTitle(openapi, path, method) : titleCase(summary)).substring(0, 100)
 
       const formattedSummary = sentenceCase(summary).endsWith(".") ? sentenceCase(summary).slice(0, -1) : sentenceCase(summary)
 
-      const description = getDescription ? getDescription(openApi, path, method) : formattedSummary + ` using the ${titleCase(config.platform)} API`;
+      const description = getDescription ? getDescription(openapi, path, method) : formattedSummary + ` using the ${titleCase(config.platform)} API`;
 
-      const docs = getDocs ? getDocs(openApi, path, method) : get(openApi.paths[path][method], "externalDocs.url") 
+      const docs = getDocs ? getDocs(openapi, path, method) : get(openapi.paths[path][method], "externalDocs.url") 
 
       const runFileInput = {
-        openApi, 
+        openapi, 
         path, 
         method,
         title,
@@ -255,10 +256,10 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
       const _runFile = getRunFile ? getRunFile(runFileInput) : runFile(runFileInput);
 
-      const configName = getConfigName ? getConfigName({ openApi, path, method }) : camelize(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description) + "Result"
+      const configName = getConfigName ? getConfigName({ openapi, path, method }) : camelize(openapi.paths[path][method].operationId || openapi.paths[path][method].summary || openapi.paths[path][method].description) + "Result"
       
       const configFileInput = {
-        openApi, 
+        openapi, 
         path, 
         method,
         title,
@@ -267,7 +268,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
         ...cleanConfigEnvVars(config)
       }
 
-      const _configFile = getConfigFile ? getConfigFile(configFileInput) : configFile(omit(configFileInput, ["openApi", "path", "method"]));
+      const _configFile = getConfigFile ? getConfigFile(configFileInput) : configFile(omit(configFileInput, ["openapi", "path", "method"]));
 
       const inputFileParams = `
         ${mapWithTemplate(union(auth, headers, params, body)
@@ -299,7 +300,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
       `;
 
       const inputFileInput = {
-        openApi, 
+        openapi, 
         path, 
         method,
         title, 
@@ -311,7 +312,7 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
 
 
 
-      let dir = `generated/${getDirName ? getDirName({ openApi, path, method }) : kebabCase(openApi.paths[path][method].operationId || openApi.paths[path][method].summary || openApi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
+      let dir = `generated/${getDirName ? getDirName({ openapi, path, method }) : kebabCase(openapi.paths[path][method].operationId || openapi.paths[path][method].summary || openapi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
 
       fs.mkdirSync(dir, { recursive: true });
 
@@ -324,60 +325,284 @@ const run = async ({ baseURL, config, getParams, getTitle, getDescription, getDo
   await generateChangelogs(config.platform); // Generate changelogs
 };
 
-
-run({
-  baseURL: `https://api.stripe.com`,
-  config: {
-    platform: "stripe",
-    type: "js-request-function",
-    envVars: {
-      BUILDABLE_STRIPE_SECRET_KEY: {
-        development: "",
-        production: "",
-        in: "header",
-        // name: "password",
-        headerName: "authorization"
-      }
-    },
-    fee: 0,
-    category: "payments",
-    accessType: "open",
-    language: "javascript",
-    price: "free",
-    tags: ["payments", "accounts"],
-    stateType: "stateless",
-    __version: "1.0.0",
-    connections: [
-      {
-        id: "627aceaf971c67182d1d76ca",
-        type: "integration"
-      }
-    ]
-  },
-  pathOrURL: "./openapi-specs/stripe-merged.json",
-  isURL: false,
-  getTitle(openApi, path, method) {
-    let summary = openApi.paths[path][method].summary || openApi.paths[path][method].description || kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
-    summary = summary.replace(/<[^>]*>?/gm, ''); // clear any html tags
-    const periodIndex = summary.indexOf(".")
-    const endIndex = periodIndex === -1 ? 100 : periodIndex
-    const title = titleCase(summary).substring(0, endIndex)
-
-    return title
-  },
-  getDescription(openApi, path, method) {
-    let summary = openApi.paths[path][method].summary || openApi.paths[path][method].description || kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
-    summary = summary.replace(/<[^>]*>?/gm, ''); // clear any html tags
-    summary = summary.replace(/\n/g, "") // remove any new line character insertions in the text
-    summary = summary.replace(/\.(?=[A-Za-z])/g, ". ") // add a space after each period and non space character
-    const description = sentenceCase(summary).endsWith(".") ? sentenceCase(summary).slice(0, -1) : sentenceCase(summary)
-
-    return description
-  },
-  getConfigName({ openApi, path, method }) {
-    return camelize(openApi.paths[path][method].summary || openApi.paths[path][method].operationId) + "Result"
-  },
-  getDirName({ openApi, path, method }) {
-    return kebabCase(openApi.paths[path][method].summary || openApi.paths[path][method].operationId)
-  }
+const httpMethods = {}
+http.METHODS.forEach(method => {
+  httpMethods[method.toLowerCase()] = method
 })
+
+const _generate = async ({ baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getConfigName, getAxiosCall, getDirName, pathOrURL, isURL  } = {}) => {
+  if(!httpMethods[method] || openapi.paths[path][method].deprecated || Object.keys(get(openapi.paths[path][method], "requestBody.content", [])).find(i => i === "multipart/form-data")) {
+    return
+  }
+
+  let url = (baseURL || getBaseUrl(openapi, path, method)) + getFullPath(openapi, path, method);
+
+  const auth = getEnvVarParams(config, ["auth"])
+
+  const headers = [];
+
+  const openapiHeaders = getHeaders(openapi, path, method)
+  const envVarHeaders = getEnvVarParams(config, ["header"])
+  
+  for(let header of openapiHeaders) {
+    const envVarHeader = envVarHeaders.find(p => p.headerName.toLowerCase() === header.name.toLowerCase())
+    if(header.isAuth && envVarHeader) {
+      headers.push({
+        ...header,
+        ...envVarHeader,
+      })
+    } else if (!header.isAuth) {
+      headers.push(header)
+    }
+  }
+
+  const params = getParams ? getParams(openapi, path, method) : getEnvVarParams(config, ["path", "query"]).concat(getParameters(openapi, path, method));
+
+  const body = getEnvVarParams(config, ["body"]).concat(getBodyParameters(openapi, path, method));
+
+  let axiosAuth = auth.length > 0
+  ? `auth: {${auth.sort(requiredSort).map(getTemplateObjectAttribute).join(", ")}}`
+  : ""
+
+  let axiosHeaders = headers.length > 0 
+  ? `headers: {${headers.sort(requiredSort).map(getTemplateObjectAttribute).join(", ")}}`
+  : ""
+
+  const queryParams = params.filter((i) => i.in === "query")
+  let axiosParams = queryParams.length > 0
+  ? `params: {${queryParams.sort(requiredSort).map(getTemplateObjectAttribute)}}`
+  : ""
+
+  let axiosData =
+    body.length > 0
+      ? `data: {${body.sort(requiredSort).map(getTemplateObjectAttribute)}}`
+      : "";
+  
+
+  let imports = ""
+  
+  if(get(openapi.paths[path][method], "requestBody.content.application/x-www-form-urlencoded")) {
+    imports = `const axios = require("axios");\nconst qs = require("qs");`
+    axiosData = body.length > 0 ? `data: qs.stringify({${body.sort(requiredSort).map(getTemplateObjectAttribute)}})` : "";
+  }
+
+  (url.match(/{(\w|-)*}/g) || []).forEach(match => {
+    const param = params.find(p => [p.name, p.camelizedName, p.envVarName].includes(match.substring(1, match.length - 1)))
+    if(param) {
+      url = url.replace(match, `\${${getInputName(param)}}`)
+    }
+  });
+  
+  let axiosCall = `
+    method: ${getTemplateString(method)},
+    url: ${getTemplateString(url)},
+    ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
+  `;
+
+  // first display env vars, then required, then optional
+  const inputUnion = union(auth, headers, params, body)
+
+  let inputEnvs = inputUnion
+    .filter(i => !i.hardcoded && i.isEnvironmentVariable)
+  
+  let inputNonEnvs = inputUnion
+    .filter(i => !i.hardcoded && !i.isEnvironmentVariable)
+    .sort(requiredSort)
+  
+  let input = inputEnvs.concat(inputNonEnvs)
+  
+
+  let verifyInput = input
+    .filter((i) => i.required)
+    .map((i) => getInputName(i));
+
+  let verifyErrors = input
+    .filter((i) => i.required)
+    .map(
+      (i) =>
+        `INVALID_${snakeCase(getInputName(i)).toUpperCase()}: "A valid ${
+          getInputName(i)
+        } field (${typeof i.sample}) was not provided in the input.",`
+    )
+    .join("\n");
+
+  const verifyChecks = input
+    .filter((i) => i.required)
+    .map(
+      (i) =>
+        `if (typeof ${
+          getInputName(i)
+        } !== "${typeof i.sample}") throw new Error(ERRORS.INVALID_${snakeCase(
+          getInputName(i)
+        ).toUpperCase()});`
+    )
+    .join("\n");
+
+
+  const summary = openapi.paths[path][method].summary || openapi.paths[path][method].description || kebabCase(openapi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
+
+  const title = (getTitle ? getTitle(openapi, path, method) : titleCase(summary)).substring(0, 100)
+
+  const formattedSummary = sentenceCase(summary).endsWith(".") ? sentenceCase(summary).slice(0, -1) : sentenceCase(summary)
+
+  const description = getDescription ? getDescription(openapi, path, method) : formattedSummary + ` using the ${titleCase(config.platform)} API`;
+
+  const docs = getDocs ? getDocs(openapi, path, method) : get(openapi.paths[path][method], "externalDocs.url") 
+
+  const runFileInput = {
+    openapi, 
+    path, 
+    method,
+    title,
+    description,
+    docs,
+    imports,
+    input: input.map((i) => getInputName(i)),
+    axiosCall,
+    url,
+    axiosAuth, 
+    axiosHeaders, 
+    axiosParams, 
+    axiosData,
+    verifyInput,
+    verifyErrors,
+    verifyChecks,
+  }
+
+  const _runFile = getRunFile ? getRunFile(runFileInput) : runFile(runFileInput);
+
+  const configName = getConfigName ? getConfigName({ openapi, path, method }) : camelize(openapi.paths[path][method].operationId || openapi.paths[path][method].summary || openapi.paths[path][method].description) + "Result"
+  
+  const configFileInput = {
+    openapi, 
+    path, 
+    method,
+    title,
+    description,
+    name: configName.length > 50 || configName.length === 0 ? "result" : configName,
+    ...cleanConfigEnvVars(config)
+  }
+
+  const _configFile = getConfigFile ? getConfigFile(configFileInput) : configFile(omit(configFileInput, ["openapi", "path", "method"]));
+
+  const inputFileParams = `
+    ${mapWithTemplate(union(auth, headers, params, body)
+      .filter(i => !i.hardcoded)
+      .filter((p) => p.required)
+      .sort((a, b) => {
+        if(a.isEnvironmentVariable) {
+          return -1
+        }
+
+        if(b.isEnvironmentVariable) {
+          return 1
+        }
+
+        if(a.in === "header") {
+          return -1
+        }
+
+        if(b.in === "header") {
+          return 1
+        }
+      }), requiredInputTemplate)
+      .join("\n")}
+    
+    ${mapWithTemplate(union(auth, headers, params, body)
+      .filter(i => !i.hardcoded)
+      .filter((p) => !p.required), optionalInputTemplate)
+      .join("\n")}
+  `;
+
+  const inputFileInput = {
+    openapi, 
+    path, 
+    method,
+    title, 
+    docs, 
+    input: inputFileParams,
+  }
+
+  let _inputFile = getInputFile ? getInputFile(inputFileInput) : inputFile(inputFileInput);
+
+  return {
+    input: _inputFile,
+    run: _runFile,
+    config: _configFile,
+
+  }
+
+}
+
+const getGeneratorInput = async (platform) => {
+  const files = fs.readdirSync(`./platforms`)
+
+  if(!files.find(f => f === platform)) {
+    throw new Error("cannot find platform with name: " + platform)
+  }
+
+  const { getGeneratorInput } = require(`./platforms/${platform}`)
+
+  const generatorInput = getGeneratorInput()
+
+  const { openapi } = generatorInput
+
+  try {
+    if(!openapi.url) {
+      openapi = JSON.parse(fs.readFileSync(`./platforms/${platform}/openapi.json`))
+    } else {
+      openapi = (await axios({
+        url: generatorInput.url
+      })).data
+    }
+  } catch(e) {
+    console.error("Error parsing openapi spec")
+    throw e
+  }
+
+  return {
+    ...generatorInput,
+    openapi,
+  }
+}
+
+const generate = async ({ openapi, paths, methods, ...rest }) => {
+  const result = {}
+
+  for (const path of paths || Object.keys(openapi.paths)) {
+    for (const method of methods || Object.keys(openapi.paths[path])) {
+
+      const { input, run, config } = _generate({ ...rest, openapi, path, method })
+
+
+      set(result, `${path}.${method}.input`, input)
+      set(result, `${path}.${method}.run`, run)
+      set(result, `${path}.${method}.config`, config)
+      
+    }
+  }
+
+  return result
+}
+
+const writeGeneratedFiles = async ({ generated, openapi, getDirName }) => {
+  for(const path in generated) {
+    for(const method in generated) {
+      const { run, input, config } = generated[path][method]
+
+      let dir = `generated/${getDirName ? getDirName({ openapi, path, method }) : kebabCase(openapi.paths[path][method].operationId || openapi.paths[path][method].summary || openapi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
+
+      fs.mkdirSync(dir, { recursive: true });
+
+      fs.writeFileSync(`${dir}/run.js`, run);
+      fs.writeFileSync(`${dir}/config.json`, JSON.stringify(config));
+      fs.writeFileSync(`${dir}/input.js`, input);
+    }
+  }
+}
+
+module.exports = {
+  generate,
+  getGeneratorInput,
+  writeGeneratedFiles,
+}
