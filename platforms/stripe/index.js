@@ -1,3 +1,10 @@
+const {titleCase} = require("title-case")
+const kebabCase = require("lodash/kebabCase")
+const {
+  camelize,
+  sentenceCase,
+} = require("../../utils");
+
 const getGeneratorInput = () => ({
   baseURL: `https://api.stripe.com`,
   config: {
@@ -27,10 +34,8 @@ const getGeneratorInput = () => ({
       }
     ]
   },
-  pathOrURL: "./openapi-specs/stripe-merged.json",
-  isURL: false,
-  getTitle(openApi, path, method) {
-    let summary = openApi.paths[path][method].summary || openApi.paths[path][method].description || kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
+  getTitle(openapi, path, method) {
+    let summary = openapi.paths[path][method].summary || openapi.paths[path][method].description || kebabCase(openapi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
     summary = summary.replace(/<[^>]*>?/gm, ''); // clear any html tags
     const periodIndex = summary.indexOf(".")
     const endIndex = periodIndex === -1 ? 100 : periodIndex
@@ -38,8 +43,8 @@ const getGeneratorInput = () => ({
 
     return title
   },
-  getDescription(openApi, path, method) {
-    let summary = openApi.paths[path][method].summary || openApi.paths[path][method].description || kebabCase(openApi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
+  getDescription(openapi, path, method) {
+    let summary = openapi.paths[path][method].summary || openapi.paths[path][method].description || kebabCase(openapi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
     summary = summary.replace(/<[^>]*>?/gm, ''); // clear any html tags
     summary = summary.replace(/\n/g, "") // remove any new line character insertions in the text
     summary = summary.replace(/\.(?=[A-Za-z])/g, ". ") // add a space after each period and non space character
@@ -47,11 +52,11 @@ const getGeneratorInput = () => ({
 
     return description
   },
-  getConfigName({ openApi, path, method }) {
-    return camelize(openApi.paths[path][method].summary || openApi.paths[path][method].operationId) + "Result"
+  getConfigName({ openapi, path, method }) {
+    return camelize(openapi.paths[path][method].summary || openapi.paths[path][method].operationId) + "Result"
   },
-  getDirName({ openApi, path, method }) {
-    return kebabCase(openApi.paths[path][method].summary || openApi.paths[path][method].operationId)
+  getDirName({ openapi, path, method }) {
+    return kebabCase(openapi.paths[path][method].summary || openapi.paths[path][method].operationId)
   }
 })
 

@@ -1,17 +1,20 @@
-const { getGeneratorInput, generate, writeGeneratedFiles } = require("./index.js");
+const { getGeneratorInput, generate, writeGeneratedFiles, prettifyGeneratedFiles } = require("./index.js");
 
 (async () => {
   //TODO: allow all/multiple platforms
   
-  const platform = process.argv[2]
+  const platforms = process.argv.slice(2)
 
-  if(!platform) {
-    console.error("missing platform name in argument")
+  if(platforms.length === 0) {
+    console.error("must provide at least one platform in arguments")
     return
   }
 
-  console.log("platform", platform)
-  
-  writeGeneratedFiles(generate(getGeneratorInput(platform)))
+  for(const platform of platforms) {
+    const generatorInput = await getGeneratorInput(platform)
+    const generated = await generate(generatorInput)
+    writeGeneratedFiles({ ...generatorInput, platform, generated })
+    prettifyGeneratedFiles({ platform })
+  }
 })()
 

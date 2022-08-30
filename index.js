@@ -8,6 +8,7 @@ const get = require("lodash/get")
 const set = require("lodash/set")
 const union = require("lodash/union")
 const omit = require("lodash/omit")
+const { spawn } = require('child_process');
 const {
   camelize,
   sentenceCase,
@@ -330,7 +331,7 @@ http.METHODS.forEach(method => {
   httpMethods[method.toLowerCase()] = method
 })
 
-const _generate = async ({ baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getConfigName, getAxiosCall, getDirName, pathOrURL, isURL  } = {}) => {
+const _generate = async ({ openapi, path, method, baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getConfigName, getAxiosCall, getDirName, pathOrURL, isURL  } = {}) => {
   if(!httpMethods[method] || openapi.paths[path][method].deprecated || Object.keys(get(openapi.paths[path][method], "requestBody.content", [])).find(i => i === "multipart/form-data")) {
     return
   }
@@ -524,12 +525,11 @@ const _generate = async ({ baseURL, config, getParams, getTitle, getDescription,
   }
 
   let _inputFile = getInputFile ? getInputFile(inputFileInput) : inputFile(inputFileInput);
-
+  
   return {
     input: _inputFile,
     run: _runFile,
     config: _configFile,
-
   }
 
 }
@@ -545,19 +545,25 @@ const getGeneratorInput = async (platform) => {
 
   const generatorInput = getGeneratorInput()
 
-  const { openapi } = generatorInput
+  let openapi
 
-  try {
-    if(!openapi.url) {
-      openapi = JSON.parse(fs.readFileSync(`./platforms/${platform}/openapi.json`))
-    } else {
+  if(generatorInput.url) {
+    try {
       openapi = (await axios({
         url: generatorInput.url
       })).data
+    } catch(e) {
+      console.error("Error parsing retrieving openapi spec from url:", generatorInput.url)
     }
-  } catch(e) {
-    console.error("Error parsing openapi spec")
-    throw e
+  }
+
+  if(!openapi) {
+    try {
+      openapi = JSON.parse(fs.readFileSync(`./platforms/${platform}/openapi.json`))
+    } catch(e) {
+      console.error("Error parsing openapi spec")
+      throw e
+    }
   }
 
   return {
@@ -572,12 +578,16 @@ const generate = async ({ openapi, paths, methods, ...rest }) => {
   for (const path of paths || Object.keys(openapi.paths)) {
     for (const method of methods || Object.keys(openapi.paths[path])) {
 
-      const { input, run, config } = _generate({ ...rest, openapi, path, method })
+      const res = await _generate({ ...rest, openapi, path, method })
 
+      if(res) {
+        const { input, run, config } = res
 
-      set(result, `${path}.${method}.input`, input)
-      set(result, `${path}.${method}.run`, run)
-      set(result, `${path}.${method}.config`, config)
+        set(result, `${path}.${method}.input`, input)
+        set(result, `${path}.${method}.run`, run)
+        set(result, `${path}.${method}.config`, config)
+      }
+      
       
     }
   }
@@ -585,24 +595,40 @@ const generate = async ({ openapi, paths, methods, ...rest }) => {
   return result
 }
 
-const writeGeneratedFiles = async ({ generated, openapi, getDirName }) => {
+const writeGeneratedFiles = async ({ platform, generated, openapi, getDirName }) => {
   for(const path in generated) {
-    for(const method in generated) {
-      const { run, input, config } = generated[path][method]
+    for(const method in generated[path]) {
+      const res = generated[path][method]
 
-      let dir = `generated/${getDirName ? getDirName({ openapi, path, method }) : kebabCase(openapi.paths[path][method].operationId || openapi.paths[path][method].summary || openapi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
+      if(res) {
+        const { input, run, config } = res
+        let dir = `generated/${platform}/${getDirName ? getDirName({ openapi, path, method }) : kebabCase(openapi.paths[path][method].operationId || openapi.paths[path][method].summary || openapi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
 
-      fs.mkdirSync(dir, { recursive: true });
-
-      fs.writeFileSync(`${dir}/run.js`, run);
-      fs.writeFileSync(`${dir}/config.json`, JSON.stringify(config));
-      fs.writeFileSync(`${dir}/input.js`, input);
+        fs.mkdirSync(dir, { recursive: true });
+  
+        fs.writeFileSync(`${dir}/run.js`, run);
+        fs.writeFileSync(`${dir}/config.json`, JSON.stringify(config));
+        fs.writeFileSync(`${dir}/input.js`, input);
+      }
     }
   }
+}
+
+const prettifyGeneratedFiles = async ({ platform }) => {
+  const _spawn = spawn("npx", ["prettier", "--write", `generated/${platform}/**/*.{js,json}`])
+
+  _spawn.stdout.on('data', function(msg){         
+    console.log(msg.toString())
+  });
+
+  _spawn.stderr.on('data', function(msg){         
+    console.log(msg.toString())
+  });
 }
 
 module.exports = {
   generate,
   getGeneratorInput,
   writeGeneratedFiles,
+  prettifyGeneratedFiles
 }
