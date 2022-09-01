@@ -583,9 +583,9 @@ const generate = async ({ openapi, paths, methods, ...rest }) => {
       if(res) {
         const { input, run, config } = res
 
-        set(result, `${path}.${method}.input`, input)
-        set(result, `${path}.${method}.run`, run)
-        set(result, `${path}.${method}.config`, config)
+        set(result, `["${path}"]["${method}"].input`, input)
+        set(result, `["${path}"]["${method}"].run`, run)
+        set(result, `["${path}"]["${method}"].config`, config)
       }
       
       
@@ -596,12 +596,14 @@ const generate = async ({ openapi, paths, methods, ...rest }) => {
 }
 
 const writeGeneratedFiles = async ({ platform, generated, openapi, getDirName }) => {
+  // console.log(JSON.stringify(generated, null, 2))
   for(const path in generated) {
     for(const method in generated[path]) {
       const res = generated[path][method]
 
       if(res) {
         const { input, run, config } = res
+        // console.log(path, method)
         let dir = `generated/${platform}/${getDirName ? getDirName({ openapi, path, method }) : kebabCase(openapi.paths[path][method].operationId || openapi.paths[path][method].summary || openapi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
 
         fs.mkdirSync(dir, { recursive: true });
