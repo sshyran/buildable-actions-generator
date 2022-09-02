@@ -31,8 +31,6 @@ const {
   requiredSort
 } = require("./utils");
 
-const { generateChangelogs } = require("./generate-changelogs");
-
 
 
 let configFile = ({ name, title, description, ...rest }) => ({
@@ -484,7 +482,7 @@ const _generate = async ({ openapi, path, method, baseURL, config, getParams, ge
     ...cleanConfigEnvVars(config)
   }
 
-  const _configFile = getConfigFile ? getConfigFile(configFileInput) : configFile(omit(configFileInput, ["openapi", "path", "method"]));
+  const _configFile = getConfigFile ? getConfigFile(configFileInput) : configFile(omit(configFileInput, ["openapi"]));
 
   const inputFileParams = `
     ${mapWithTemplate(union(auth, headers, params, body)
@@ -595,7 +593,11 @@ const generate = async ({ openapi, paths, methods, ...rest }) => {
   return result
 }
 
-const writeGeneratedFiles = async ({ platform, generated, openapi, getDirName }) => {
+const getDirName = ({ openapi, path, method }) => {
+  return kebabCase(openapi.paths[path][method].operationId || openapi.paths[path][method].summary || openapi.paths[path][method].description || `${method.toUpperCase()} ${path}`)
+}
+
+const writeGeneratedFiles = async ({ platform, generated, openapi, getDirName: _getDirName }) => {
   // console.log(JSON.stringify(generated, null, 2))
   for(const path in generated) {
     for(const method in generated[path]) {
@@ -604,33 +606,43 @@ const writeGeneratedFiles = async ({ platform, generated, openapi, getDirName })
       if(res) {
         const { input, run, config } = res
         // console.log(path, method)
-        let dir = `generated/${platform}/${getDirName ? getDirName({ openapi, path, method }) : kebabCase(openapi.paths[path][method].operationId || openapi.paths[path][method].summary || openapi.paths[path][method].description || `${method.toUpperCase()} ${path}`)}`;
+        const dir = `generated/${platform}/${_getDirName ? _getDirName({ openapi, path, method }) : getDirName({ openapi, path, method }) }`;
 
-        fs.mkdirSync(dir, { recursive: true });
+        await fs.promises.mkdir(dir, { recursive: true });
   
-        fs.writeFileSync(`${dir}/run.js`, run);
-        fs.writeFileSync(`${dir}/config.json`, JSON.stringify(config));
-        fs.writeFileSync(`${dir}/input.js`, input);
+        await fs.promises.writeFile(`${dir}/run.js`, run);
+        await fs.promises.writeFile(`${dir}/config.json`, JSON.stringify(config));
+        await fs.promises.writeFile(`${dir}/input.js`, input);
       }
     }
   }
 }
 
-const prettifyGeneratedFiles = async ({ platform }) => {
+const prettifyFiles = async ({ platform }) => {
   const _spawn = spawn("npx", ["prettier", "--write", `generated/${platform}/**/*.{js,json}`])
 
-  _spawn.stdout.on('data', function(msg){         
-    console.log(msg.toString())
-  });
-
-  _spawn.stderr.on('data', function(msg){         
-    console.log(msg.toString())
-  });
+  return new Promise((resolve, reject) => {
+    _spawn.stdout.on('data', function(msg){         
+      console.log(msg.toString())
+    });
+  
+    _spawn.stderr.on('data', function(msg){         
+      console.log(msg.toString())
+    });
+  
+    _spawn.on('close', (code) => {
+      console.log("exited with code:", code)
+      resolve()
+    });
+  })
 }
 
 module.exports = {
   generate,
   getGeneratorInput,
   writeGeneratedFiles,
-  prettifyGeneratedFiles
+  prettifyFiles,
+  getDirName,
+  inputFile,
+  runFile
 }

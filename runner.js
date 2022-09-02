@@ -1,4 +1,4 @@
-const { getGeneratorInput, generate, writeGeneratedFiles, prettifyGeneratedFiles } = require("./index.js");
+const { getGeneratorInput, generate, writeGeneratedFiles, prettifyFiles } = require("./index.js");
 
 (async () => {
   //TODO: allow all/multiple platforms
@@ -13,8 +13,9 @@ const { getGeneratorInput, generate, writeGeneratedFiles, prettifyGeneratedFiles
   for(const platform of platforms) {
     const generatorInput = await getGeneratorInput(platform)
     const generated = await generate(generatorInput)
-    writeGeneratedFiles({ ...generatorInput, platform, generated })
-    prettifyGeneratedFiles({ platform })
+    
+    await writeGeneratedFiles({ ...generatorInput, platform, generated })
+    await prettifyFiles({ platform })
   }
 })()
 
