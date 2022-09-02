@@ -18,17 +18,19 @@ const initActionProvider = async ({ platform }) => {
 
   const generated = await generate(generatorInput);
 
-  await writeGeneratedFiles({ ...generatorInput, platform, generated });
+  // await writeGeneratedFiles({ ...generatorInput, platform, generated });
 
-  await prettifyFiles({ platform });
+  // await prettifyFiles({ platform });
 
   const provider = {
     call: async ({ path, method, input, $body, $headers, $actions }) => {
       const dirNameInput = { openapi: generatorInput.openapi, path, method }
       const actionName = generatorInput.getDirName ? generatorInput.getDirName(dirNameInput) : getDirName(dirNameInput)
       
-      const { nodeInput } = require(`../generated/${platform}/${actionName}/input`);
-      const { run } = await fs.readFile(`../generated/${platform}/${actionName}/run`);
+      const files = await fs.readdir(`generated/${platform}/${actionName}`)
+      console.log(files)
+      const { nodeInput } = require(`../generated/${platform}/${actionName}/input.js`);
+      const { run } = require(`../generated/${platform}/${actionName}/run.js`);
 
       const _input = nodeInput({ $body, $headers, $actions, $env: process.env });
       const result = run({ ..._input, ...input })
@@ -37,7 +39,7 @@ const initActionProvider = async ({ platform }) => {
     }
   };
 
-  return provider;
+  return { provider, openapi: generatorInput.openapi };
 };
 
 module.exports = {
