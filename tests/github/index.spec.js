@@ -1,3 +1,4 @@
+const uuid = require("uuid")
 const { initActionProvider } = require("../../utils/action-provider")
 const platform = __dirname.split("/").pop()
 jest.setTimeout(30000)
@@ -5,31 +6,109 @@ jest.setTimeout(30000)
 describe(`Testing ${platform}`, () => {
   let provider
   let openapi
+
+  const seed = {}
   beforeAll(async () => {
 
     const { provider: _provider, openapi: _openapi } = await initActionProvider({ platform })
 
     provider = _provider
     openapi = _openapi
+
+    const repo = await provider.call({
+      path: "/user/repos",
+      method: "post",
+      input: {
+        owner: process.env.TEST_GITHUB_OWNER,
+        name: `test-${uuid.v4()}`
+      }
+    })
+
+    seed.repo = repo
+
+    const file = await provider.call({
+      path: "/repos/{owner}/{repo}/contents/{path}",
+      method: "put",
+      input: {
+        owner: process.env.TEST_GITHUB_OWNER,
+        repo: seed.repo.name,
+        message: "File creation from tests",
+        content: Buffer.from("new file contents", 'utf-8').toString("base64"),
+        path: "hello.txt"
+      }
+    })
+
+    seed.file = file
+
+    const head = await provider.call({
+      path: "/repos/{owner}/{repo}/git/refs",
+      method: "post",
+      input: {
+        owner: process.env.TEST_GITHUB_OWNER,
+        repo: seed.repo.name,
+        ref: "refs/heads/development",
+        sha: seed.file.commit.sha
+      }
+    })
+
+    seed.head = head
+
+    const fileOnHead = await provider.call({
+      path: "/repos/{owner}/{repo}/contents/{path}",
+      method: "put",
+      input: {
+        owner: process.env.TEST_GITHUB_OWNER,
+        repo: seed.repo.name,
+        message: "Update file from tests",
+        content: Buffer.from("updated file contents", 'utf-8').toString("base64"),
+        branch: seed.head.ref.replace("/refs/heads/", ""),
+        path: "hello.txt",
+        sha: seed.file.content.sha
+      }
+    })
+
+    seed.fileOnHead = fileOnHead
+
   })
 
-  it("successfully creates a pr", async () => {
-    const result = await provider.call({
+  it("successfully creates nd closes a pr", async () => {
+    const createResult = await provider.call({
       path: "/repos/{owner}/{repo}/pulls",
       method: "post",
       input: {
         owner: process.env.TEST_GITHUB_OWNER,
-        repo: process.env.TEST_GITHUB_REPO,
-        head: process.env.TEST_GITHUB_HEAD,
-        base: process.env.TEST_GITHUB_BASE,
+        repo: seed.repo.name,
+        head: seed.head.ref.replace("/refs/heads/", ""),
+        base: seed.repo.default_branch,
+        title: uuid.v4()
       }
     })
 
-    console.log(result)
+    expect(createResult.failed).not.toEqual(true)
 
-    // for(const key in Object.keys(result)) {
-    //   openapi[path][method]
-    // }
+    const patchResult = await provider.call({
+      path: "/repos/{owner}/{repo}/pulls/{pull_number}",
+      method: "patch",
+      input: {
+        owner: process.env.TEST_GITHUB_OWNER,
+        repo: seed.repo.name,
+        pull_number: createResult.number,
+        state: "closed"
+      }
+    })
+
+    expect(patchResult.failed).not.toEqual(true)
+  })
+
+  afterAll(async () => {
+    const deleteRepoResponse = await provider.call({
+      path: "/repos/{owner}/{repo}",
+      method: "delete",
+      input: {
+        owner: process.env.TEST_GITHUB_OWNER,
+        repo: seed.repo.name,
+      }
+    })
   })
 })
 

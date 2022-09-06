@@ -1,5 +1,5 @@
 const getGeneratorInput = () => ({
-  baseURL: "https://api.github.com/api/v3",
+  baseURL: "https://api.github.com",
   config: {
     platform: "github",
     type: "js-request-function",
