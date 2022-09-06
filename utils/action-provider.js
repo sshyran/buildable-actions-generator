@@ -26,9 +26,7 @@ const initActionProvider = async ({ platform }) => {
     call: async ({ path, method, input, $body, $headers, $actions }) => {
       const dirNameInput = { openapi: generatorInput.openapi, path, method }
       const actionName = generatorInput.getDirName ? generatorInput.getDirName(dirNameInput) : getDirName(dirNameInput)
-      
-      const files = await fs.readdir(`generated/${platform}/${actionName}`)
-      console.log(files)
+
       const { nodeInput } = require(`../generated/${platform}/${actionName}/input.js`);
       const { run } = require(`../generated/${platform}/${actionName}/run.js`);
 
