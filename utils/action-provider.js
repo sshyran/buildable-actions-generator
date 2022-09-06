@@ -18,9 +18,9 @@ const initActionProvider = async ({ platform }) => {
 
   const generated = await generate(generatorInput);
 
-  // await writeGeneratedFiles({ ...generatorInput, platform, generated });
+  await writeGeneratedFiles({ ...generatorInput, platform, generated });
 
-  // await prettifyFiles({ platform });
+  await prettifyFiles({ platform });
 
   const provider = {
     call: async ({ path, method, input, $body, $headers, $actions }) => {
