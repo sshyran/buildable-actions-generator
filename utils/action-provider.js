@@ -1,7 +1,6 @@
 
 require("dotenv").config()
 
-const fs = require('fs').promises;
 const { generate, inputFile, runFile, getGeneratorInput, writeGeneratedFiles, getDirName, prettifyFiles } = require("../index.js");
 
 
