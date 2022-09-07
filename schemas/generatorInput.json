@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "baseURL": {
+      "type": "string",
+      "description": "Overwrites the base url that platform actions call"
+    },
+    "config": {
+      "type": "object",
+      "description": "Main configuration object the generator and buildable uses to identify and configure the actions",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "Name of the third party platform (i.e github)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["js-request-function"],
+          "description": "Buildable's type identifier for the type of action"
+        }
+      }
+    }
+  }
+}
