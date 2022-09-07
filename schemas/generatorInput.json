@@ -17,6 +17,34 @@
           "type": "string",
           "enum": ["js-request-function"],
           "description": "Buildable's type identifier for the type of action"
+        },
+        "envVars": {
+          "type": "object",
+          "description": "Specifies environment variables used in the actions",
+          "patternProperties": {
+            "*": {
+              "type": "object",
+              "properties": {
+                "development": {
+                  "type": "string",
+                  "description": "Specifies the default value for the development environment"
+                },
+                "production": {
+                  "type": "string",
+                  "description": "Specifies the default value for the production environment"
+                },
+                "in": {
+                  "type": "string",
+                  "enum": ["auth", "header", "params", "query", "body"],
+                  "description": "Specifies where the environment variable is used in the API request"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Specifies the key name of the environment variable"
+                }
+              }
+            }
+          }
         }
       }
     }
