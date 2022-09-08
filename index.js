@@ -99,7 +99,7 @@ http.METHODS.forEach(method => {
   httpMethods[method.toLowerCase()] = method
 })
 
-const _generate = async ({ openapi, path, method, baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getConfigName, getAxiosCall, getDirName, pathOrURL, isURL  } = {}) => {
+const _generate = async ({ openapi, path, method, baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getConfigName } = {}) => {
   if(!httpMethods[method] || openapi.paths[path][method].deprecated || Object.keys(get(openapi.paths[path][method], "requestBody.content", [])).find(i => i === "multipart/form-data")) {
     return
   }

@@ -8,7 +8,6 @@ const getGeneratorInput = () => ({
         development: "",
         production: "",
         in: "header",
-        // name: "password",
         name: "Authorization"
       }
     },
