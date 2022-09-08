@@ -15,6 +15,8 @@ function santizeReservedKeywords(str) {
   if(reserved.includes(str)) {
     return `_${str}`
   }
+
+  return str
 }
 
 function camelize(str) {
