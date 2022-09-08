@@ -1,6 +1,6 @@
 
 require("dotenv").config()
-
+const get = require("lodash/get")
 const { generate, inputFile, runFile, getGeneratorInput, writeGeneratedFiles, getDirName, prettifyFiles } = require("../index.js");
 
 const getGeneratorInputWithModuleExportInRunAndInput = generatorInput => {
@@ -17,6 +17,8 @@ const getGeneratorInputWithModuleExportInRunAndInput = generatorInput => {
 
 const writeAndPrettyGenerated = async (generatorInput) => {
   const generated = await generate(generatorInput);
+
+  const platform = get(generatorInput, "config.platform")
 
   await writeGeneratedFiles({ ...generatorInput, platform, generated });
 
@@ -46,7 +48,7 @@ const initActionProvider = async (generatorInput = {}) => {
 const setupTests = async (platform) => {
   let generatorInput = await getGeneratorInput(platform);
 
-  generatorInput =  getGeneratorInputWithModuleExportInRunAndInput(generatorInput)
+  generatorInput = getGeneratorInputWithModuleExportInRunAndInput(generatorInput)
 
   await writeAndPrettyGenerated(generatorInput)
 

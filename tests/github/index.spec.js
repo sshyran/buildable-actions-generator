@@ -5,7 +5,6 @@ jest.setTimeout(30000)
 
 describe(`Testing ${platform}`, () => {
   let provider
-  let openapi
 
   const seed = {}
 
