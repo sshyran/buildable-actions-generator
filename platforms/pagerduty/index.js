@@ -7,7 +7,7 @@ const getGeneratorInput = () => ({
         development: "",
         production: "",
         in: "header",
-        headerName: "authorization",
+        name: "Authorization",
         value: "Token token= ${BUILDABLE_PAGERDUTY_API_KEY}"
       }
     },

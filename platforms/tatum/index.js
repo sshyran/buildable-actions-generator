@@ -11,7 +11,7 @@ const getGeneratorInput = () => ({
         development: "",
         production: "",
         in: "header",
-        headerName: "x-api-key"
+        name: "x-api-key"
       },
     },
     type: "js-request-function",

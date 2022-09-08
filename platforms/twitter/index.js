@@ -11,7 +11,7 @@ const getGeneratorInput = () => ({
         development: "",
         production: "",
         in: "header",
-        headerName: "authorization"
+        name: "Authorization"
       },
     },
     fee: 0,

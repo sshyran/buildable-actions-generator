@@ -114,7 +114,7 @@ const _generate = async ({ openapi, path, method, baseURL, config, getParams, ge
   const envVarHeaders = getEnvVarParams(config, ["header"])
   
   for(let header of openapiHeaders) {
-    const envVarHeader = envVarHeaders.find(p => p.headerName.toLowerCase() === header.name.toLowerCase())
+    const envVarHeader = envVarHeaders.find(p => p.name.toLowerCase() === header.name.toLowerCase())
     if(header.isAuth && envVarHeader) {
       headers.push({
         ...header,

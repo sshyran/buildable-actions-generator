@@ -9,7 +9,7 @@ const getGeneratorInput = () => ({
         production: "",
         in: "header",
         // name: "password",
-        headerName: "authorization"
+        name: "Authorization"
       }
     },
     fee: 0,
