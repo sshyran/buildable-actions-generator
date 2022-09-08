@@ -1,5 +1,5 @@
 const uuid = require("uuid")
-const { initActionProvider } = require("../../utils/action-provider")
+const { setupTests } = require("../../utils/helpers")
 const platform = __dirname.split("/").pop()
 jest.setTimeout(30000)
 
@@ -8,12 +8,12 @@ describe(`Testing ${platform}`, () => {
   let openapi
 
   const seed = {}
-  beforeAll(async () => {
 
-    const { provider: _provider, openapi: _openapi } = await initActionProvider({ platform })
+  beforeAll(async () => {
+    const { provider: _provider } = await setupTests(platform)
 
     provider = _provider
-    openapi = _openapi
+
 
     const repo = await provider.call({
       path: "/user/repos",
