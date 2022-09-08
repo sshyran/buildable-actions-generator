@@ -18,19 +18,15 @@
 
 Replace PLATFORM_NAME with one of the platforms available under the `platforms` folder
 
+See generated actions in the `generated` folder :)
+
 <br/>
 
 ### Adding a new platform
 
 - create a new folder under `platforms` (you can copy over one of the existing ones)
-- edit the `getGeneratorInput` function with required data (see [Configuring Generator Input](#configuring-generator-input))
+- edit the `getGeneratorInput` function with required data (see See [schemas/generatorInput.json](schemas/generatorInput.json))
 - To use a local spec instead of a remote one (e.g the remote needs updating), add it as `openapi.json` under the platform folder (see the `circleci` folder as an example)
 
-<br/>
-
-
-### Configuring Generator Input
-
-See [generatorInput.json](schemas/generatorInput.json)
 
 
