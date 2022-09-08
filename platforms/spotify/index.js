@@ -3,7 +3,7 @@ const {
 } = require("../../utils");
 
 const getGeneratorInput = () => ({
-  baseURL: "{SPOTIFY_BASE_URI}", // can be hardcoded string (i.e https://my-api.com) and/or contain envVar replacement values (i.e https://{SOME_API_URL}/api)
+  baseURL: "{SPOTIFY_BASE_URI}",
   config: {
     platform: "spotify",
     type: "js-request-function",
@@ -35,14 +35,13 @@ const getGeneratorInput = () => ({
     stateType: "stateless",
     __version: "1.0.0",
   },
-  pathOrURL: "openapi.json",
-  isURL: false,
   connections: [
     {
       id: "62d865290bd36f737a23f632",
       type: "integration"
     }
   ],
+  url: "https://api.apis.guru/v2/specs/spotify.com/2021.8.15/openapi.json",
   getRunFile: ({
     title,
     description,

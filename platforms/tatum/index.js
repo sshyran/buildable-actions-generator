@@ -31,6 +31,7 @@ const getGeneratorInput = () => ({
       }
     ]
   },
+  url: "blob:https://apidoc.tatum.io/05873cbc-52ca-4c12-a4b1-0e83bbd19c1f"
 })
 
 module.exports = {

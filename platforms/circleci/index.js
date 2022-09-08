@@ -26,6 +26,7 @@ const getGeneratorInput = () => ({
       }
     ]
   },
+  url: "blob:https://circleci.com/0dc791fe-549a-4ba4-ba93-cadab0f65147"
 })
 
 module.exports = {

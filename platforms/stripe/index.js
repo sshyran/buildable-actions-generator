@@ -33,6 +33,7 @@ const getGeneratorInput = () => ({
       }
     ]
   },
+  url: "https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json", //merged with postman collection https://raw.githubusercontent.com/stripe/stripe-postman/master/StripeAPICollection.json https://www.postman.com/stripedev/workspace/stripe-developers/overview
   getTitle(openapi, path, method) {
     let summary = openapi.paths[path][method].summary || openapi.paths[path][method].description || kebabCase(openapi.paths[path][method].operationId).replace(/-/g, " ") || `${method.toUpperCase()} ${path}`
     summary = summary.replace(/<[^>]*>?/gm, ''); // clear any html tags

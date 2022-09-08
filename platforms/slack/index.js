@@ -27,6 +27,7 @@ const getGeneratorInput = () => ({
     ]
   },
   // url: "https://raw.githubusercontent.com/slackapi/slack-api-specs/master/web-api/slack_web_openapi_v2.json"
+  url: "https://api.apis.guru/v2/specs/slack.com/1.7.0/openapi.json"
 })
 
 module.exports = {

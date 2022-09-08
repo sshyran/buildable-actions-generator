@@ -25,6 +25,7 @@ const getGeneratorInput = () => ({
       }
     ]
   },
+  // url: "https://www.postman.com/notionhq/workspace/notion-s-api-workspace/overview" // converted to openapi from a postman collection
 })
 
 module.exports = {
