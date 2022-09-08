@@ -312,26 +312,29 @@ const getGeneratorInput = async (platform) => {
   const { getGeneratorInput } = require(`./platforms/${platform}`)
 
   const generatorInput = getGeneratorInput()
+  
+  const platformFiles = fs.readdirSync(`./platforms/${platform}`)
 
   let openapi
 
-  if(generatorInput.url) {
-    try {
-      openapi = (await axios({
-        url: generatorInput.url
-      })).data
-    } catch(e) {
-      console.error("Error parsing retrieving openapi spec from url:", generatorInput.url)
-    }
-  }
-
-  if(!openapi) {
+  if(platformFiles.find(f => f === "openapi.json")) {
     try {
       openapi = JSON.parse(fs.readFileSync(`./platforms/${platform}/openapi.json`))
     } catch(e) {
       console.error("Error parsing openapi spec")
       throw e
     }
+  } else if (generatorInput.url) {
+    try {
+      openapi = (await axios({
+        url: generatorInput.url
+      })).data
+    } catch(e) {
+      console.error("Error parsing retrieving openapi spec from url:", generatorInput.url)
+      throw e
+    }
+  } else {
+    throw new Error("Must specify a local openapi.json file or a valid remote url for the openapi spec in the generatorInput")
   }
 
   return {
