@@ -128,15 +128,15 @@
       "required": true
     },
     "getParams": {
-      "description": "Overwrites default parameter retrieval",
+      "description": "Overwrites default parameter retrieval. See twilio as an example.",
       "$ref": "#/definitions/function"
     },
     "getTitle": {
-      "description": "Overwrites default title retrieval",
+      "description": "Overwrites default title retrieval. See stripe as an example.",
       "$ref": "#/definitions/function"
     },
     "getDescription": {
-      "description": "Overwrites default description retrieval",
+      "description": "Overwrites default description retrieval. See stripe as an example.",
       "$ref": "#/definitions/function"
     },
     "getDocs": {
@@ -144,7 +144,7 @@
       "$ref": "#/definitions/function"
     },
     "getRunFile": {
-      "description": "Overwrites default run file template retrieval",
+      "description": "Overwrites default run file template retrieval. See twilio as an example.",
       "$ref": "#/definitions/function"
     },
     "getInputFile": {
@@ -156,7 +156,11 @@
       "$ref": "#/definitions/function"
     },
     "getConfigName": {
-      "description": "Overwrites default config name retrieval",
+      "description": "Overwrites default config name retrieval. See stripe as an example.",
+      "$ref": "#/definitions/function"
+    },
+    "getDirName": {
+      "description": "Overwrites the action directory name retrieval. See stripe as an example.",
       "$ref": "#/definitions/function"
     }
   },
