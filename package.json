@@ -4,21 +4,30 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "generate": "rm -rf generated && node index.js && npx prettier --write \"generated/**/*.{js,json}\"",
-    "count": "find generated/* -maxdepth 0 -type d | wc -l"
+    "test": "jest tests",
+    "generate": "node runner.js",
+    "count": "find generated/$PLATFORM/* -maxdepth 0 -type d | wc -l"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.25.0",
+    "dotenv": "^16.0.2",
     "lodash": "^4.17.21",
     "mustache": "^4.2.0",
     "openapi-snippet": "^0.13.0",
     "prettier": "^2.5.1",
     "snake-case": "^3.0.4",
     "swagger-parser": "^10.0.3",
-    "title-case": "^3.0.3"
+    "title-case": "^3.0.3",
+    "uuid": "^9.0.0"
+  },
+  "engines": {
+    "npm": ">=8.0.0",
+    "node": ">=16.11.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.1"
   }
 }

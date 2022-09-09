@@ -7,6 +7,18 @@ const prettier = require("prettier")
 const sampleOverrides = require("../sampler-override")
 OpenAPISampler._registerSampler("string", sampleOverrides.sampleString)
 
+function santizeReservedKeywords(str) {
+  const reserved = [
+    "private"
+  ]
+
+  if(reserved.includes(str)) {
+    return `_${str}`
+  }
+
+  return str
+}
+
 function camelize(str) {
   return str
     .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
@@ -301,9 +313,9 @@ const getHeaders = (openApi, path, method) => {
     let splitHeaderName = header.name.split("-")
     splitHeaderName = splitHeaderName.map(i => capitalCase(i))
     if(splitHeaderName[0] === "x" || splitHeaderName[0] === "X") {
-      header.camelizedName = camelize(splitHeaderName.slice(1).join("-")).replace(/-/g, "")
+      header.camelizedName = santizeReservedKeywords(camelize(splitHeaderName.slice(1).join("-")).replace(/-/g, ""))
     } else {
-      header.camelizedName = camelize(header.name).replace(/-/g, "")
+      header.camelizedName = santizeReservedKeywords(camelize(header.name).replace(/-/g, ""))
     }
 
     
@@ -389,7 +401,7 @@ const _getParameters = function (openApi, path, method, values) {
 
 const getParameters = (openApi, path, method) => {
   return _getParameters(openApi, path, method, {}).filter(p => !p.deprecated && !getHeaders(openApi, path, method).find(h => h.name === p.name)).map(i => {
-    i.camelizedName = camelize(i.name).replace(".", "")
+    i.camelizedName = santizeReservedKeywords(camelize(i.name).replace(".", ""))
 
     return i
   })
@@ -529,7 +541,7 @@ const _getBodyParameters = function (openApi, path, method) {
 
 const getBodyParameters = (openApi, path, method) => {
   return _getBodyParameters(openApi, path, method).filter(p => !p.deprecated).map(i => {
-    i.camelizedName = camelize(i.name).replace(".", "")
+    i.camelizedName = santizeReservedKeywords(camelize(i.name).replace(".", ""))
 
     return i
   })

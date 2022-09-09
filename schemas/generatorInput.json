@@ -1,0 +1,181 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "baseURL": {
+      "type": "string",
+      "description": "Overwrites the base url that platform actions call"
+    },
+    "config": {
+      "type": "object",
+      "description": "Main configuration object the generator and buildable uses to identify and configure the actions",
+      "required": true,
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "Name of the third party platform (i.e github)",
+          "required": true
+        },
+        "type": {
+          "type": "string",
+          "enum": ["js-request-function"],
+          "description": "Buildable's type identifier for the type of action",
+          "required": true
+        },
+        "envVars": {
+          "type": "object",
+          "description": "Specifies environment variables used in the actions",
+          "patternProperties": {
+            "*": {
+              "type": "object",
+              "properties": {
+                "development": {
+                  "type": "string",
+                  "description": "Specifies the default value for the development environment",
+                  "default": "",
+                  "required": true
+                },
+                "production": {
+                  "type": "string",
+                  "description": "Specifies the default value for the production environment",
+                  "default": "",
+                  "required": true
+                },
+                "in": {
+                  "type": "string",
+                  "enum": ["auth", "header", "params", "query", "body"],
+                  "description": "Specifies where the environment variable is used in the API request",
+                  "required": true
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Specifies the key name of the environment variable"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Overwrites the value of the environment variable"
+                }
+              }
+            }
+          }
+        },
+        "fee": {
+          "type": "number",
+          "default": 0,
+          "required": true
+        },
+        "category": {
+          "type": "string",
+          "required": true
+        },
+        "accessType": {
+          "type": "string",
+          "default": "open",
+          "enum": ["open", "closed"],
+          "required": true
+        },
+        "language": {
+          "type": "string",
+          "enum": ["javascript"],
+          "required": true
+        },
+        "price": {
+          "type": "string",
+          "enum": ["free"],
+          "required": true
+        },
+        "tags": {
+          "type": "array",
+          "required": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "stateType": {
+          "type": "string",
+          "default": "stateless",
+          "enum": ["stateless", "stateful"],
+          "required": true
+        },
+        "__version": {
+          "type": "string",
+          "default": "1.0.0",
+          "required": true
+        },
+        "connections": {
+          "type": "array",
+          "required": true,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "required": true
+              },
+              "type": {
+                "type": "string",
+                "enum": ["integration"],
+                "required": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "url": {
+      "type": "string",
+      "description": "Specifies the original remote location of the OpenAPI specification",
+      "required": true
+    },
+    "getParams": {
+      "description": "Overwrites default parameter retrieval. See twilio as an example.",
+      "$ref": "#/definitions/function"
+    },
+    "getTitle": {
+      "description": "Overwrites default title retrieval. See stripe as an example.",
+      "$ref": "#/definitions/function"
+    },
+    "getDescription": {
+      "description": "Overwrites default description retrieval. See stripe as an example.",
+      "$ref": "#/definitions/function"
+    },
+    "getDocs": {
+      "description": "Overwrites default docs retrieval",
+      "$ref": "#/definitions/function"
+    },
+    "getRunFile": {
+      "description": "Overwrites default run file template retrieval. See twilio as an example.",
+      "$ref": "#/definitions/function"
+    },
+    "getInputFile": {
+      "description": "Overwrites default input file template retrieval",
+      "$ref": "#/definitions/function"
+    },
+    "getConfigFile": {
+      "description": "Overwrites default config file template retrieval",
+      "$ref": "#/definitions/function"
+    },
+    "getConfigName": {
+      "description": "Overwrites default config name retrieval. See stripe as an example.",
+      "$ref": "#/definitions/function"
+    },
+    "getDirName": {
+      "description": "Overwrites the action directory name retrieval. See stripe as an example.",
+      "$ref": "#/definitions/function"
+    }
+  },
+  "definitions": {
+    "function": {
+      "description": "This is defined only for documentation purposes. The javascript file should contain an actual javascript function.",
+      "type": "object",
+      "properties": {
+          "arguments": {
+              "type": "array"
+          },
+          "body": {
+              "type": "string"
+          }
+      }
+    }
+},
+}
