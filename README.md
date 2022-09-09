@@ -16,7 +16,7 @@
 
 `npm run generate PLATFORM_NAME`
 
-Replace PLATFORM_NAME with one of the platforms available under the `platforms` folder
+Replace `PLATFORM_NAME` with one of the platforms available under the `platforms` folder
 
 See generated actions in the `generated` folder :)
 
@@ -25,7 +25,7 @@ See generated actions in the `generated` folder :)
 ### Adding a new platform
 
 - create a new folder under `platforms` (you can copy over one of the existing ones)
-- edit the `getGeneratorInput` function with required data (see See [schemas/generatorInput.json](schemas/generatorInput.json))
+- edit the `getGeneratorInput` function with required data (See [schemas/generatorInput.json](schemas/generatorInput.json))
 - To use a local spec instead of a remote one (e.g the remote needs updating), add it as `openapi.json` under the platform folder (see the `circleci` folder as an example)
 
 
