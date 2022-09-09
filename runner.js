@@ -1,8 +1,6 @@
 const { getGeneratorInput, generate, writeGeneratedFiles, prettifyFiles } = require("./index.js");
 
 (async () => {
-  //TODO: allow all/multiple platforms
-  
   const platforms = process.argv.slice(2)
 
   if(platforms.length === 0) {
