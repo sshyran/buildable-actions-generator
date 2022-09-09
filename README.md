@@ -26,5 +26,16 @@ See generated actions in the `generated` folder :)
 - Edit the `getGeneratorInput` function with required data (See [schemas/generatorInput.json](schemas/generatorInput.json))
 - To use a local spec instead of a remote one (e.g the remote needs updating), add it as `openapi.json` under the platform folder (see the `circleci` folder as an example)
 
+<hr />
 
+### Contributors
 
+Supported by a network of early advocates, contributors, and champions!
+
+<a href="https://github.com/buildable/action-generator/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=buildable/action-generator" />
+</a>
+
+### License
+
+© 2022, Buildable Technologies Inc. - Released under the MIT License
