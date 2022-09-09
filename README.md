@@ -6,9 +6,9 @@
 
 # Buildable Actions
 
-## OpenAPI Generated Actions
-
 <br/>
+
+## OpenAPI Generated Actions
 
 ### Getting Started
 
