@@ -4,11 +4,11 @@
 
 ---
 
-# Buildable Action Templates
+# Buildable Action Generator
 
 Action Templates are open-source functions that save developers hundreds of hours when integrating databases, apps and other complicated logic. They work natively with [Buildable Workflows](https://docs.buildable.dev/workflows/building-workflows), which means you can build, test, deploy any integration using Templates in a matter of minutes.
 
-## OpenAPI Generated actions-generator
+## OpenAPI Generated Actions
 
 ### Getting Started
 
