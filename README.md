@@ -1,6 +1,6 @@
 ![Header](https://assets.buildable.dev/catalog/graphics/one-api-100-integrations.png)
 
-[![Buildable](https://assets.buildable.dev/buildable-logos/powered-by-buildable.svg)](https://buildable.dev) [![GitHub stars](https://img.shields.io/github/stars/buildable/action-generator)](https://github.com/buildable/action-generator/stargazers) ![GitHub contributors](https://img.shields.io/github/contributors/buildable/action-generator) ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/buildable/action-generator) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/buildable/action-generator) [![GitHub issues](https://img.shields.io/github/issues/buildable/action-generator)](https://github.com/buildable/action-generator/issues) ![GitHub closed issues](https://img.shields.io/github/issues-closed/buildable/action-generator) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/buildable/action-generator) [![GitHub license](https://img.shields.io/github/license/buildable/action-generator)](https://github.com/buildable/action-generator) [![Twitter Follow](https://img.shields.io/twitter/follow/BuildableHQ?style=social)](https://twitter.com/BuildableHQ)
+[![Buildable](https://assets.buildable.dev/buildable-logos/powered-by-buildable.svg)](https://buildable.dev) [![GitHub stars](https://img.shields.io/github/stars/buildable/actions)](https://github.com/buildable/actions/stargazers) ![GitHub contributors](https://img.shields.io/github/contributors/buildable/actions) ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/buildable/actions) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/buildable/actions) [![GitHub issues](https://img.shields.io/github/issues/buildable/actions)](https://github.com/buildable/actions/issues) ![GitHub closed issues](https://img.shields.io/github/issues-closed/buildable/actions) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/buildable/actions) [![GitHub license](https://img.shields.io/github/license/buildable/actions)](https://github.com/buildable/actions) [![Twitter Follow](https://img.shields.io/twitter/follow/BuildableHQ?style=social)](https://twitter.com/BuildableHQ)
 
 ---
 
@@ -32,8 +32,8 @@ See generated actions in the `generated` folder :)
 
 Supported by a network of early advocates, contributors, and champions!
 
-<a href="https://github.com/buildable/action-generator/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=buildable/action-generator" />
+<a href="https://github.com/buildable/actions/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=buildable/actions" />
 </a>
 
 ### License
