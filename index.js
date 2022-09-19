@@ -8,6 +8,7 @@ const get = require("lodash/get")
 const set = require("lodash/set")
 const union = require("lodash/union")
 const omit = require("lodash/omit")
+const intersection = require("lodash/intersection")
 const { spawn } = require('child_process');
 const {
   camelize,
@@ -28,8 +29,15 @@ const {
   cleanConfigEnvVars,
   getTemplateString,
   getTemplateObjectAttribute,
-  requiredSort
+  requiredSort,
+  supportedMediaTypes,
+  getParams,
+  getBody,
+  getHeadrs,
+  getSample
 } = require("./utils");
+const { intersection } = require("lodash");
+const { getEndpoint } = require("openapi-snippet/openapi-to-har");
 
 
 
@@ -100,9 +108,7 @@ http.METHODS.forEach(method => {
 })
 
 const generateOne = async ({ openapi, path, method, baseURL, config, getParams, getTitle, getDescription, getDocs, getRunFile, getInputFile, getConfigFile, getConfigName } = {}) => {
-  if(!httpMethods[method] || openapi.paths[path][method].deprecated || Object.keys(get(openapi.paths[path][method], "requestBody.content", [])).find(i => i === "multipart/form-data")) {
-    return
-  }
+  
 
   let url = (baseURL || getBaseUrl(openapi, path, method)) + getFullPath(openapi, path, method);
 
@@ -163,7 +169,7 @@ const generateOne = async ({ openapi, path, method, baseURL, config, getParams, 
   });
   
   let axiosCall = `
-    method: ${getTemplateString(method)},
+    method: "${method}",
     url: ${getTemplateString(url)},
     ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
   `;
@@ -343,23 +349,37 @@ const getGeneratorInput = async (platform) => {
   }
 }
 
+const shouldSkipEndpoint = ({ openapi, path, method }) => {
+  if(!httpMethods[method] || openapi.paths[path][method].deprecated) {
+   return true
+  }
+  
+  const requestBodyMediaTypes = Object.keys(get(openapi.paths[path][method], "requestBody.content", {}))
+
+  if(requestBodyMediaTypes.length > 0 && intersection(supportedMediaTypes, requestBodyMediaTypes).length === 0) {
+    return true
+  }
+
+  return false
+}
+
 const generate = async ({ openapi, paths, methods, ...rest }) => {
   const result = {}
 
   for (const path of paths || Object.keys(openapi.paths)) {
     for (const method of methods || Object.keys(openapi.paths[path])) {
 
-      const res = await generateOne({ ...rest, openapi, path, method })
+      if(!shouldSkipEndpoint({ openapi, path, method })) {
+        const res = await generateOne({ ...rest, openapi, path, method })
 
-      if(res) {
-        const { input, run, config } = res
-
-        set(result, `["${path}"]["${method}"].input`, input)
-        set(result, `["${path}"]["${method}"].run`, run)
-        set(result, `["${path}"]["${method}"].config`, config)
+        if(res) {
+          const { input, run, config } = res
+  
+          set(result, `["${path}"]["${method}"].input`, input)
+          set(result, `["${path}"]["${method}"].run`, run)
+          set(result, `["${path}"]["${method}"].config`, config)
+        }
       }
-      
-      
     }
   }
 
@@ -409,6 +429,267 @@ const prettifyFiles = async ({ platform }) => {
     });
   })
 }
+
+
+const traverseEndpoints = async ({ openapi, paths, methods, cb }) => {
+  for (const path of paths || Object.keys(openapi.paths)) {
+    for (const method of methods || Object.keys(openapi.paths[path])) {
+
+      await cb({ openapi, path, method })
+    }
+  }
+}
+
+const getEndpointData = async ({ openapi, path, method }) => {
+  const parameters = getParams({ openapi, path, method }) || []
+
+  const pathParams = parameters.filter(p => p.in === "path")
+  const queryParams = parameters.filter(p => p.in === "query")
+  
+  const headers = getHeadrs({ openapi, path, method })
+  
+  const body = getBody({ openapi, path, method })
+
+  return {
+    pathParams,
+    queryParams,
+    headers,
+    body
+  }
+}
+
+const getRunFile = ({ openapi, path, method, config, pathParams, queryParams, headers, body }) => {
+  const input = union(pathParams, queryParams, headers)
+
+  if(body && body.schema) {
+    if(body.schema.properties) {
+      for(const property in body.schema.properties) {
+        input.push(body.schema.properties[property])
+      }
+    } else if (body.schema.items) {
+      input.push(body)
+    }
+  }
+
+  const paramsSort = (a, b) => {
+    const orderOfImportance = [
+      "isEnvironmentVariable",
+      "required",
+    ]
+
+    const aPropertyIndex = orderOfImportance.findIndex(property => a[property])
+    const bPropertyIndex = orderOfImportance.find(property => b[property])
+
+    if(aPropertyIndex === bPropertyIndex) {
+      if(a.varName < b.varName) {
+        return -1
+      } else {
+        return 1
+      }
+    }
+
+    return aPropertyIndex - bPropertyIndex
+  }
+  
+  input.sort(paramsSort).map(p => p.varName)
+
+  const isFormUrlEncoded = body && body.mediaType === "application/x-www-form-urlencoded"
+
+  //handle basic auth explicitly from the config - TODO: change this?
+  const auth = []
+  for(const key in config.envVars) {
+    const envVar = config.envVars[key]
+    if(envVar.in === "auth") {
+      auth.push({ ...envVar, envVarName: key })
+    }
+  }
+
+  let axiosAuth = auth.length > 0
+  ? `auth: {${auth.map(i => `"${i.name}": $env.${i.envVarName}`).join(", ")}}`
+  : ""
+
+  let axiosHeaders = headers.length > 0 
+  ? `headers: {${headers.sort(requiredSort).map(getTemplateObjectAttribute).join(", ")}}`
+  : ""
+
+  const queryParams = params.filter((i) => i.in === "query")
+  let axiosParams = queryParams.length > 0
+  ? `params: {${queryParams.sort(requiredSort).map(getTemplateObjectAttribute)}}`
+  : ""
+
+  let axiosData =
+    body.length > 0
+      ? `data: {${body.sort(requiredSort).map(getTemplateObjectAttribute)}}`
+      : "";
+
+  if(body.schema.items) {
+    axiosData = `data: ${body.name}` // pass entire body
+  }
+  if(body.schema.properties && isFormUrlEncoded) {
+    axiosData = body.length > 0 ? `data: qs.stringify({${Object.values(body.schema.properties).sort(requiredSort).map(getTemplateObjectAttribute)}})` : "";
+  }
+
+  let url = (config.baseURL || getBaseUrl(openapi, path, method)) + path;
+
+  (url.match(/{(\w|-)*}/g) || []).forEach(match => {
+    const param = pathParams.find(p => [p.name, p.varName, p.envVarName].includes(match.substring(1, match.length - 1)))
+    if(param) {
+      url = url.replace(match, `\${${p.varName}}`)
+    }
+  });
+
+  const axiosCall = `
+    method: ${getTemplateString(method)},
+    url: ${getTemplateString(url)},
+    ${[axiosHeaders, axiosAuth, axiosParams, axiosData].filter(i => !!i.trim()).join(",\n")}
+  `;
+
+  const verifyInput = input
+    .filter((i) => i.required)
+    .map((i) => i.varName);
+
+  const verifyErrors = input
+    .filter((i) => i.required)
+    .map(
+      (i) =>
+        `INVALID_${snakeCase(i.varName).toUpperCase()}: "A valid ${
+          i.varName
+        } field (${typeof i.sample}) was not provided in the input.",`
+    )
+    .join("\n");
+
+  const verifyChecks = input
+    .filter((i) => i.required)
+    .map(
+      (i) =>
+        `if (typeof ${
+          i.varName
+        } !== "${typeof i.sample}") throw new Error(ERRORS.INVALID_${snakeCase(
+          i.varName
+        ).toUpperCase()});`
+    )
+    .join("\n");
+
+  return `
+  ${`const axios = require("axios");` + isFormUrlEncoded ? `\nconst qs require("qs");` : ""}
+  
+  const run = async (input) => {
+    const { ${input.join(",")} } = input;
+  
+    verifyInput(input);
+  
+    try {
+      const { ${input.includes("data") ? "data: _data" : "data"} } = await axios({
+        ${axiosCall}
+      });
+  
+      return ${input.includes("data") ? "_data" : "data"};
+    } catch (error) {
+      return {
+        failed: true,
+        message: error?.message,
+        data: error?.response?.data,
+      };
+    }
+  };
+  
+  /**
+   * Verifies the input parameters
+   */
+  const verifyInput = ({ ${verifyInput} }) => {
+    const ERRORS = {
+      ${verifyErrors}
+    };
+  
+    ${verifyChecks}
+  };
+  `;
+}
+
+//traverse through all properties, add sample data
+//pass data with sample to templates
+//write template to file
+
+const _ = () => {
+  const cb = async ({ openapi, path, method, config = {} }) => {
+    let { pathParams, queryParams, headers, body } = getEndpointData({ openapi, path, method })
+    //get endpoint data
+    //set samples
+    //loop through templates, passing endpoint data with samples
+      //each template grabs needed data and returns file contents as text
+    //loop through template results and write them to files as indicated
+
+    const modifyParam = ({ param, openapi, config }) => {
+
+      //associate with envVars
+      for(const key in config.envVars) {
+        const envVar = config.envVars[key]
+        if(envVar.name === param.name && envVar.in === param.in) {
+          param.isEnvironmentVariable = true
+          param.envVarName = key
+        }
+      }
+
+      //add sample
+      param.sample = getSample({ openapi, schema: param.schema })
+
+      //add varName
+      let varName
+      if(param.isEnvironmentVariable) {
+        varName = param.envVarName
+      } else if(param.in === "header") {
+        let splitName = param.name.split("-")
+        if(splitName[0].toLowerCase === "x") { //header name with X-Some-Value
+          varName = santizeReservedKeywords(camelize(splitHeaderName.slice(1).join("-")).replace(/-/g, ""))
+        } else {
+          varName = santizeReservedKeywords(camelize(param.name).replace(/-/g, ""))
+        }
+      } else {
+        varName = camelize(param.name).replace(".", "") //remove periods in names
+      }
+
+      param.varName = varName
+
+      
+
+      return param
+    }
+
+    pathParams = pathParams.map(param => modifyParam({ param, openapi, config }))
+    queryParams = queryParams.map(param => modifyParam({ param, openapi, config }))
+    headers = headers.map(param => modifyParam({ param, openapi, config }))
+
+    if(body && body.schema) {
+      if(body.schema.properties) { // body is object
+        for(const property in body.schema.properties) {
+          body.schema.properties[property] = modifyParam({ param: { ...body.schema.properties[property], name: property }, openapi, config })
+        }
+      }
+      if(body.schema.items) { // body is array
+        body = modifyParam({ param: { ...body, name: "$$body" }, openapi, config })
+      }
+    }
+
+    const templates = config.templates || [{ getTemplateResult: getRunFile, filename: "run.js" }, { getTemplateResult: getInputFile, filename: "input.js" }, { getTemplateResult: getConfigFile, filename: "config.json" }]
+    
+    const templateResults = Promise.all(templates.map(({ getTemplateResult, filename }) => {
+      return { templateResult: getTemplateResult({ openapi, path, method, config, pathParams, queryParams, headers, body }), filename }
+    }))
+
+    const actionName = getDirName({ openapi, path, method })
+
+    templateResults.forEach(({ templateResult, filename }) => {
+      fs.writeFileSync(`generated/${config.platform}/${actionName}/${filename}`, templateResult)
+    })
+
+  }
+  
+  traverseEndpoints({ openapi, paths, methods, cb })
+}
+
+
+
+
 
 module.exports = {
   generate,
