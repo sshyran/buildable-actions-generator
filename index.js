@@ -125,13 +125,13 @@ const prettifyFiles = async ({ path }) => {
   })
 }
 
-const traverseEndpoints = async ({ openapi, paths, methods, config, callback }) => {
+const traverseEndpoints = async ({ openapi, paths, methods, config, callback, ...rest }) => {
   let context
 
   for (const path of paths || Object.keys(openapi.paths)) {
     for (const method of methods || Object.keys(openapi.paths[path])) {
 
-      await callback({ openapi, path, method, config, context })
+      await callback({ openapi, path, method, config, ...rest, context })
     }
   }
   
@@ -223,7 +223,7 @@ const getModifiedParams = ({ openapi, path, method, config = {} }) => {
   }
 }
 
-const getTemplatesResults = ({ openapi, path, method, config = {} }) => {
+const getTemplatesResults = ({ openapi, path, method, config = {}, ...rest }) => {
   const {
     pathParams,
     queryParams,
@@ -234,16 +234,16 @@ const getTemplatesResults = ({ openapi, path, method, config = {} }) => {
   const templates = config.templates || defaultTemplates
   
   return templates.map(({ getTemplateResult, filename }) => {
-    return { templateResult: getTemplateResult({ openapi, path, method, config, pathParams, queryParams, headers, body }), filename }
+    return { templateResult: getTemplateResult({ openapi, path, method, config, pathParams, queryParams, headers, body, ...rest }), filename }
   })
 }
 
-const generateOne = async ({ openapi, path, method, config = {} }) => {
+const generateOne = async ({ openapi, path, method, config = {}, ...rest }) => {
   if(shouldSkipEndpoint({ openapi, path, method })) {
     return
   }
   
-  const templatesResults = getTemplatesResults({ openapi, path, method, config })
+  const templatesResults = getTemplatesResults({ openapi, path, method, config, ...rest })
 
   const actionName = getDirName({ openapi, path, method })
 
@@ -255,8 +255,8 @@ const generateOne = async ({ openapi, path, method, config = {} }) => {
   await prettifyFiles({ path: `generated/${config.platform}/${actionName}/` })
 }
 
-const generate = async ({ openapi, paths, methods, config }) => {
-  return traverseEndpoints({ openapi, paths, methods, config, callback: generateOne })
+const generate = async ({ openapi, paths, methods, config, ...rest }) => {
+  return traverseEndpoints({ openapi, paths, methods, config, ...rest, callback: generateOne })
 }
 
 

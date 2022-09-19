@@ -17,8 +17,23 @@ const {
   requiredSort,
 } = require("../utils");
 
-const getRunFile = ({ openapi, path, method, config, pathParams, queryParams, headers, body }) => {
-  const input = union(pathParams, queryParams, headers)
+const getTemplateInputAuth = ({ config }) => {
+  //handle basic auth explicitly from the config - TODO: change this?
+  const auth = []
+  for(const key in config.envVars) {
+    const envVar = config.envVars[key]
+    if(envVar.in === "auth") {
+      auth.push({ ...envVar, required: true, isEnvironmentVariable: true, sample: `$env.${key}`, envVarName: key, varName: key })
+    }
+  }
+  
+  return auth
+}
+
+const getTemplateInput = ({ openapi, path, method, config, pathParams, queryParams, headers, body }) => {
+  const auth = getTemplateInputAuth({ config })
+
+  const input = union(pathParams, queryParams, headers, auth)
 
   if(body && body.schema) {
     if(body.schema.properties) {
@@ -52,19 +67,19 @@ const getRunFile = ({ openapi, path, method, config, pathParams, queryParams, he
   
   input.sort(paramsSort).map(p => p.varName)
 
+  return input
+}
+
+const getRunFile = ({ openapi, path, method, config, pathParams, queryParams, headers, body, baseURL }) => {
+
+  const input = getTemplateInput({ openapi, path, method, config, pathParams, queryParams, headers, body })
+
   const isFormUrlEncoded = body && body.mediaType === "application/x-www-form-urlencoded"
 
-  //handle basic auth explicitly from the config - TODO: change this?
-  const auth = []
-  for(const key in config.envVars) {
-    const envVar = config.envVars[key]
-    if(envVar.in === "auth") {
-      auth.push({ ...envVar, envVarName: key })
-    }
-  }
+  const auth = getTemplateInputAuth({ config })
 
   let axiosAuth = auth.length > 0
-  ? `auth: {${auth.map(i => `"${i.name}": $env.${i.envVarName}`).join(", ")}}`
+  ? `auth: {${auth.map(i => `"${i.name}": ${i.varName}`).join(", ")}}`
   : ""
 
   let axiosHeaders = headers.length > 0 
@@ -92,7 +107,7 @@ const getRunFile = ({ openapi, path, method, config, pathParams, queryParams, he
     }
   }
 
-  let url = (config.baseURL || getBaseUrl(openapi, path, method)) + path;
+  let url = (baseURL || getBaseUrl(openapi, path, method)) + path;
 
   (url.match(/{(\w|-)*}/g) || []).forEach(match => {
     const param = pathParams.find(p => [p.name, p.varName, p.envVarName].includes(match.substring(1, match.length - 1)))
@@ -172,39 +187,8 @@ const getRunFile = ({ openapi, path, method, config, pathParams, queryParams, he
 }
 
 const getInputFile = ({ openapi, path, method, config, pathParams, queryParams, headers, body }) => {
-  const input = union(pathParams, queryParams, headers)
 
-  if(body && body.schema) {
-    if(body.schema.properties) {
-      for(const property in body.schema.properties) {
-        input.push(body.schema.properties[property])
-      }
-    } else if (body.schema.items) {
-      input.push(body)
-    }
-  }
-
-  const paramsSort = (a, b) => {
-    const orderOfImportance = [
-      "isEnvironmentVariable",
-      "required",
-    ]
-
-    const aPropertyIndex = orderOfImportance.findIndex(property => a[property])
-    const bPropertyIndex = orderOfImportance.find(property => b[property])
-
-    if(aPropertyIndex === bPropertyIndex) {
-      if(a.varName < b.varName) {
-        return -1
-      } else {
-        return 1
-      }
-    }
-
-    return aPropertyIndex - bPropertyIndex
-  }
-  
-  input.sort(paramsSort).map(p => p.varName)
+  const input = getTemplateInput({ openapi, path, method, config, pathParams, queryParams, headers, body })
 
   const inputFileParams = `
     ${mapWithTemplate(input
