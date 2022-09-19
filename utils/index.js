@@ -1,12 +1,27 @@
+const { URL } = require('url');
 const OpenAPISampler = require('openapi-sampler');
 const get = require("lodash/get")
 const cloneDeep = require("lodash/cloneDeep")
 const pick = require("lodash/pick")
 const prettier = require("prettier")
-import JsonPointer from 'json-pointer';
+const JsonPointer = require('json-pointer');
 
 const sampleOverrides = require("../sampler-override")
 OpenAPISampler._registerSampler("string", sampleOverrides.sampleString)
+
+//https://stackoverflow.com/questions/30931079/validating-a-url-in-node-js
+const stringIsAValidUrl = (s, protocols) => {
+  try {
+      const url = new URL(s);
+      return protocols
+          ? url.protocol
+              ? protocols.map(x => `${x.toLowerCase()}:`).includes(url.protocol)
+              : false
+          : true;
+  } catch (err) {
+      return false;
+  }
+};
 
 function santizeReservedKeywords(str) {
   const reserved = [
@@ -233,11 +248,11 @@ const traverse = (schema, options, spec, context) => {
 /**
 * Returns the value referenced in the given reference string
 *
-* @param  {object} openApi  OpenAPI document
+* @param  {object} openapi  OpenAPI document
 * @param  {string} ref      A reference string
 * @return {any}
 */
-const resolveRef = function (openApi, ref) {
+const resolveRef = function (openapi, ref) {
   const parts = ref.split('/').map(part => part.replace(/application~1json/g, "application/json"));
 
   if (parts.length <= 1) return {}; // = 3
@@ -251,32 +266,32 @@ const resolveRef = function (openApi, ref) {
       return obj[parts[index]];
     }
   };
-  return recursive(openApi, 1);
+  return recursive(openapi, 1);
 };
 
 /**
-* Gets the base URL constructed from the given openApi.
+* Gets the base URL constructed from the given openapi.
 *
-* @param  {Object} openApi OpenAPI document
+* @param  {Object} openapi OpenAPI document
 * @return {string}         Base URL
 */
-const getBaseUrl = function (openApi, path, method) {
-  if (openApi.paths[path][method].servers)
-    return openApi.paths[path][method].servers[0].url;
-  if (openApi.paths[path].servers) return openApi.paths[path].servers[0].url;
-  if (openApi.servers) return openApi.servers[0].url;
+const getBaseUrl = function (openapi, path, method) {
+  if (openapi.paths[path][method].servers)
+    return openapi.paths[path][method].servers[0].url;
+  if (openapi.paths[path].servers) return openapi.paths[path].servers[0].url;
+  if (openapi.servers) return openapi.servers[0].url;
 
   let baseUrl = '';
-  if (typeof openApi.schemes !== 'undefined') {
-    baseUrl += openApi.schemes[0];
+  if (typeof openapi.schemes !== 'undefined') {
+    baseUrl += openapi.schemes[0];
   } else {
     baseUrl += 'http';
   }
 
-  if (openApi.basePath === '/') {
-    baseUrl += '://' + openApi.host;
+  if (openapi.basePath === '/') {
+    baseUrl += '://' + openapi.host;
   } else {
-    baseUrl += '://' + openApi.host + openApi.basePath;
+    baseUrl += '://' + openapi.host + openapi.basePath;
   }
 
   return baseUrl;
@@ -285,21 +300,21 @@ const getBaseUrl = function (openApi, path, method) {
 /**
 * Return the path with the parameters example values used if specified.
 *
-* @param  {Object} openApi OpenApi document
+* @param  {Object} openapi OpenApi document
 * @param  {string} path    Key of the path
 * @param  {string} method  Key of the method
 * @return {string}         Full path including example values
 */
-const getFullPath = function (openApi, path, method) {
+const getFullPath = function (openapi, path, method) {
   let fullPath = path;
   const parameters =
-    openApi.paths[path].parameters || openApi.paths[path][method].parameters;
+    openapi.paths[path].parameters || openapi.paths[path][method].parameters;
 
   if (typeof parameters !== 'undefined') {
     for (let i in parameters) {
       let param = parameters[i];
       if (typeof param['$ref'] === 'string' && /^#/.test(param['$ref'])) {
-        param = resolveRef(openApi, param['$ref']);
+        param = resolveRef(openapi, param['$ref']);
       }
       if (
         typeof param.in !== 'undefined' &&
@@ -319,14 +334,14 @@ const getFullPath = function (openApi, path, method) {
   * Get an array of objects describing the header for a path and method pair
   * described in the given OpenAPI document.
   *
-  * @param  {Object} openApi OpenAPI document
+  * @param  {Object} openapi OpenAPI document
   * @param  {string} path    Key of the path
   * @param  {string} method  Key of the method
   * @return {array}          List of objects describing the header
   */
- const getHeadersArray = function (openApi, path, method) {
+ const getHeadersArray = function (openapi, path, method) {
   const headers = [];
-  const pathObj = openApi.paths[path][method];
+  const pathObj = openapi.paths[path][method];
 
   // 'accept' header:
   if (typeof pathObj.consumes !== 'undefined') {
@@ -364,9 +379,9 @@ const getFullPath = function (openApi, path, method) {
   if (typeof pathObj.security !== 'undefined') {
     for (var l in pathObj.security) {
       const secScheme = Object.keys(pathObj.security[l])[0];
-      const secDefinition = openApi.securityDefinitions
-        ? openApi.securityDefinitions[secScheme]
-        : openApi.components.securitySchemes[secScheme];
+      const secDefinition = openapi.securityDefinitions
+        ? openapi.securityDefinitions[secScheme]
+        : openapi.components.securitySchemes[secScheme];
       const authType = secDefinition.type.toLowerCase();
       let authScheme = null;
 
@@ -398,11 +413,11 @@ const getFullPath = function (openApi, path, method) {
           break;
       }
     }
-  } else if (typeof openApi.security !== 'undefined') {
+  } else if (typeof openapi.security !== 'undefined') {
     // Need to check OAS 3.0 spec about type http and scheme
-    for (let m in openApi.security) {
-      const secScheme = Object.keys(openApi.security[m])[0];
-      const secDefinition = openApi.components.securitySchemes[secScheme];
+    for (let m in openapi.security) {
+      const secScheme = Object.keys(openapi.security[m])[0];
+      const secDefinition = openapi.components.securitySchemes[secScheme];
       const authType = secDefinition.type.toLowerCase();
       let authScheme = null;
 
@@ -492,8 +507,8 @@ const getFullPath = function (openApi, path, method) {
   return _headers;
 };
 
-const getHeaders = (openApi, path, method) => {
-  const headers = getHeadersArray(openApi, path, method)
+const getHeaders = (openapi, path, method) => {
+  const headers = getHeadersArray(openapi, path, method)
 
   return headers.map(header => {
     if(header.isAuth && header.value) {
@@ -519,20 +534,20 @@ const getHeaders = (openApi, path, method) => {
 
 
 
-const _parseParameters = function (openApi, parameters, values) {
+const _parseParameters = function (openapi, parameters, values) {
   const params = {};
 
   for (let i in parameters) {
     let param = parameters[i];
     if (typeof param['$ref'] === 'string' && /^#/.test(param['$ref'])) {
-      param = resolveRef(openApi, param['$ref']);
+      param = resolveRef(openapi, param['$ref']);
     }
     if (typeof param.schema !== 'undefined') {
       if (
         typeof param.schema['$ref'] === 'string' &&
         /^#/.test(param.schema['$ref'])
       ) {
-        param.schema = resolveRef(openApi, param.schema['$ref']);
+        param.schema = resolveRef(openapi, param.schema['$ref']);
         if (typeof param.schema.type === 'undefined') {
           // many schemas don't have an explicit type
           param.schema.type = 'object';
@@ -545,7 +560,7 @@ const _parseParameters = function (openApi, parameters, values) {
       sample = OpenAPISampler.sample(
         param.schema,
         { skipReadOnly: true },
-        openApi
+        openapi
       );
     } catch (err) {
       console.log(err);
@@ -557,7 +572,7 @@ const _parseParameters = function (openApi, parameters, values) {
   return params;
 };
 
-const _getParameters = function (openApi, path, method, values) {
+const _getParameters = function (openapi, path, method, values) {
   // Set the optional parameter if it's not provided
   if (typeof values === 'undefined') {
     values = {};
@@ -567,18 +582,18 @@ const _getParameters = function (openApi, path, method, values) {
   let methodParams = {};
 
   // First get any parameters from the path
-  if (typeof openApi.paths[path].parameters !== 'undefined') {
+  if (typeof openapi.paths[path].parameters !== 'undefined') {
     pathParams = _parseParameters(
-      openApi,
-      openApi.paths[path].parameters,
+      openapi,
+      openapi.paths[path].parameters,
       values
     );
   }
 
-  if (typeof openApi.paths[path][method].parameters !== 'undefined') {
+  if (typeof openapi.paths[path][method].parameters !== 'undefined') {
     methodParams = _parseParameters(
-      openApi,
-      openApi.paths[path][method].parameters,
+      openapi,
+      openapi.paths[path][method].parameters,
       values
     );
   }
@@ -592,8 +607,8 @@ const _getParameters = function (openApi, path, method, values) {
   return Object.values(queryStrings);
 };
 
-const getParameters = (openApi, path, method) => {
-  return _getParameters(openApi, path, method, {}).filter(p => !p.deprecated && !getHeaders(openApi, path, method).find(h => h.name === p.name)).map(i => {
+const getParameters = (openapi, path, method) => {
+  return _getParameters(openapi, path, method, {}).filter(p => !p.deprecated && !getHeaders(openapi, path, method).find(h => h.name === p.name)).map(i => {
     i.camelizedName = santizeReservedKeywords(camelize(i.name).replace(".", ""))
 
     return i
@@ -601,20 +616,20 @@ const getParameters = (openApi, path, method) => {
 }
 
 const getParams = ({ openapi, path, method }) => {
-  const _parseParameters = function (openApi, parameters, values) {
+  const _parseParameters = function (openapi, parameters, values) {
     const params = {};
   
     for (let i in parameters) {
       let param = parameters[i];
       if (typeof param['$ref'] === 'string' && /^#/.test(param['$ref'])) {
-        param = resolveRef(openApi, param['$ref']);
+        param = resolveRef(openapi, param['$ref']);
       }
       if (typeof param.schema !== 'undefined') {
         if (
           typeof param.schema['$ref'] === 'string' &&
           /^#/.test(param.schema['$ref'])
         ) {
-          param.schema = resolveRef(openApi, param.schema['$ref']);
+          param.schema = resolveRef(openapi, param.schema['$ref']);
           if (typeof param.schema.type === 'undefined') {
             // many schemas don't have an explicit type
             param.schema.type = 'object';
@@ -730,13 +745,11 @@ const getBody = ({ openapi, path, method }) => {
       }
     }
   }
-
-  return result
 }
 
-const getHeadrs = function ({ openApi, path, method }) {
+const getHeadrs = ({ openapi, path, method }) => {
   const headers = [];
-  const pathObj = openApi.paths[path][method];
+  const pathObj = openapi.paths[path][method];
 
   // 'accept' header:
   if (typeof pathObj.consumes !== 'undefined') {
@@ -770,9 +783,9 @@ const getHeadrs = function ({ openApi, path, method }) {
   if (typeof pathObj.security !== 'undefined') {
     for (var l in pathObj.security) {
       const secScheme = Object.keys(pathObj.security[l])[0];
-      const secDefinition = openApi.securityDefinitions
-        ? openApi.securityDefinitions[secScheme]
-        : openApi.components.securitySchemes[secScheme];
+      const secDefinition = openapi.securityDefinitions
+        ? openapi.securityDefinitions[secScheme]
+        : openapi.components.securitySchemes[secScheme];
       const authType = secDefinition.type.toLowerCase();
       let authScheme = null;
 
@@ -804,11 +817,11 @@ const getHeadrs = function ({ openApi, path, method }) {
           break;
       }
     }
-  } else if (typeof openApi.security !== 'undefined') {
+  } else if (typeof openapi.security !== 'undefined') {
     // Need to check OAS 3.0 spec about type http and scheme
-    for (let m in openApi.security) {
-      const secScheme = Object.keys(openApi.security[m])[0];
-      const secDefinition = openApi.components.securitySchemes[secScheme];
+    for (let m in openapi.security) {
+      const secScheme = Object.keys(openapi.security[m])[0];
+      const secDefinition = openapi.components.securitySchemes[secScheme];
       const authType = secDefinition.type.toLowerCase();
       let authScheme = null;
 
@@ -913,16 +926,16 @@ const supportedMediaTypes = [
   * given OAI specification. References within the payload definition are
   * resolved.
   *
-  * @param  {object} openApi
+  * @param  {object} openapi
   * @param  {string} path
   * @param  {string} method
   * @return {array}  A list of payload objects
   */
-const _getBodyParameters = function (openApi, path, method) {
+const _getBodyParameters = function (openapi, path, method) {
   let bodyParameters = []
-  if (typeof openApi.paths[path][method].parameters !== 'undefined') {
-    for (let i in openApi.paths[path][method].parameters) {
-      const param = openApi.paths[path][method].parameters[i];
+  if (typeof openapi.paths[path][method].parameters !== 'undefined') {
+    for (let i in openapi.paths[path][method].parameters) {
+      const param = openapi.paths[path][method].parameters[i];
       if (
         typeof param.in !== 'undefined' &&
         param.in.toLowerCase() === 'body' &&
@@ -933,7 +946,7 @@ const _getBodyParameters = function (openApi, path, method) {
           sample = OpenAPISampler.sample(
             param.schema,
             { skipReadOnly: true },
-            openApi
+            openapi
           );
         } catch (err) {
           console.log(err);
@@ -945,22 +958,22 @@ const _getBodyParameters = function (openApi, path, method) {
   }
 
   if (
-    openApi.paths[path][method].requestBody &&
-    openApi.paths[path][method].requestBody['$ref']
+    openapi.paths[path][method].requestBody &&
+    openapi.paths[path][method].requestBody['$ref']
   ) {
-    openApi.paths[path][method].requestBody = resolveRef(
-      openApi,
-      openApi.paths[path][method].requestBody['$ref']
+    openapi.paths[path][method].requestBody = resolveRef(
+      openapi,
+      openapi.paths[path][method].requestBody['$ref']
     );
   }
 
   if (
-    openApi.paths[path][method].requestBody &&
-    openApi.paths[path][method].requestBody.content
+    openapi.paths[path][method].requestBody &&
+    openapi.paths[path][method].requestBody.content
   ) {
 
     //order of supportedMediaTypes matters here, we prefer application/json usually
-    const content = supportedMediaTypes.find(type => !!openApi.paths[path][method].requestBody.content[type])
+    const content = supportedMediaTypes.find(type => !!openapi.paths[path][method].requestBody.content[type])
 
     if (content && content.schema) {
       const parameters = []
@@ -978,7 +991,7 @@ const _getBodyParameters = function (openApi, path, method) {
         for(let schema of content.schema.allOf) {
           if(schema["$ref"]) {
             schema = resolveRef(
-              openApi,
+              openapi,
               schema["$ref"]
             );
           }
@@ -1004,7 +1017,7 @@ const _getBodyParameters = function (openApi, path, method) {
 
       if(content.schema["$ref"]) {
         content.schema = resolveRef(
-          openApi,
+          openapi,
           content.schema["$ref"]
         );
       }
@@ -1018,7 +1031,7 @@ const _getBodyParameters = function (openApi, path, method) {
             sample = OpenAPISampler.sample(
               property,
               { skipReadOnly: true },
-              openApi
+              openapi
             );
             if(sample === undefined) {
               sample = property.example || property.default
@@ -1042,7 +1055,7 @@ const _getBodyParameters = function (openApi, path, method) {
           sample = OpenAPISampler.sample(
             content.schema.items,
             { skipReadOnly: true },
-            openApi
+            openapi
           );
           if(sample === undefined) {
             sample = content.schema.example || content.schema.default
@@ -1054,7 +1067,7 @@ const _getBodyParameters = function (openApi, path, method) {
         return {
           isArrayBody: true,
           in: "body",
-          required: !!(openApi.paths[path][method].requestBody.required === true || (content.schema.required || []).find(r => r === p)),
+          required: !!(openapi.paths[path][method].requestBody.required === true || (content.schema.required || []).find(r => r === p)),
           schema: content.schema,
           sample,
         }
@@ -1062,7 +1075,7 @@ const _getBodyParameters = function (openApi, path, method) {
 
       
       
-      bodyParameters = bodyParameters.concat(Object.values(_parseParameters(openApi, parameters)))
+      bodyParameters = bodyParameters.concat(Object.values(_parseParameters(openapi, parameters)))
 
       return // exit, take the first requestBody type
 
@@ -1073,18 +1086,18 @@ const _getBodyParameters = function (openApi, path, method) {
   return bodyParameters;
 };
 
-const getBodyParameters = (openApi, path, method) => {
-  return _getBodyParameters(openApi, path, method).filter(p => !p.deprecated).map(i => {
+const getBodyParameters = (openapi, path, method) => {
+  return _getBodyParameters(openapi, path, method).filter(p => !p.deprecated).map(i => {
     i.camelizedName = santizeReservedKeywords(camelize(i.name).replace(".", ""))
 
     return i
   })
 }
 
-const getInput = (openApi, path, method) => {
-  const headers = getHeadersArray(openApi, path, method).map(header => ({ ...header, in: "header" }))
-  const parameters = _getParameters(openApi, path, method) // `in` can be query or path
-  const body = _getBodyParameters(openApi, path, method).map(header => ({ ...header, in: "body" }))
+const getInput = (openapi, path, method) => {
+  const headers = getHeadersArray(openapi, path, method).map(header => ({ ...header, in: "header" }))
+  const parameters = _getParameters(openapi, path, method) // `in` can be query or path
+  const body = _getBodyParameters(openapi, path, method).map(header => ({ ...header, in: "body" }))
 
   return [headers, parameters, body].flat()
 }
@@ -1138,7 +1151,7 @@ const getTemplateObjectAttribute = (i = {}) => {
     let value = splitValue.map(v => {
       
       if(v.includes("REPLACE")) {
-        v = getInputName(i)
+        v = i.varName
         if(splitValue.length > 1) {
           v = `\${${v}}`
         }
@@ -1155,15 +1168,15 @@ const getTemplateObjectAttribute = (i = {}) => {
     if(i.required) {
       return `"${i.name}": ${value}`
     } else {
-      return `...(${getInputName(i)} ? { "${i.name}": ${value} } : {})`
+      return `...(${i.varName} ? { "${i.name}": ${value} } : {})`
     }
   }
 
-  const nameFormat = i.name === getInputName(i) ? i.name : `"${i.name}": ${getInputName(i)}`
+  const nameFormat = i.name === i.varName ? i.name : `"${i.name}": ${i.varName}`
   if(i.required) {
     return nameFormat
   } else {
-    return `...(${getInputName(i)} ? { ${nameFormat} } : {})`
+    return `...(${i.varName} ? { ${nameFormat} } : {})`
   }
 }
 
@@ -1195,10 +1208,10 @@ const mapWithTemplate = (array = [], template = () => {}) => {
     }
 
     if (typeof p.sample === "string" && !p.isEnvironmentVariable) {
-      return template(`${getInputName(p)}: ${getTemplateString(p.sample.replace(/"/g, ""))}`);
+      return template(`${p.varName}: ${getTemplateString(p.sample.replace(/"/g, ""))}`);
     }
 
-    return template(`${getInputName(p)}: ${handleObjectQuotes(p)}`);
+    return template(`${p.varName}: ${handleObjectQuotes(p)}`);
   })
 }
 
@@ -1247,5 +1260,6 @@ module.exports = {
   getParams,
   getBody,
   getHeadrs,
-  getSample
+  getSample,
+  stringIsAValidUrl
 }

@@ -1,28 +1,15 @@
 
 require("dotenv").config()
 const get = require("lodash/get")
-const { generate, inputFile, runFile, getGeneratorInput, writeGeneratedFiles, getDirName, prettifyFiles } = require("../index.js");
+const { generate, getGeneratorInput, getDirName } = require("../index.js");
+const { defaultTemplates } = require("../templates")
 
-const getGeneratorInputWithModuleExportInRunAndInput = generatorInput => {
+const getGeneratorInputWithModuleExportInTemplates = generatorInput => {
+  const templates = Array.isArray(generatorInput.templates) && generatorInput.templates.length > 0 ? generatorInput.templates : defaultTemplates
   return {
     ...generatorInput,
-    getRunFile: (args) => {
-      return (generatorInput.getRunFile ? generatorInput.getRunFile(args) : runFile(args)) + `\nmodule.exports = { run }`;
-    },
-    getInputFile: (args) => {
-      return (generatorInput.getInputFile ? generatorInput.getInputFile(args) : inputFile(args)) + `\nmodule.exports = { nodeInput }`;
-    },
+    templates: templates.map(t => ({ ...t, getTemplateResult: (args) => t.getTemplateResult(args) + `\nmodule.exports = { ${t.filename === "input.js" ? "nodeInput" : t.filename.split(".").pop().join(".") } }`}))
   }
-}
-
-const writeAndPrettyGenerated = async (generatorInput) => {
-  const generated = await generate(generatorInput);
-
-  const platform = get(generatorInput, "config.platform")
-
-  await writeGeneratedFiles({ ...generatorInput, platform, generated });
-
-  await prettifyFiles({ platform });
 }
 
 const initActionProvider = async (generatorInput = {}) => {
@@ -32,13 +19,22 @@ const initActionProvider = async (generatorInput = {}) => {
       const dirNameInput = { openapi: generatorInput.openapi, path, method }
       const actionName = generatorInput.getDirName ? generatorInput.getDirName(dirNameInput) : getDirName(dirNameInput)
 
-      const { nodeInput } = require(`../generated/${platform}/${actionName}/input.js`);
-      const { run } = require(`../generated/${platform}/${actionName}/run.js`);
+      const files = fs.readdirSync(`../generated/${platform}/${actionName}`)
 
-      const _input = nodeInput({ $body, $headers, $actions, $env: process.env });
-      const result = run({ ..._input, ...input })
+      const inputFile = files.find(f => f === "input.js")
+      const runFile = files.find(f => f === "run.js")
 
-      return result
+      if(inputFile && runFile) {
+        const { nodeInput } = require(`../generated/${platform}/${actionName}/input.js`);
+        const { run } = require(`../generated/${platform}/${actionName}/run.js`);
+
+        const _input = nodeInput({ $body, $headers, $actions, $env: process.env });
+        const result = run({ ..._input, ...input })
+
+        return result
+      } else {
+        throw new Error("Unknown way to handle generated files for the action")
+      }
     }
   };
 
@@ -48,9 +44,9 @@ const initActionProvider = async (generatorInput = {}) => {
 const setupTests = async (platform) => {
   let generatorInput = await getGeneratorInput(platform);
 
-  generatorInput = getGeneratorInputWithModuleExportInRunAndInput(generatorInput)
+  generatorInput = getGeneratorInputWithModuleExportInTemplates(generatorInput)
 
-  await writeAndPrettyGenerated(generatorInput)
+  await generate(generatorInput)
 
   const { provider } = await initActionProvider(generatorInput)
 
@@ -59,7 +55,7 @@ const setupTests = async (platform) => {
 
 module.exports = {
   initActionProvider,
-  getGeneratorInputWithModuleExportInRunAndInput,
+  getGeneratorInputWithModuleExportInTemplates,
   writeAndPrettyGenerated,
   setupTests
 }
