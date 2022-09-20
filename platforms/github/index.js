@@ -4,17 +4,17 @@ const getGeneratorInput = () => ({
     platform: "github",
     type: "js-request-function",
     envVars: {
-      BUILDABLE_GITHUB_ACCESS_TOKEN: {
-        development: "",
-        production: "",
-        in: "auth",
-        name: "password"
-      },
       BUILDABLE_GITHUB_ACCOUNT_USERNAME: {
         development: "",
         production: "",
         in: "auth",
         name: "username"
+      },
+      BUILDABLE_GITHUB_ACCESS_TOKEN: {
+        development: "",
+        production: "",
+        in: "auth",
+        name: "password"
       },
     },
     fee: 0,

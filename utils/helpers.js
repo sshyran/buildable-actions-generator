@@ -1,5 +1,6 @@
 
 require("dotenv").config()
+const fs = require("fs")
 const get = require("lodash/get")
 const { generate, getGeneratorInput, getDirName } = require("../index.js");
 const { defaultTemplates } = require("../templates")
@@ -56,6 +57,5 @@ const setupTests = async (platform) => {
 module.exports = {
   initActionProvider,
   getGeneratorInputWithModuleExportInTemplates,
-  writeAndPrettyGenerated,
   setupTests
 }

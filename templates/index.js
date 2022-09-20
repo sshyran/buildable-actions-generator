@@ -30,6 +30,46 @@ const getTemplateInputAuth = ({ config }) => {
   return auth
 }
 
+
+
+const paramsSort = (a, b) => {
+  const firstOrder = [
+    { key: "isEnvironmentVariable", value: true },
+    { key: "required", value: true },
+  ]
+
+  const secondOrder = [
+    { key: "in", value: "header" },
+    { key: "in", value: "path" },
+    { key: "in", value: "query" },
+    { key: "in", value: "body" }
+  ]
+
+  const thirdOrder = "varName"
+
+  const orders = [firstOrder, secondOrder, thirdOrder]
+
+  for(const order of orders) {
+    if(Array.isArray(order)) {
+      const aIndex = order.findIndex(({ key, value }) => a[key] === value)
+      const bIndex = order.findIndex(({ key, value }) => b[key] === value)
+      if(aIndex < bIndex) {
+        return -1
+      } else if (aIndex > bIndex) {
+        return 1
+      }
+    } else if(typeof order === "string") {
+      if(a[order] < b[order]) {
+        return -1
+      } else if (a[order] > b[order]) {
+        return 1
+      }
+    }
+  }
+
+  return 0
+}
+
 const getTemplateInput = ({ openapi, path, method, config, pathParams, queryParams, headers, body }) => {
   const auth = getTemplateInputAuth({ config })
 
@@ -44,28 +84,8 @@ const getTemplateInput = ({ openapi, path, method, config, pathParams, queryPara
       input.push(body)
     }
   }
-
-  const paramsSort = (a, b) => {
-    const orderOfImportance = [
-      "isEnvironmentVariable",
-      "required",
-    ]
-
-    const aPropertyIndex = orderOfImportance.findIndex(property => a[property])
-    const bPropertyIndex = orderOfImportance.find(property => b[property])
-
-    if(aPropertyIndex === bPropertyIndex) {
-      if(a.varName < b.varName) {
-        return -1
-      } else {
-        return 1
-      }
-    }
-
-    return aPropertyIndex - bPropertyIndex
-  }
   
-  input.sort(paramsSort).map(p => p.varName)
+  input.sort(paramsSort)
 
   return input
 }
@@ -76,18 +96,22 @@ const getRunFile = ({ openapi, path, method, config, pathParams, queryParams, he
 
   const isFormUrlEncoded = body && body.mediaType === "application/x-www-form-urlencoded"
 
-  const auth = getTemplateInputAuth({ config })
+  const _auth = input.filter(i => i.in === "auth")
+  const _headers = input.filter(i => i.in === "header")
+  const _pathParams = input.filter(i => i.in === "path")
+  const _queryParams = input.filter(i => i.in === "query")
+  const _body = input.filter(i => i.in === "body")
 
-  let axiosAuth = auth.length > 0
-  ? `auth: {${auth.map(i => `"${i.name}": ${i.varName}`).join(", ")}}`
+  let axiosAuth = _auth.length > 0
+  ? `auth: {${_auth.map(i => `"${i.name}": ${i.varName}`).join(", ")}}`
   : ""
 
-  let axiosHeaders = headers.length > 0 
-  ? `headers: {${headers.sort(requiredSort).map(getTemplateObjectAttribute).join(", ")}}`
+  let axiosHeaders = _headers.length > 0 
+  ? `headers: {${_headers.map(getTemplateObjectAttribute).join(", ")}}`
   : ""
 
-  let axiosParams = queryParams.length > 0
-  ? `params: {${queryParams.sort(requiredSort).map(getTemplateObjectAttribute)}}`
+  let axiosParams = _queryParams.length > 0
+  ? `params: {${_queryParams.map(getTemplateObjectAttribute).join(", ")}}`
   : ""
 
   let axiosData = ""
@@ -96,14 +120,12 @@ const getRunFile = ({ openapi, path, method, config, pathParams, queryParams, he
     axiosData = `data: ${body.name}` // pass entire body
   }
   if(get(body, "schema.properties")) {
-    const bodyProperties = Object.values(body.schema.properties)
+    const formattedBodyProperties = _body.map(getTemplateObjectAttribute)
+
     if(isFormUrlEncoded) {
-      axiosData = bodyProperties.length > 0 ? `data: qs.stringify({${bodyProperties.sort(requiredSort).map(getTemplateObjectAttribute)}})` : "";
+      axiosData = _body.length > 0 ? `data: qs.stringify({${formattedBodyProperties}})` : "";
     } else {
-      axiosData =
-      bodyProperties.length > 0
-          ? `data: {${bodyProperties.sort(requiredSort).map(getTemplateObjectAttribute)}}`
-          : "";
+      axiosData = _body.length > 0 ? `data: {${formattedBodyProperties}}`: "";
     }
   }
 
@@ -151,7 +173,7 @@ const getRunFile = ({ openapi, path, method, config, pathParams, queryParams, he
   const inputVarNames = input.map(i => i.varName)
 
   return `
-  ${`const axios = require("axios");` + isFormUrlEncoded ? `\nconst qs = require("qs");` : ""}
+  ${`const axios = require("axios");` + (isFormUrlEncoded ? `\nconst qs = require("qs");` : "")}
   
   const run = async (input) => {
     const { ${inputVarNames.join(",")} } = input;
@@ -193,24 +215,7 @@ const getInputFile = ({ openapi, path, method, config, pathParams, queryParams, 
   const inputFileParams = `
     ${mapWithTemplate(input
       .filter(i => !i.hardcoded)
-      .filter((p) => p.required)
-      .sort((a, b) => {
-        if(a.isEnvironmentVariable) {
-          return -1
-        }
-
-        if(b.isEnvironmentVariable) {
-          return 1
-        }
-
-        if(a.in === "header") {
-          return -1
-        }
-
-        if(b.in === "header") {
-          return 1
-        }
-      }), requiredInputTemplate)
+      .filter((p) => p.required), requiredInputTemplate)
       .join("\n")}
     
     ${mapWithTemplate(input

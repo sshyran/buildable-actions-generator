@@ -207,11 +207,13 @@ const getModifiedParams = ({ openapi, path, method, config = {} }) => {
   if(body && body.schema) {
     if(body.schema.properties) { // body is object
       for(const property in body.schema.properties) {
-        body.schema.properties[property] = modifyParam({ param: { ...body.schema.properties[property], name: property }, openapi, config })
+        //TODO: set sample on entire object and then pull sample pieces?
+        const required = !!get(body, "schema.required", []).find(p => p === property)
+        body.schema.properties[property] = modifyParam({ param: { schema: body.schema.properties[property], name: property, required, in: "body" }, openapi, config })
       }
     }
     if(body.schema.items) { // body is array
-      body = modifyParam({ param: { ...body, name: "$$body" }, openapi, config })
+      body = modifyParam({ param: { ...body, name: "$$body", in: "body" }, openapi, config })
     }
   }
 
@@ -251,12 +253,11 @@ const generateOne = async ({ openapi, path, method, config = {}, ...rest }) => {
     fs.mkdirSync(`generated/${config.platform}/${actionName}/`, { recursive: true })
     fs.writeFileSync(`generated/${config.platform}/${actionName}/${filename}`, templateResult)
   })
-
-  await prettifyFiles({ path: `generated/${config.platform}/${actionName}/` })
 }
 
 const generate = async ({ openapi, paths, methods, config, ...rest }) => {
-  return traverseEndpoints({ openapi, paths, methods, config, ...rest, callback: generateOne })
+  await traverseEndpoints({ openapi, paths, methods, config, ...rest, callback: generateOne })
+  await prettifyFiles({ path: `generated/${config.platform}/` })
 }
 
 

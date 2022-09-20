@@ -739,8 +739,12 @@ const getBody = ({ openapi, path, method }) => {
         );
       }
 
+      if(content.schema.items) { //requestBody is array
+        content.required = !!openapi.paths[path][method].requestBody.required
+      }
+
       return {
-        content,
+        ...content,
         mediaType
       }
     }
