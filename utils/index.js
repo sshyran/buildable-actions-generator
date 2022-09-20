@@ -695,6 +695,13 @@ const getBody = ({ openapi, path, method }) => {
     const mediaType = Object.keys(openapi.paths[path][method].requestBody.content).find(mediaType => supportedMediaTypes.includes(mediaType))
     const content = openapi.paths[path][method].requestBody.content[mediaType];
     if (content && content.schema) {
+      if(content.schema["$ref"]) {
+        content.schema = resolveRef(
+          openapi,
+          content.schema["$ref"]
+        );
+      }
+      
       if(content.schema.oneOf) {
         content.schema = content.schema.oneOf[0]
       } else if(content.schema.anyOf) {
@@ -719,6 +726,10 @@ const getBody = ({ openapi, path, method }) => {
           }
 
           children.push(schema)
+        }
+
+        if(!res.type) {
+          res.type = get(children, "0.type") || "object"
         }
 
         if (res.type === 'object') {
