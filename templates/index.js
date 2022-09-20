@@ -47,12 +47,16 @@ const paramsSort = (a, b) => {
 
   const thirdOrder = "varName"
 
-  const orders = [firstOrder, secondOrder, thirdOrder]
+  const orders = [firstOrder, secondOrder]
+
+  const findOrderIndex = (order, v) => order.findIndex(({ key, value }) => v[key] === value)
+  const handleNotFoundIndex = (index) => index === -1 ? Number.MAX_SAFE_INTEGER : index
 
   for(const order of orders) {
     if(Array.isArray(order)) {
-      const aIndex = order.findIndex(({ key, value }) => a[key] === value)
-      const bIndex = order.findIndex(({ key, value }) => b[key] === value)
+      let aIndex = handleNotFoundIndex(findOrderIndex(order, a))
+      let bIndex = handleNotFoundIndex(findOrderIndex(order, b))
+
       if(aIndex < bIndex) {
         return -1
       } else if (aIndex > bIndex) {
