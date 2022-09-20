@@ -12,7 +12,8 @@ const {
   getBody,
   getHeadrs,
   getSample,
-  stringIsAValidUrl
+  stringIsAValidUrl,
+  santizeReservedKeywords
 } = require("./utils");
 const { defaultTemplates } = require("./templates")
 
@@ -185,15 +186,15 @@ const getModifiedParams = ({ openapi, path, method, config = {} }) => {
     } else if(param.in === "header") {
       let splitName = param.name.split("-")
       if(splitName[0].toLowerCase === "x") { //header name with X-Some-Value
-        varName = santizeReservedKeywords(camelize(splitHeaderName.slice(1).join("-")).replace(/-/g, ""))
+        varName = camelize(splitHeaderName.slice(1).join("-")).replace(/-/g, "")
       } else {
-        varName = santizeReservedKeywords(camelize(param.name).replace(/-/g, ""))
+        varName = camelize(param.name).replace(/-/g, "")
       }
     } else {
       varName = camelize(param.name).replace(".", "") //remove periods in names
     }
 
-    param.varName = varName
+    param.varName = santizeReservedKeywords(varName)
 
     
 
@@ -225,15 +226,13 @@ const getModifiedParams = ({ openapi, path, method, config = {} }) => {
   }
 }
 
-const getTemplatesResults = ({ openapi, path, method, config = {}, ...rest }) => {
+const getTemplatesResults = ({ openapi, path, method, config = {}, templates = defaultTemplates, ...rest }) => {
   const {
     pathParams,
     queryParams,
     headers,
     body
   } = getModifiedParams({ openapi, path, method, config })
-
-  const templates = config.templates || defaultTemplates
   
   return templates.map(({ getTemplateResult, filename }) => {
     return { templateResult: getTemplateResult({ openapi, path, method, config, pathParams, queryParams, headers, body, ...rest }), filename }

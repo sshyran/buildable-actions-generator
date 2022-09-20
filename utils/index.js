@@ -1265,5 +1265,6 @@ module.exports = {
   getBody,
   getHeadrs,
   getSample,
-  stringIsAValidUrl
+  stringIsAValidUrl,
+  santizeReservedKeywords
 }

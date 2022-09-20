@@ -9,7 +9,12 @@ const getGeneratorInputWithModuleExportInTemplates = generatorInput => {
   const templates = Array.isArray(generatorInput.templates) && generatorInput.templates.length > 0 ? generatorInput.templates : defaultTemplates
   return {
     ...generatorInput,
-    templates: templates.map(t => ({ ...t, getTemplateResult: (args) => t.getTemplateResult(args) + `\nmodule.exports = { ${t.filename === "input.js" ? "nodeInput" : t.filename.split(".").pop().join(".") } }`}))
+    templates: templates.map(t => ({ 
+      ...t, 
+      getTemplateResult: t.filename.split(".").pop() === "js" 
+                            ? (args) => t.getTemplateResult(args) + `\nmodule.exports = { ${t.filename === "input.js" ? "nodeInput" : t.filename.split(".").slice(0, -1).join(".") } }`
+                            : t.getTemplateResult
+    }))
   }
 }
 
@@ -20,7 +25,8 @@ const initActionProvider = async (generatorInput = {}) => {
       const dirNameInput = { openapi: generatorInput.openapi, path, method }
       const actionName = generatorInput.getDirName ? generatorInput.getDirName(dirNameInput) : getDirName(dirNameInput)
 
-      const files = fs.readdirSync(`../generated/${platform}/${actionName}`)
+      //need __dirname otherwise reads from base repo directory
+      const files = fs.readdirSync(`${__dirname}/../generated/${platform}/${actionName}`)
 
       const inputFile = files.find(f => f === "input.js")
       const runFile = files.find(f => f === "run.js")
