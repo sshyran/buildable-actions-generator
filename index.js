@@ -31,7 +31,7 @@ const getOpenAPISpec = async (path) => {
       url: path
     })).data
   } else {
-    return await JSON.parse(fs.promises.readFile(path))
+    return JSON.parse(await fs.promises.readFile(path))
   }
 }
 
