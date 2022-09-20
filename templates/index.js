@@ -23,7 +23,7 @@ const getTemplateInputAuth = ({ config }) => {
   for(const key in config.envVars) {
     const envVar = config.envVars[key]
     if(envVar.in === "auth") {
-      auth.push({ ...envVar, required: true, isEnvironmentVariable: true, sample: `$env.${key}`, envVarName: key, varName: key })
+      auth.push({ ...envVar, required: true, isEnvironmentVariable: true, envVarName: key, varName: key })
     }
   }
   
@@ -214,7 +214,9 @@ const getRunFile = ({ openapi, path, method, config, pathParams, queryParams, he
 
 const getInputFile = ({ openapi, path, method, config, pathParams, queryParams, headers, body }) => {
 
-  const input = getTemplateInput({ openapi, path, method, config, pathParams, queryParams, headers, body })
+  let input = getTemplateInput({ openapi, path, method, config, pathParams, queryParams, headers, body })
+
+  input = input.map(i => i.isEnvironmentVariable ? { ...i, inputValue: `$env.${i.varName}` } : i)
 
   const inputFileParams = `
     ${mapWithTemplate(input

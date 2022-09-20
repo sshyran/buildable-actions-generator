@@ -903,6 +903,8 @@ const getHeadrs = ({ openapi, path, method }) => {
     _headers.push(headers[i])
   }
 
+  _headers = _headers.map(h => ({ ...h, schema: h.schema || { type: "string" }, in: h.in || "header", required: h.hasOwnProperty("required") ? h.required : true }))
+
   return _headers;
 };
 
@@ -1211,7 +1213,11 @@ const mapWithTemplate = (array = [], template = () => {}) => {
         : obj.sample
     }
 
-    if (typeof p.sample === "string" && !p.isEnvironmentVariable) {
+    if(p.inputValue) {
+      return template(`${p.varName}: ${p.inputValue}`);
+    }
+
+    if (typeof p.sample === "string") {
       return template(`${p.varName}: ${getTemplateString(p.sample.replace(/"/g, ""))}`);
     }
 
